@@ -183,8 +183,8 @@ pdfborder=0 1 1]{hyperref}
 
 \newcommand{\installttf}{
     %%%% Windows Thesis Fonts
-    % \setmainfont{Times New Roman PS Std}
-    \setmainfont{Arial}
+    \setmainfont{Times New Roman}
+    % \setmainfont{Arial}
     \setsansfont{Arial}
     \setmonofont{Courier New}
     %%%% Using Office Family Fonts
@@ -200,8 +200,8 @@ pdfborder=0 1 1]{hyperref}
 
 \newcommand{\installotf}{
     %%%% Windows Thesis Fonts
-    % \setmainfont{Times New Roman PS Std}
-    \setmainfont{Arial}
+    \setmainfont{Times New Roman}
+    % \setmainfont{Arial}
     \setsansfont{Arial}
     \setmonofont{Courier New}
     %%%% Using Adobe Family Fonts
@@ -217,8 +217,8 @@ pdfborder=0 1 1]{hyperref}
 
 \newcommand{\installfz}{
     %%%% Windows Thesis Fonts
-    % \setmainfont{Times New Roman PS Std}
-    \setmainfont{Arial}
+    \setmainfont{Times New Roman}
+    % \setmainfont{Arial}
     \setsansfont{Arial}
     \setmonofont{Courier New}
     %%%% Using Founder Family Fonts
@@ -234,8 +234,8 @@ pdfborder=0 1 1]{hyperref}
 
 \newcommand{\installfandol}{
     %%%% Windows Thesis Fonts
-    % \setmainfont{Times New Roman PS Std}
-    \setmainfont{Arial}
+    \setmainfont{Times New Roman}
+    % \setmainfont{Arial}
     \setsansfont{Arial}
     \setmonofont{Courier New}
     %%%% Using Fandol Family Fonts

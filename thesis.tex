@@ -1,5 +1,5 @@
-%!TEX program = xelatex
-%!BIB program = biber
+% !TEX program = xelatex
+% !BIB program = biber
 %%
 %% This is file `thesis.tex',
 %% generated with the docstrip utility.
@@ -58,23 +58,22 @@
 \usepackage{mynudt}
 
 \classification{TP957}
-\serialno{0123456}
+\serialno{23033116}
 \confidentiality{公开}
 \UDC{}
-\title{国防科大学位论文\LaTeX{}模板\\
-使用手册}
-\displaytitle{国防科技大学学位论文\LaTeX{}模板}
-\author{张三}
+\title{实测数据受限条件下的跨域SAR目标识别技术研究}
+\displaytitle{实测数据受限条件下的跨域SAR目标识别技术研究}
+\author{束文郁}
 \zhdate{\zhtoday}
-\entitle{How to Use the \LaTeX{} Document Class for NUDT Dissertations}
-\enauthor{ZHANG San}
+\entitle{Research on Cross-Domain SAR Target Recognition Technology Under Real-Data Limited Conditions}
+\enauthor{SHU Wenyu}
 \endate{\entoday}
-\subject{通信与信息工程}
+\subject{信息与通信工程}
 \ensubject{Information and Communication Engineering}
-\researchfield{自动目标识别与模糊工程}
-\supervisor{李四\quad{}教授}
-\cosupervisor{王五\quad{}副教授} % 没有就空着
-\ensupervisor{Prof. LI Si}
+\researchfield{智能目标识别}
+\supervisor{占荣辉\quad{}副教授}
+\cosupervisor{} % 没有就空着
+\ensupervisor{Prof. ZHAN Ronghui}
 \encosupervisor{} % 没有就空着
 \papertype{工学}
 \enpapertype{Engineering}
@@ -83,10 +82,7 @@
 \begin{document}
 \graphicspath{{figures/}}
 % 制作封面，生成目录，插入摘要，插入符号列表 \\
-% 默认符号列表使用denotation.tex，如果要使用nomencl \\
-% 需要注释掉denotation，并取消下面两个命令的注释。 \\
-% cleardoublepage% \\
-% printnomenclature% \\
+
 \maketitle
 \frontmatter
 
@@ -95,9 +91,19 @@
 \listoftables
 \listoffigures
 
+%%中间部分
+
 \midmatter
 \input{data/abstract}
 \input{data/denotation}
+% 默认符号列表使用denotation.tex，如果要使用nomencl \\
+% 需要注释掉denotation，并取消下面两个命令的注释。 \\
+% cleardoublepage% \\
+% printnomenclature% \\
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%正文部分%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %书写正文，可以根据需要增添章节; 正文还包括致谢，参考文献与成果
 \let\cleardoublepage=\cleardoublepagewithhead %章节需从单数页起始
