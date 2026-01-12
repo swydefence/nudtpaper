@@ -82,41 +82,41 @@
 % tabularx 中的 Z 环境，居中自动调整
 \newcolumntype{Z}{>{\centering\arraybackslash}X}
 
-% 0. 符号表
-\RequirePackage[intoc,norefeq,refpage]{nomencl}
-\renewcommand{\nomname}{重要符号表}
-\renewcommand{\nomgroup}[1]{}%
-% 1. 定制nom条目
-\def\pagedeclaration#1{\nobreakspace#1}%
-\def\@@nomenclature[#1]#2#3#4{\endgroup\@esphack}
-\def\@@@nomenclature[#1]#2#3#4{%
- \def\@tempa{#2}\def\@tempb{#3}%
- \protected@write\@nomenclaturefile{}%
-  {\string\nomenclatureentry{#1\nom@verb\@tempa @{\nom@verb\@tempa}&%
-      \begingroup\nom@verb\@tempb\endgroup &\begingroup#4\endgroup&%
-      \begingroup\protect%
-        |nompageref}{\thepage}}%
- \endgroup%
- \@esphack}
-% 2. 定制nom表格
-\def\thenomenclature{%
-  \@ifundefined{chapter}%
-  {
-    \section*{\nomname}
-    \if@intoc\addcontentsline{toc}{section}{\nomname}\fi%
-  }%
-  {
-    \chapter*{\nomname}
-    \if@intoc\addcontentsline{toc}{chapter}{\nomname}\fi%
-  }%
-\nompreamble%
-\begin{longtable}[c]{@{}lp{23em}ll@{}}%
-{\hei 符~号} & {\hei 定~义} & {\hei 单~位} & {\hei 页~码} \\
-}
-\def\endthenomenclature{%
-\end{longtable}%
-\nompostamble%
-}
+% % 0. 符号表
+% \RequirePackage[intoc,norefeq,refpage]{nomencl}
+% \renewcommand{\nomname}{重要符号表}
+% \renewcommand{\nomgroup}[1]{}%
+% % 1. 定制nom条目
+% \def\pagedeclaration#1{\nobreakspace#1}%
+% \def\@@nomenclature[#1]#2#3#4{\endgroup\@esphack}
+% \def\@@@nomenclature[#1]#2#3#4{%
+%  \def\@tempa{#2}\def\@tempb{#3}%
+%  \protected@write\@nomenclaturefile{}%
+%   {\string\nomenclatureentry{#1\nom@verb\@tempa @{\nom@verb\@tempa}&%
+%       \begingroup\nom@verb\@tempb\endgroup &\begingroup#4\endgroup&%
+%       \begingroup\protect%
+%         |nompageref}{\thepage}}%
+%  \endgroup%
+%  \@esphack}
+% % 2. 定制nom表格
+% \def\thenomenclature{%
+%   \@ifundefined{chapter}%
+%   {
+%     \section*{\nomname}
+%     \if@intoc\addcontentsline{toc}{section}{\nomname}\fi%
+%   }%
+%   {
+%     \chapter*{\nomname}
+%     \if@intoc\addcontentsline{toc}{chapter}{\nomname}\fi%
+%   }%
+% \nompreamble%
+% \begin{longtable}[c]{@{}lp{23em}ll@{}}%
+% {\hei 符~号} & {\hei 定~义} & {\hei 单~位} & {\hei 页~码} \\
+% }
+% \def\endthenomenclature{%
+% \end{longtable}%
+% \nompostamble%
+% }
 
 % %
 \endinput

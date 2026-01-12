@@ -202,7 +202,7 @@ DTN\cite{taigman2016unsupervised}和UNIT\cite{liu2017unsupervised}进一步基�
 
 随后，研究焦点从“仅像素对齐”转向“像素+特征+语义任务”的联合自适应：CyCADA\cite{hoffman2018cycada}将CycleGAN\cite{zhu2017unpaired}式双向图像翻译与特征层对抗对齐、任务损失耦合，
 系统消融表明多层次联合对齐效果最佳；Murez等人\cite{murez2017image}将无配对图像翻译嵌入共享编码器–解码器结构，要求同一编码器既能重建源域也能重建目标域图像，并结合特征域对抗约束学习域不变表示。
-为更充分利用未标注目标域并缓解单向映射不稳定的问题,SBADA-GAN\cite{russo2017source}和DupGAN\cite{hull2017domain}通过双向或多域生成器同时建模源到目标和目标到源（或多源）的映射，引入类别一致性约束与域代码，
+为更充分利用未标注目标域并缓解单向映射不稳定的问题,SBADA-GAN\cite{russo2017source}和DupGAN\cite{hu2018domain}通过双向或多域生成器同时建模源到目标和目标到源（或多源）的映射，引入类别一致性约束与域代码，
 实现多域风格切换和潜在空间对齐；Li等人\cite{li2020generating}的目标域图像–标签对生成方法通过标签条件生成与语义损失显式对齐类条件分布，提升了生成图像的语义一致性和分类性能。
 类似思想也被拓展到医学影像与遥感等领域：Benjdira等人\cite{benjdira2019unsupervised}和Li等人\cite{li2020evaluating}则利用CycleGAN等风格迁移模型在跨城市、
 跨传感器遥感语义分割与目标检测中进行图像级域适应，系统评估表明在以光谱或外观差异为主的场景中像素级风格迁移能显著提升泛化性能。

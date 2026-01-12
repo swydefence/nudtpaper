@@ -1,4 +1,5 @@
 \chapter{面向少目标域样本的域适应SAR目标识别方法}
+% \chapter{面向少实测样本的域适应SAR目标识别方法}
 
 \section{引言}
 已有的研究在无监督域适应SAR目标识别方面已经取得了可观的成果，
@@ -27,7 +28,8 @@
 旨在提升现有无监督域适应方法在目标域数据受限条件下的适用性与鲁棒性，
 减少对目标域数据的依赖，从而提升模型在目标域的识别性能。
 
-\section{基于像素级域对齐和类混淆损失的少目标域样本域适应方法}
+% \section{基于像素级域对齐和类混淆损失的少目标域样本域适应方法}
+\section{基于像素级域对齐和类混淆损失的域适应SAR目标识别方法}
 
 \subsection{方法概述}
 
@@ -194,6 +196,94 @@ CC-Loss由类混淆最小化和类混淆一致性两部分组成，分别实现�
 
 
 \section{实验设计与结果分析}
+
+
+\begin{table}[htb]
+  \centering
+  % 沿用教程中的minipage环境，宽度设为0.9\linewidth（匹配教程示例）
+  \begin{minipage}[t]{\linewidth}
+  % 标题格式：中括号内为索引短标题，外部为完整标题（贴合教程规范）
+  \caption[SAMPLE数据集十类目标型号与数量]{SAMPLE数据集十类目标型号与数量}
+  \label{tab:sample-data}
+    % 表格列格式：
+    % 第1列：居中+黑体+固定宽度（适配换行）；后10列使用教程中提到的Z列（自动换行+居中）
+    \begin{tabularx}{\linewidth}{>{\centering\bfseries\arraybackslash}m{1.5cm}*{5}{>{\centering\arraybackslash}p{0.8cm}}*{5}{>{\centering\arraybackslash}X}}
+      \toprule[1.5pt]  % 教程指定的1.5pt粗上框线
+      目标类别 & 2S1 & BMP2 & BTR70 & T72 & ZSU23 & M1 & M2 & M35 & M548 & M60 \\
+      \midrule[1pt]    % 教程指定的1pt粗中框线
+    %   型号 & B01 & 9563 & C71 & 812 & D08 & 0AP00N & MV02GX & T839 & C245HAB & 3336 \\
+      型号 & B01 & 9563 & C71 & 812 & D08 & \makecell{0AP\\00N} & \makecell{MV0\\2GX} & T839 & \makecell{C245\\HAB} & 3336 \\
+      实测目标图像数量 & 174 & 107 & 92 & 108 & 174 & 129 & 128 & 129 & 128 & 176 \\
+      仿真目标图像数量 & 174 & 107 & 92 & 108 & 174 & 129 & 128 & 129 & 128 & 176 \\
+      \bottomrule[1.5pt] % 教程指定的1.5pt粗下框线
+    \end{tabularx}
+  \end{minipage}
+\end{table}
+
+% 正文区域的图片排版代码
+\begin{figure}[htbp]  % 推荐的浮动参数，给LaTeX排版灵活性
+  \centering          % 整体居中
+  
+  % 第一行：4张子图，用\qquad分隔（教程说明等价于2em间距）
+  \subfloat[2S1仿真]{\label{2S1仿真} \includegraphics[width=0.21\textwidth]{2s1_synth_A_elevDeg_016_azCenter_010_22_serial_b01.png}} \hspace{0.8em}
+  \subfloat[M1仿真]{\label{M1仿真} \includegraphics[width=0.21\textwidth]{m1_synth_A_elevDeg_016_azCenter_010_18_serial_0ap00n.png}} \hspace{0.8em}
+  \subfloat[M35仿真]{\label{M35仿真} \includegraphics[width=0.21\textwidth]{m35_synth_A_elevDeg_016_azCenter_010_62_serial_t839.png}} \hspace{0.8em}
+  \subfloat[M548仿真]{\label{M548仿真} \includegraphics[width=0.21\textwidth]{m548_synth_A_elevDeg_016_azCenter_010_63_serial_c245hab.png}} \\[5pt]  % 换行并加5pt垂直间距
+
+  % 第二行：4张子图，保持和第一行一致的宽度/间距
+  \subfloat[2S1实测]{\label{2S1实测} \includegraphics[width=0.21\textwidth]{2s1_real_A_elevDeg_017_azCenter_010_22_serial_b01.png}} \hspace{0.8em}
+  \subfloat[M1实测]{\label{M1实测} \includegraphics[width=0.21\textwidth]{m1_real_A_elevDeg_017_azCenter_012_18_serial_0ap00n.png}} \hspace{0.8em}
+  \subfloat[M35实测]{\label{M35实测} \includegraphics[width=0.21\textwidth]{m35_real_A_elevDeg_017_azCenter_010_62_serial_t839.png}} \hspace{0.8em}
+  \subfloat[M548实测]{\label{M548实测} \includegraphics[width=0.21\textwidth]{m548_real_A_elevDeg_017_azCenter_010_63_serial_c245hab.png}} \\
+
+  \caption{SAMPLE数据集在$16^{\circ}$俯仰角下的仿真图像与$17^{\circ}$俯仰角下对应的实测图像}  % 整体大标题
+  \label{fig:sample_data}                   % 整体标签，用于交叉引用
+\end{figure}
+
+为了全面验证本文提出方法在少目标域样本SAR目标识别任务中的有效性与鲁棒性，本章使用公开的SAMPLE数据集进行实验评测。
+SAMPLE数据集包含充足成对的仿真与实测SAR图像，适合用于跨域SAR目标识别任务的研究。
+
+SAMPLE数据集是由美国空军研究实验室（Air Force Research Laboratory，AFRL）发布的公开基准数据集\cite{lewis2019sar}。
+该数据集包含10类军用车辆目标，共计1345对配对的仿真与实测SAR图像切片。
+其中，仿真数据是利用高精度的CAD模型，通过电磁计算软件模拟生成的，并在几何结构上与实测数据进行了精细对齐。
+具体来说，对于给定的CAD模型，模拟合成孔径雷达（SAR）数据的生成主要分为两个步骤：
+（1）基于电磁计算，预测目标的电磁散射特性并生成雷达回波；
+（2）基于SAR成像算法，对雷达回波进行成像处理，生成复图像。
+SAMPLE 数据集中采用的 SAR 成像算法为极坐标格式算法（polar format algorithm）
+在成像参数方面，SAMPLE数据集采用X波段HH极化方式，分辨率为0.3m。数据覆盖的俯仰角（Depression angle）范围为$14^{\circ}$至$17^{\circ}$，
+方位角（Azimuth angle）范围为$10^{\circ}$至$80^{\circ}$。
+表3.1给出了公开发布的SAMPLE数据集中目标的具体型号和数量。
+图3.3展示了SAMPLE数据集中部分目标的仿真与实测SAR图像样例。从图中可以看出，尽管仿真图像与实测图像在
+目标结构上基本一致，但在纹理细节、噪声特性等方面存在显著差异，这正是域偏移问题的典型体现。
+本文选用SAMPLE数据集作为跨域SAR目标识别的评测基准，旨在验证所提方法在应对仿真与实测数据分布差异方面的有效性。
+
+
+\subsection{评价指标}
+
+在目标识别任务中，准确率（Accuracy, ACC）与宏平均 F1 分数（Macro F1-score）是评估模型性能的两个基础指标。
+准确率衡量的是所有预测结果中，预测正确的样本所占的整体比例。因其直观且易于解释，准确率常被用作通用的基准评价指标。
+然而，在处理类别不平衡数据集时，由于预测结果往往由样本量较大的“多数类”主导，单纯依赖准确率可能会对模型性能产生误导性评价。
+相比之下，宏平均 F1 分数通过综合考量所有类别的精确率（Precision）与召回率（Recall）来评估模型表现。
+准确率侧重于整体预测的正确性，而宏平均 F1 分数则更关注每个类别内部精确率与召回率的平衡，确保模型能够兼顾所有类别，避免忽视任何一类（特别是少数类）。
+因此本文选择同时使用准确率和宏平均 F1 分数两种指标进行综合评价。上述指标的具体计算方式如下：
+
+\begin{gather}
+\text{Accuracy} = \frac{TP + TN}{TP + TN + FP + FN} \tag{$\triangleright$} \\
+\text{precision} = \frac{TP}{TP + FP} \tag{$\triangleright$} \\
+\text{recall} = \frac{TP}{TP + FN} \tag{$\triangleright$} \\
+\text{F1-score} = 2 \times \frac{\text{precision} \times \text{recall}}{\text{precision} + \text{recall}} \tag{$\triangleright$} \\
+\text{Macro F1} = \frac{1}{n} \sum_{i=1}^{n} \text{F1-score}_i \tag{$\triangleright$}
+\end{gather}
+
+其中，$\mathbf{TP}$（True Positives，真阳性）指模型正确预测为阳性的样本数量；$\mathbf{TN}$（True Negatives，真阴性）表示模型正确预测为阴性的样本数量；
+$\mathbf{FP}$（False Positives，假阳性）代表被错误预测为阳性的样本；而$\mathbf{FN}$（False Negatives，假阴性）则指被错误预测为阴性的样本。
+$\mathbf{Macro\ F1}$（宏F1值）表示$n$个类别中每个类别$i$对应的F1值的平均值。
+通过同时考察准确率和宏平均 F1 分数，本文能够全面评估所提方法在跨域SAR目标识别任务中的性能表现，
+确保模型在整体预测正确性的同时，也能兼顾各类别的识别能力。
+
+
+
+
 
 
 

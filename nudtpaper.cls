@@ -101,7 +101,7 @@
 \newcounter{numitemval}
 \newcounter{numitemslt} %selected
 \ifisbiber
-\RequirePackage[backend=biber,style=gb7714-2015,gbalign=gb7714-2015,%
+\RequirePackage[backend=bibtex,style=gb7714-2015,gbalign=gb7714-2015,%
 gbnamefmt=lowercase,gbpub=false,url=false,doi=false]{biblatex}%,backref=true
 \DeclareDelimFormat[bib,biblist]{titletypedelim}{\iffieldequalstr{userd}{chinese}{}{\space}}
 \renewbibmacro{addendum+pubstate}{} %去掉放在addendum中的信息
