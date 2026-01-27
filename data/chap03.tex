@@ -305,7 +305,40 @@ GRL则将上述最大化问题转化为最小化问题：
 如图所示，S2M-5数据集中的仿真和实测数据在背景、纹理细节、噪声等方面均存在着更为显著的差异。
 相较于SAMPLE数据集，S2M-5呈现出更具挑战性的跨域识别场景。
 
-\subsection{实验条件设置}
+\subsection{实验设置}
+
+
+\subsubsection{评价指标}
+
+在目标识别任务中，当数据集样本不均衡时，单一的准确率指标难以全面评估模型性能，
+因此本章同时使用准确率与宏平均F1分数（Macro F1-score）作为综合评价指标。
+
+准确率衡量的是所有预测结果中预测正确样本的整体占比，是通用的基准评价指标，其计算公式为：
+\begin{gather}
+\text{Accuracy} = \frac{TP + TN}{TP + TN + FP + FN}
+\end{gather}
+但在处理类别不平衡数据集时，准确率易被样本量较大的“多数类”主导，可能对模型性能产生误导性评价。
+为此，本章引入宏平均F1分数补充评价指标。
+宏平均 F1 分数通过综合考量所有类别的精确率（Precision）与召回率（Recall）来评估模型表现。
+准确率侧重于整体预测的正确性，而宏平均 F1 分数则更关注每个类别内部精确率与召回率的平衡，
+确保模型能够兼顾所有类别，避免忽视任何一类（特别是少数类）。相关计算公式如下：
+\begin{gather}
+\text{precision} = \frac{TP}{TP + FP} \\
+\text{recall} = \frac{TP}{TP + FN} \\
+\text{F1-score} = 2 \times \frac{\text{precision} \times \text{recall}}{\text{precision} + \text{recall}} \\
+\text{Macro F1} = \frac{1}{n} \sum_{i=1}^{n} \text{F1-score}_i
+\end{gather}
+其中，$\mathbf{TP}$（真阳性）、$\mathbf{TN}$（真阴性）、$\mathbf{FP}$（假阳性）、$\mathbf{FN}$（假阴性）的定义与第二章一致；
+$\mathbf{Macro\ F1}$（宏F1分数）表示$n$个类别中每个类别$i$对应的F1分数的平均值。
+
+$\mathbf{Macro\ F1}$的取值范围同样为 [0,1]，取值越接近 1，表明模型对各类别（尤其是少数类）的精确率与召回率平衡效果越好，
+各类别预测性能更稳定、更全面；取值越接近 0，则说明模型在各类别间的预测性能失衡，难以兼顾不同类别（易忽视少数类），整体预测效果较差。
+通过同时考察准确率和宏平均F1分数，本章能够全面评估所提方法在跨域SAR目标识别任务中的性能表现，
+既保证模型整体预测的正确性，又兼顾各类别的识别能力。
+
+
+\subsubsection{实验数据设置}
+
 在本章的所有实验中，训练阶段仅使用仿真SAR图像作为源域，而测试阶段完全基于实测SAR图像作为目标域。
 所有SAR图像均采用幅度（Amplitude）格式，以16位无符号整数存储，图像尺寸为128×128。
 并在输入网络前归一化至 $[0, 1]$ 范围。
@@ -350,6 +383,8 @@ GRL则将上述最大化问题转化为最小化问题：
   \end{minipage}
 \end{table}
 
+\subsubsection{训练参数设置}
+
 \begin{table}[htb]
   \centering
   \begin{minipage}[t]{0.7\linewidth}
@@ -364,8 +399,8 @@ GRL则将上述最大化问题转化为最小化问题：
       网络训练轮数 & 20 \\
       每轮迭代次数 & 500 \\
       优化器 & SGD \\
-      动量大小 & 0.9 \\
-      权重衰减值 & 5e-4 \\
+      动量系数 & 0.9 \\
+      权重衰减系数 & 5e-4 \\
       学习率调整策略 & 余弦退火 \\
       域判别损失权重因子$\beta$ & 1 \\
       Beta分布系数$\alpha$ & 0.1\\
@@ -386,7 +421,8 @@ GRL则将上述最大化问题转化为最小化问题：
 
 
 \subsection{对比实验}
-鉴于针对SAR-ATR的域泛化研究相对有限，本章在对比实验中采用了四种源自计算机视觉领域的经典域泛化算法：
+为了证明本章所提出方法在域泛化SAR目标识别任务中的有效性和鲁棒性，
+本章在对比实验中采用了四种源自计算机视觉领域的经典域泛化算法：
 CORAL\cite{deepcoral}、DANN\cite{ganin2016domain}、Mixup\cite{zhang2017mixup}，VREx\cite{krueger2021out};
 以及四种专为SAR-ATR设计的算法:
 RN18+\cite{inkawhich2021bridging}、HDANet\cite{li2023hierarchical}、SSR\cite{kim2024soft}、IRSANet\cite{jang2025irasnet}。

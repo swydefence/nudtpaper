@@ -139,7 +139,7 @@ SAR成像技术的应用场景已从早期军事侦察逐步演进至战场态�
 基于差异的域适应方法主要指的是通过设计特征分布距离度量来衡量源域与目标域之间的分布差异，并通过最小化该距离度量来减小域偏移，
 从而实现域适应。典型代表如Deep CORAL\cite{deepcoral}在深层网络中加入相关对齐损失，
 对齐源域与目标域特征的协方差矩阵，从而在不改变网络结构的前提下实现二阶统计层面的域对齐。
-Long等人\cite{RTN}提出的残差迁移网络（Residual Transfer Network，RTN）则在多层特征上引入基于最大平均差异（Maximum Mean Discrepancy，MMD）的核均值匹配，
+Long等人\cite{RTN}提出的残差迁移网络（Residual Transfer Network，RTN）则在多层特征上引入基于极大均值差异（Maximum Mean Discrepancy，MMD）的核均值匹配，
 同时将目标分类器建模为源分类器的残差修正，联合完成特征与分类器的迁移。
 这类方法结构简单、训练稳定，易于与任意卷积主干结合，因此最早被成体系地应用于图像分类任务。
 随后大量工作在其基础上进行扩展：一类是将对齐操作直接嵌入网络归一化层，
@@ -155,7 +155,7 @@ Long等人\cite{RTN}提出的残差迁移网络（Residual Transfer Network，RT
 基于对抗的域适应框架以域判别器与特征提取器之间的对抗博弈为核心：域判别器通过最小化域分类损失学习区分输入来自源域还是目标域，
 而特征提取器则通过最大化该损失（通常借助梯度反转层实现）逼迫中间特征“域不可辨”，
 在同时最小化源域任务损失的约束下，得到既域不变又类别可分的表示。
-Ganin和Lempitsky提出\cite{ganin2016domain}的域对抗网络（Domain Adversarial Neural Network，DANN），首次将对抗学习思想与深度域适应方法相结合，
+Ganin和Lempitsky提出\cite{ganin2015unsupervised}的域对抗网络（Domain Adversarial Neural Network，DANN），首次将对抗学习思想与深度域适应方法相结合，
 给出了一个与主干结构基本正交、可直接插入任意骨干网络的通用“域对齐模块”。后续的许多工作基本都沿着“对抗对齐 + 任务网络”的方向开展拓展。
 Tzeng等人\cite{tzeng2017adversarial}提出的对抗判别域适应（Adversarial Discriminative Domain Adaptation，ADDA）
 方法，突破了DANN 特征提取器与判别器共享参数的限制，采用非共享参数架构，分阶段训练以强化目标域特征的特异性学习，
@@ -352,7 +352,7 @@ Girshick等人\cite{girshick2014rich}的研究证实，即使经过预训练与�
 
 Huang等人\cite{huang2019and}深入探究了自然图像数据集ImageNet与不同来源SAR图像间深层特征的迁移性能，
 发现直接采用ImageNet数据预训练OpenSARShip舰船分类模型会引发负迁移问题。
-为此，他们提出一种基于多核最大均值差异（Multikernel Maximum Mean Discrepancy，MK-MMD）的域自适应方法，通过匹配多源数据间的特征分布，有效提升了模型的预训练效率。
+为此，他们提出一种基于多核极大均值差异（Multikernel Maximum Mean Discrepancy，MK-MMD）的域自适应方法，通过匹配多源数据间的特征分布，有效提升了模型的预训练效率。
 针对不同成像条件下的SAR图像目标识别任务，Shi等人\cite{shi2021unsupervised}为SAR目标检测任务构建了融合生成对抗与对抗学习的域自适应网络，
 分别对浅层、深层及样本层特征实施域适配，并通过选择性构建目标域伪标签的方式实现网络的迭代训练。
 Chen等人\cite{chen2022pixel}提出一种两阶段无监督域自适应方法，该方法融合风格迁移网络与对抗学习机制：
