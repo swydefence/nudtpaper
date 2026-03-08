@@ -712,7 +712,7 @@ CycleGAN 依赖大数据分布估计的缺陷逐渐暴露，性能呈断崖式�
   \subfloat[All: CUT + CC-Loss]{\includegraphics[width=0.32\textwidth]{chap2_vis/tsne_all_ours.png}} \\
   
   % 第三行：1-shot 设置 (数据稀缺)
-  \subfloat[1-shot: CUT Only]{\includegraphics[width=0.32\textwidth]{chap2_vis/tsne_1shot_cut.jpg}} \hspace{0.1em}
+  \subfloat[1-shot: CUT Only]{\includegraphics[width=0.32\textwidth]{chap2_vis/tsne_1shot_cut.png}} \hspace{0.1em}
   \subfloat[1-shot: CC-Loss Only]{\includegraphics[width=0.32\textwidth]{chap2_vis/tsne_1shot_ccloss.png}} \hspace{0.1em}
   \subfloat[1-shot: CUT + CC-Loss]{\includegraphics[width=0.32\textwidth]{chap2_vis/tsne_1shot_ours.png}} 
   
@@ -732,11 +732,12 @@ CC-Loss 能够基于充足的样本准确计算目标域的类混淆矩阵 $\hat
 通过最小化跨类混淆，模型成功将目标域特征拉向高置信度区域，特征簇呈现出极高的类内紧凑性（Intra-class Compactness）和类间可分性。
 这证明了当统计量可靠时，直接在特征空间优化决策边界比单纯的像素变换更能提取出判别性强的特征。
 
-\textbf{1-shot 设置（少样本）:}然而，当数据量骤减至单张样本时（如图第三行所示），情况发生了逆转，像素级对齐展现出了不可替代的鲁棒性。
-观察图(e)可知，在 1-shot 条件下，单独使用 CC-Loss 的特征对齐效果严重退化，源域与目标域特征再次分离。
+\textbf{1-shot 设置（少样本）:}然而，当数据量骤减至单张样本时（如图第三行所示），情况发生了变化，像素级对齐展现出了不可替代的鲁棒性。
+观察图(f)可知，在 1-shot 条件下，单独使用 CC-Loss 的特征对齐效果退化明显。源域与目标域特征仍然分离，
+且实测数据特征簇的类内紧凑性和类间可分性较全样本条件下均有所降低。
 这是因为 CC-Loss 的核心机制高度依赖于对目标域分布的统计估计，当样本量 $N=1$ 时，
 计算得到的混淆矩阵存在一定的估计偏差，导致边界优化方向失效。
-相比之下，图(d)中的 CUT 依然能促使特征分布向目标域有效靠拢。这得益于 CUT 采用的 PatchNCE 损失机制，
+相比之下，图(e)中的 CUT 依然能促使特征分布向目标域有效靠拢。这得益于 CUT 采用的 PatchNCE 损失机制，
 其通过最大化输入与输出对应图像块（Patch）的互信息，仅需单张目标域图像即可在保留语义结构的同时完成风格迁移。
 这种基于“单样本内部”的对比学习机制，避免了对目标域整体分布统计的依赖，从而在极少样本下依然能有效缩小底层的视觉域差异。
 
