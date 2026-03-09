@@ -468,7 +468,7 @@ pdfborder=0 1 1]{hyperref}
 \setlength{\topskip}{0pt}
 \setcounter{secnumdepth}{3}
 \setlength{\footnotesep}{2.2ex \@minus 2bp}
-\titleformat{\chapter}{\filcenter\sf \heiti\sanhao[1.25]}{第\zhnumber{\thechapter}章\,}{1em}{}
+\titleformat{\chapter}[block]{\filcenter\sf \heiti\sanhao[1.25]}{第\zhnumber{\thechapter}章\,}{1em}{}
 \titleformat{\section}{\filcenter\bfseries \cusong\sihao[1.25]}{\thesection}{1em}{}
 \titleformat{\subsection}{\sf \heiti\xiaosi[1.25]}{\thesubsection}{1em}{}
 \titleformat{\subsubsection}{\bfseries \cusong\xiaosi[1.25]}{\thesubsubsection}{1em}{}
