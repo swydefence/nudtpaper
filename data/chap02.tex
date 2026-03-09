@@ -239,7 +239,7 @@ SAMPLE数据集包含充足的仿真与实测成对SAR图像，是跨域SAR目�
   \subfloat[M35实测]{\label{M35实测} \includegraphics[width=0.21\textwidth]{m35_real_A_elevDeg_017_azCenter_010_62_serial_t839.png}} \hspace{0.8em}
   \subfloat[M548实测]{\label{M548实测} \includegraphics[width=0.21\textwidth]{m548_real_A_elevDeg_017_azCenter_010_63_serial_c245hab.png}} \\
 
-  \caption{SAMPLE数据集在$16^{\circ}$俯仰角下的仿真图像与$17^{\circ}$俯仰角下对应的实测图像}  % 整体大标题
+  \caption[SAMPLE数据集仿真与实测图像对示例]{SAMPLE数据集在$16^{\circ}$俯仰角下的仿真图像与$17^{\circ}$俯仰角下对应的实测图像}  % 整体大标题
   \label{fig:sample_data}                   % 整体标签，用于交叉引用
 \end{figure}
 
@@ -656,7 +656,7 @@ CUT 模块作为像素级域对齐模块，首先解决了最棘手的底层异�
   \subfloat[1-shot: CycleGAN]{\includegraphics[width=0.3\textwidth]{chap2_vis/cyclegan_1shot.png}} \hspace{0.2em}
   \subfloat[1-shot: CUT]{\includegraphics[width=0.3\textwidth]{chap2_vis/cut_1shot.png}} \hspace{0.2em}
   \subfloat[1-shot: 真实参考]{\includegraphics[width=0.3\textwidth]{chap2_vis/real_1shot_ref.png}} 
-  \caption{不同目标域样本量（All, 10-shot, 5-shot, 1-shot）下 CycleGAN 与 CUT 的图像翻译效果演变对比}
+  \caption[不同数据量条件下CycleGAN 与 CUT 的图像翻译效果对比]{不同数据量条件下（All, 10-shot, 5-shot, 1-shot）下 CycleGAN 与 CUT 的图像翻译效果演变对比}
   \label{fig:gan_comparison_multishot}
 \end{figure}
 
@@ -716,7 +716,7 @@ CycleGAN 依赖大数据分布估计的缺陷逐渐暴露，性能呈断崖式�
   \subfloat[1-shot: CC-Loss Only]{\includegraphics[width=0.32\textwidth]{chap2_vis/tsne_1shot_ccloss.png}} \hspace{0.1em}
   \subfloat[1-shot: CUT + CC-Loss]{\includegraphics[width=0.32\textwidth]{chap2_vis/tsne_1shot_ours.png}} 
   
-  \caption{不同数据量条件下消融实验t-SNE特征可视化（红色：源域/仿真；蓝色：目标域/实测）。图(a)为未适应的共享基线；第二行为数据充足(All)时的特征演变；第三行为少样本(1-shot)时的特征演变。}
+  \caption[不同数据量条件下消融实验t-SNE特征可视化]{不同数据量条件下消融实验t-SNE特征可视化（红色：源域/仿真；蓝色：目标域/实测）。图(a)为未适应的共享基线；第二行为数据充足(All)时的特征演变；第三行为少样本(1-shot)时的特征演变。}
   \label{fig:chap2_ablation_tsne_comparison}
 \end{figure}
 
