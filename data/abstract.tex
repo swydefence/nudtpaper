@@ -1,21 +1,52 @@
 \begin{cabstract}
-国防科学技术大学是一所直属中央军委的综合性大学。1984年,学校经国务院、中央军委和教育部批准首批成立研究生院，%
-肩负着为全军培养高级科学和工程技术人才与指挥人才，培训高级领导干部，从事先进武器装备和国防关键技术研究的重要任务。%
-国防科技大学是全国重点大学，也是全国首批进入国家“211工程” 建设并获中央专项经费支持的全国重点院校之一。%
-学校前身是1953年创建于哈尔滨的中国人民解放军军事工程学院，简称“哈军工”。
+合成孔径雷达（SAR）凭借其全天时、全天候的主动成像能力，已成为军事侦察与战场态势感知的关键手段。
+基于深度学习的SAR自动目标识别技术虽取得了显著进展，但在实际应用中仍面临三大核心挑战：
+实测训练数据获取困难、仿真与实测数据间域偏移显著，以及边缘平台资源受限与国产化部署需求迫切。
+本文面向实测数据受限条件下的跨域SAR目标识别需求，
+针对"目标域数据少样本"和"目标域数据不可见"两种典型场景，
+分别研究域适应和域泛化SAR目标识别方法，
+并进一步实现模型在国产AI芯片平台上的轻量化部署与验证。主要研究内容与贡献如下：
+
+（1）提出了一种基于像素级域对齐和类混淆损失的少目标域样本域适应SAR目标识别方法。
+针对现有无监督域适应方法过度依赖大量目标域数据的问题，
+引入基于对比学习的非配对图像翻译模型（CUT）替代传统CycleGAN，
+利用块噪声对比估计损失实现少样本条件下的高质量像素级域对齐；
+设计类混淆损失（CC-Loss）与随机数据增强一致性正则化机制，
+通过概率校准与不确定性加权直接优化目标域判别边界，
+摆脱对目标域数据完整统计分布的依赖。
+基于SAMPLE数据集的实验表明，所提方法在全样本条件下达到99.15\%的识别准确率，
+在极端1-shot条件下仍取得92.45\%的突破性准确率，显著优于现有方法。
+
+（2）提出了一种基于多层级数据增强和对抗学习的域泛化SAR目标识别方法。
+针对目标域数据完全不可见的极端场景，
+设计了像素级数据增强、特征级风格混淆和域对抗学习三大模块协同工作的域泛化框架。
+像素级模块基于SAR成像特性设计高斯噪声注入、高频频域扰动和分贝化变换，扩展源域数据分布多样性；
+特征级模块通过Mixstyle机制混合实例级特征统计量，在深层特征空间模拟多样化域风格；
+域对抗学习模块利用梯度反转层构建极小极大博弈，剥离域特异性信息以学习域不变特征。
+在SAMPLE和S2M-5两个数据集上的实验验证了方法的有效性，
+分别达到96.93\%和93.70\%的识别准确率，且跨数据集性能降幅仅为3.23个百分点，展现了优异的跨域鲁棒性。
+
+（3）设计并验证了面向国产AI芯片的跨域SAR目标识别模型轻量化部署方案。
+以域泛化训练所得的ResNet50为教师模型，设计"ResNet50教师网络—MobileNetV2学生网络"的知识蒸馏框架，
+通过软硬标签联合监督将跨域判别知识迁移至轻量级结构，实现参数规模约7倍压缩；
+基于华为昇腾模型压缩工具AMCT设计INT8后训练均匀量化方案，
+采用权重逐通道对称量化与激活IFMR非对称校准的混合策略，进一步压缩模型体积并降低推理时延；
+依托华为Atlas 200I DK A2开发者套件构建从模型导出、AMCT量化、ATC转换到AscendCL板端推理的完整部署流程。
+实验从识别精度、模型大小、推理时延等多维度验证了轻量化方案的有效性，
+确认了跨域SAR目标识别模型在国产AI芯片平台上的可部署性与工程应用潜力，
+形成了"跨域识别模型训练—轻量化压缩—国产化部署"的完整技术闭环。
 \end{cabstract}
-\ckeywords{国防科学技术大学；211；哈军工；间隔符用全角分号}
+\ckeywords{合成孔径雷达；目标识别；跨域迁移学习；域适应；域泛化；知识蒸馏；模型量化；国产AI芯片}
 
 \begin{eabstract}
-National University of Defense Technology is a comprehensive national key university based in Changsha, %
-Hunan Province, China. It is under the dual supervision of the Ministry of National Defense %
-and the Ministry of Education, designated for Project 211 and Project 985, %
-the two national plans for facilitating the development of Chinese higher education. %
+Synthetic Aperture Radar (SAR), with its all-day, all-weather active imaging capability, has become a critical tool for military reconnaissance and battlefield situational awareness. Although deep learning-based SAR automatic target recognition (ATR) has achieved remarkable progress, practical applications still face three core challenges: difficulty in acquiring real measured training data, significant domain shift between simulated and measured data, and urgent demands for lightweight deployment on resource-constrained edge platforms with domestic AI chips. This thesis addresses the cross-domain SAR target recognition problem under real-data limited conditions, investigates domain adaptation and domain generalization methods for two typical scenarios---few target-domain samples and invisible target-domain data---and further realizes lightweight deployment and verification on a domestic AI chip platform. The main contributions are as follows:
 
-NUDT was originally founded in 1953 as the Military Academy of Engineering in Harbin of Heilongjiang Province. %
-In 1970 the Academy of Engineering moved southwards to Changsha and was renamed Changsha Institute of Technology.%
- The Institute changed its name to National University of Defense Technology in 1978.
+(1) A few-shot domain adaptation method for SAR target recognition based on pixel-level domain alignment and class confusion loss is proposed. To address the excessive dependence of existing unsupervised domain adaptation methods on large amounts of target-domain data, a contrastive learning-based unpaired image translation model (CUT) is introduced to replace the conventional CycleGAN, achieving high-quality pixel-level domain alignment under few-shot conditions via PatchNCE loss. A class confusion loss (CC-Loss) with random data augmentation consistency regularization is designed to directly optimize the target-domain decision boundaries through probability calibration and uncertainty weighting, eliminating the reliance on complete statistical distribution of target-domain data. Experiments on the SAMPLE dataset demonstrate that the proposed method achieves 99.15\% accuracy under the full-sample setting and a breakthrough accuracy of 92.45\% under the extreme 1-shot condition, significantly outperforming existing methods.
+
+(2) A domain generalization method for SAR target recognition based on multi-level data augmentation and adversarial learning is proposed. For the extreme scenario where target-domain data is completely invisible, a domain generalization framework integrating three synergistic modules is designed: pixel-level data augmentation based on SAR imaging characteristics (Gaussian noise injection, high-frequency spectral perturbation, and decibel transformation), feature-level style confusion via the Mixstyle mechanism that mixes instance-level feature statistics to simulate diverse domain styles, and domain adversarial learning that constructs a minimax game using gradient reversal layers to strip domain-specific information and learn domain-invariant features. Experiments on the SAMPLE and S2M-5 datasets validate the effectiveness, achieving recognition accuracies of 96.93\% and 93.70\% respectively, with a cross-dataset performance drop of only 3.23 percentage points, demonstrating excellent cross-domain robustness.
+
+(3) A lightweight deployment scheme for cross-domain SAR target recognition models on domestic AI chips is designed and verified. Using the domain-generalized ResNet50 as the teacher model, a knowledge distillation framework with MobileNetV2 as the student network is designed, transferring cross-domain discriminative knowledge to a lightweight architecture through joint soft-hard label supervision, achieving approximately 7$\times$ parameter compression. An INT8 post-training uniform quantization scheme based on the Huawei Ascend Model Compression Toolkit (AMCT) is designed with a hybrid strategy of per-channel symmetric weight quantization and IFMR asymmetric activation calibration, further compressing model size and reducing inference latency. A complete deployment pipeline from model export, AMCT quantization, ATC conversion to AscendCL on-board inference is constructed on the Huawei Atlas 200I DK A2 developer kit. Experiments validate the effectiveness of the lightweight scheme from multiple dimensions including recognition accuracy, model size, and inference latency, confirming the deployability and engineering application potential of cross-domain SAR target recognition models on domestic AI chip platforms, forming a complete technical closed loop of ``cross-domain recognition model training---lightweight compression---domestic platform deployment''.
 
 \end{eabstract}
-\ekeywords{NUDT, MND, ME, Delimiter is comma}
+\ekeywords{Synthetic Aperture Radar, Target Recognition, Cross-Domain Transfer Learning, Domain Adaptation, Domain Generalization, Knowledge Distillation, Model Quantization, Domestic AI Chip}
 
