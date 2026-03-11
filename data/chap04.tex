@@ -21,7 +21,7 @@
 
 基于上述需求，本章在第三章跨域泛化SAR目标识别模型的基础上，
 面向国产AI芯片平台开展轻量化处理与部署验证研究。
-具体而言，本章首先设计基于"ResNet50教师网络—MobileNetV2学生网络"的知识蒸馏方案，
+具体而言，本章首先设计基于“ResNet50教师网络—MobileNetV2学生网络”的知识蒸馏方案，
 将教师模型中蕴含的跨域判别知识迁移到轻量级学生网络中，
 在降低模型复杂度的同时尽可能保留域不变特征表达能力；
 随后，基于华为昇腾模型压缩工具AMCT构建INT8后训练均匀量化方案，
@@ -86,6 +86,15 @@ ResNet50与MobileNetV2的参数量比约为7.5:1，属于蒸馏研究中经验�
 
 
 \subsubsection{蒸馏损失函数设计}
+
+
+\begin{figure}[htbp]
+	\centering
+	\includegraphics[width=0.9\textwidth]{chap4/knowledge_distall.png}
+	\caption{基于逻辑的教师-学生知识蒸馏框架图}
+	\label{fig:chap4_kd}
+\end{figure}
+
 
 本章设计的知识蒸馏损失由硬标签交叉熵损失与软标签KL散度损失共同构成。
 设教师网络与学生网络分别为$F_T(\cdot)$与$F_S(\cdot)$，
@@ -174,6 +183,17 @@ MobileNetV2在深度可分离卷积基础上引入了倒残差结构（Inverted 
 	与ResNet直接在高维特征上建立残差连接不同，MobileNetV2先通过$1\times 1$卷积将输入特征通道数$c$扩展至$tc$维（$t$为扩展倍率），
 	在扩展空间内执行$3\times3$深度卷积建模，最后通过$1\times 1$卷积投影回低维空间$c'$。
 	残差连接建立在瓶颈两端的低维空间，在降低参数量的同时保留了特征流动路径；
+
+	\begin{figure}[htbp]
+	\centering
+	\includegraphics[width=0.8\textwidth]{chap4/mobilenetc2_inverted_res.png}
+	\caption[MobileNetV2倒残差结构示意图]{MobileNetV2倒残差结构示意图}
+	\label{fig:chap4_inverted_res}
+	\end{figure}
+
+
+
+
 	\item \textbf{线性瓶颈}：
 	在最后的低维投影层去除ReLU等强非线性激活，
 	以避免低维流形经非线性映射后造成有效信息损失。
@@ -297,13 +317,15 @@ IFMR（Input Feature Map Reconstruction）是AMCT工具链提供的激活值量�
 具体流程为：
 首先将校准数据前向传播通过浮点模型，收集每一层激活值的统计分布；
 随后以分位数作为截断区间的初始值$\mathrm{clip\_min\_init}$和$\mathrm{clip\_max\_init}$，
-在预设的搜索范围$[\mathrm{search\_range\_start},\mathrm{search\_range\_end}]$内按步长$\mathrm{search\_step}$遍历候选截断区间。
-% \begin{gather}
-% \mathrm{clip\_min} \in [\mathrm{clip\_min\_init}\cdot\mathrm{search\_range\_start} \\
-% \mathrm{clip\_min\_init}\cdot\mathrm{search\_range\_end}] \\
-% \mathrm{clip\_max} \in [\mathrm{clip\_max\_init}\cdot\mathrm{search\_range\_start}\\
-% \mathrm{clip\_max\_init}\cdot\mathrm{search\_range\_end}]
-% \end{gather}
+在预设的搜索范围$[\mathrm{search\_range\_start},\mathrm{search\_range\_end}]$内按步长$\mathrm{search\_step}$遍历候选截断区间：
+\begin{gather}
+\mathrm{clip\_min} \in [\mathrm{clip\_min_start},\mathrm{clip\_min_end}] \\
+\mathrm{clip\_min_start}=\mathrm{clip\_min\_init}\cdot\mathrm{search\_range\_start}\\
+\mathrm{clip\_min_end}=\mathrm{clip\_min\_init}\cdot\mathrm{search\_range\_end} \\
+\mathrm{clip\_max} \in [\mathrm{clip\_max_start},\mathrm{clip\_max_end}] \\
+\mathrm{clip\_max_start}=\mathrm{clip\_max\_init}\cdot\mathrm{search\_range\_start}\\
+\mathrm{clip\_max_end}=\mathrm{clip\_max\_init}\cdot\mathrm{search\_range\_end}
+\end{gather}
 对每组候选区间，执行"截断—量化—反量化"操作并计算重构误差，
 最终选择使重构误差最小的截断区间作为该层激活值的量化参数。
 搜索范围越大、步长越小，量化精度通常越高，但校准耗时也相应增加。
@@ -356,6 +378,15 @@ AMCT完成校准后，将量化参数（各层权重与激活的$s$/$z$值）
 支持Ubuntu 22.04与openEuler 22.03两类镜像，便于部署流程的快速构建与复现。
 从板端资源角度看，该平台既具备一定代表性的国产AI推理能力，
 又具有明显的资源约束特征，因此适合作为本章跨域SAR目标识别模型轻量化部署验证平台。
+
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{chap4/atlas_200idk.png}
+\caption[atlas 200I DK A2开发者套件实物图]{atlas 200I DK A2开发者套件实物图}
+\label{fig:chap4_atlas}
+\end{figure}
+
 
 \subsection{平台环境与部署约束分析}
 

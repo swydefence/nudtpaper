@@ -36,7 +36,7 @@
 确认了跨域SAR目标识别模型在国产AI芯片平台上的可部署性与工程应用潜力，
 形成了"跨域识别模型训练—轻量化压缩—国产化部署"的完整技术闭环。
 \end{cabstract}
-\ckeywords{合成孔径雷达；目标识别；跨域迁移学习；域适应；域泛化；知识蒸馏；模型量化；国产AI芯片}
+\ckeywords{合成孔径雷达；自动目标识别；跨域迁移学习；域适应；域泛化；知识蒸馏；模型量化；华为atlas 200I DK A2}
 
 \begin{eabstract}
 Synthetic Aperture Radar (SAR), with its all-day, all-weather active imaging capability, has become a critical tool for military reconnaissance and battlefield situational awareness. Although deep learning-based SAR automatic target recognition (ATR) has achieved remarkable progress, practical applications still face three core challenges: difficulty in acquiring real measured training data, significant domain shift between simulated and measured data, and urgent demands for lightweight deployment on resource-constrained edge platforms with domestic AI chips. This thesis addresses the cross-domain SAR target recognition problem under real-data limited conditions, investigates domain adaptation and domain generalization methods for two typical scenarios---few target-domain samples and invisible target-domain data---and further realizes lightweight deployment and verification on a domestic AI chip platform. The main contributions are as follows:
@@ -48,5 +48,5 @@ Synthetic Aperture Radar (SAR), with its all-day, all-weather active imaging cap
 (3) A lightweight deployment scheme for cross-domain SAR target recognition models on domestic AI chips is designed and verified. Using the domain-generalized ResNet50 as the teacher model, a knowledge distillation framework with MobileNetV2 as the student network is designed, transferring cross-domain discriminative knowledge to a lightweight architecture through joint soft-hard label supervision, achieving approximately 7$\times$ parameter compression. An INT8 post-training uniform quantization scheme based on the Huawei Ascend Model Compression Toolkit (AMCT) is designed with a hybrid strategy of per-channel symmetric weight quantization and IFMR asymmetric activation calibration, further compressing model size and reducing inference latency. A complete deployment pipeline from model export, AMCT quantization, ATC conversion to AscendCL on-board inference is constructed on the Huawei Atlas 200I DK A2 developer kit. Experiments validate the effectiveness of the lightweight scheme from multiple dimensions including recognition accuracy, model size, and inference latency, confirming the deployability and engineering application potential of cross-domain SAR target recognition models on domestic AI chip platforms, forming a complete technical closed loop of ``cross-domain recognition model training---lightweight compression---domestic platform deployment''.
 
 \end{eabstract}
-\ekeywords{Synthetic Aperture Radar, Target Recognition, Cross-Domain Transfer Learning, Domain Adaptation, Domain Generalization, Knowledge Distillation, Model Quantization, Domestic AI Chip}
+\ekeywords{Synthetic Aperture Radar, Automatic Target Recognition, Cross-Domain Transfer Learning, Domain Adaptation, Domain Generalization, Knowledge Distillation, Model Quantization, Huawei Atlas 200I DK A2}
 
