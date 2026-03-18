@@ -1,4 +1,4 @@
-\chapter{面向国产AI芯片的跨域SAR目标识别模型轻量化部署}
+\chapter{面向国产AI芯片的跨域SAR目标识别模型\\轻量化部署}
 
 
 \section{引言}
@@ -30,6 +30,11 @@
 最后从识别精度、资源消耗与部署便捷性等多个维度开展实验分析，
 形成"跨域识别模型轻量化—国产平台部署—端侧性能验证"的完整技术链路，
 以实现"实测数据受限条件下SAR目标识别模型需兼顾跨域适应/泛化能力与国产化部署能力"的总体需求。
+如图\ref{fig:chap4_pipeline}所示，本章整体流程可划分为四个阶段：
+（1）分别以第二章训练得到的域适应ResNet50模型和第三章训练得到的域泛化ResNet50模型为教师模型，设计基于知识蒸馏的轻量化学生模型训练方案；
+（2）基于AMCT工具链设计INT8后训练均匀量化方案，进一步压缩模型参数表示精度；
+（3）构建基于华为Atlas 200I DK A2开发者套件的模型转换、板端集成与AscendCL推理调用流程；
+（4）针对第二章和第三章两类模型分别评测轻量化后的识别性能，并统计模型压缩率、推理时延与资源占用等端侧性能指标，进行综合分析与讨论。
 
 
 \begin{figure}[htbp]
@@ -38,12 +43,6 @@
 	\caption{跨域SAR目标识别模型轻量化与部署流程示意图}
 	\label{fig:chap4_pipeline}
 \end{figure}
-
-如图\ref{fig:chap4_pipeline}所示，本章整体流程可划分为四个阶段：
-（1）分别以第二章训练得到的域适应ResNet50模型和第三章训练得到的域泛化ResNet50模型为教师模型，设计基于知识蒸馏的轻量化学生模型训练方案；
-（2）基于AMCT工具链设计INT8后训练均匀量化方案，进一步压缩模型参数表示精度；
-（3）构建基于华为Atlas 200I DK A2开发者套件的模型转换、板端集成与AscendCL推理调用流程；
-（4）针对第二章和第三章两类模型分别评测轻量化后的识别性能，并统计模型压缩率、推理时延与资源占用等端侧性能指标，进行综合分析与讨论。
 
 
 
@@ -89,6 +88,8 @@ ResNet50与MobileNetV2的参数量比约为7.5:1，属于蒸馏研究中经验�
 
 
 \subsubsection{蒸馏损失函数设计}
+
+图\ref{fig:chap4_kd}展示了本章采用的教师-学生知识蒸馏框架。
 
 
 \begin{figure}[htbp]
@@ -189,6 +190,8 @@ MobileNetV2在深度可分离卷积基础上引入了倒残差结构（Inverted 
 	与ResNet直接在高维特征上建立残差连接不同，MobileNetV2先通过$1\times 1$卷积将输入特征通道数$c$扩展至$tc$维（$t$为扩展倍率），
 	在扩展空间内执行$3\times3$深度卷积建模，最后通过$1\times 1$卷积投影回低维空间$c'$。
 	残差连接建立在瓶颈两端的低维空间，在降低参数量的同时保留了特征流动路径；
+
+	其结构如图\ref{fig:chap4_inverted_res}所示：
 
 	\begin{figure}[htbp]
 	\centering
@@ -386,6 +389,8 @@ AMCT完成校准后，将量化参数（各层权重与激活的$s$/$z$值）
 从板端资源角度看，该平台既具备一定代表性的国产AI推理能力，
 又具有明显的资源约束特征，因此适合作为本章跨域SAR目标识别模型轻量化部署验证平台。
 
+图\ref{fig:chap4_atlas}展示了Atlas 200I DK A2开发者套件实物。
+
 
 \begin{figure}[htbp]
 \centering
@@ -436,14 +441,14 @@ Atlas 200I DK A2的内存总规格为4GB，
 	\item \textbf{性能评测}：统计识别精度、模型大小、板端单图时延以及资源占用情况。
 \end{enumerate}
 
+	图\ref{fig:chap4_deploy_flow}给出了部署流程示意。
+
 \begin{figure}[htbp]
 	\centering
 	\includegraphics[width=\textwidth]{chap4/chap4_atlas_deploy_flow.png}
 	\caption{Atlas 200I DK端部署流程图}
 	\label{fig:chap4_deploy_flow}
 \end{figure}
-
-图\ref{fig:chap4_deploy_flow}给出了部署流程示意。
 其中，输入侧保持与训练阶段一致的归一化策略与尺寸设置（128$\times$128、$[0,1]$归一化），
 避免因预处理不一致引发精度偏移；输出侧采用Top-1类别判定并保留置信度用于后续分析。
 
@@ -549,7 +554,7 @@ C++实现的核心流程与Python方式一致，
 	\begin{minipage}[t]{0.8\linewidth}
 	\caption[第二章模型轻量化前后识别性能对比]{第二章模型轻量化前后识别性能对比}
 	\label{tab:chap4_acc_chap2}
-		\begin{tabularx}{\linewidth}{>{\centering\bfseries\arraybackslash}m{3.2cm}*{2}{>{\centering\arraybackslash}X}}
+		\begin{tabularx}{\linewidth}{>{\centering\bfseries\arraybackslash}m{3.2cm}*{4}{>{\centering\arraybackslash}X}}
 			\toprule[1.5pt]
 			\multirow{2}{*}模型 & \multicolumn{4}{c}SAMPLE数据集准确率（\%） \\
 			\cmidrule(lr){2-5}
@@ -643,6 +648,8 @@ MobileNetV2学生模型的参数量约为ResNet50教师模型的1/7，
 这一结果验证了本章"先蒸馏后量化"的二级压缩策略能够在保持第二章与第三章模型跨域识别精度基本稳定的前提下，
 实现"参数规模—模型体积—推理时延"的逐级递减优化，
 充分满足Atlas 200I DK A2的4GB内存和实时推理约束。
+
+图\ref{fig:chap4_system_demo}展示了基于Atlas 200I DK的SAR目标识别系统展示结果。
 
 
 

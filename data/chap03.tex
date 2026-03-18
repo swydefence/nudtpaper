@@ -1,4 +1,4 @@
-\chapter{面向目标域数据不可见的域泛化SAR目标识别方法}
+\chapter{面向目标域数据不可见的域泛化SAR目标识别\\方法}
 % \chapter{面向无实测样本的域泛化SAR目标识别方法}
 
 \section{引言}
@@ -35,6 +35,8 @@
 % \section{基于多层级数据增强和对抗学习的单源域泛化方法}
 \section{基于多层级数据增强和对抗学习的域泛化SAR目标识别方法}
 \subsection{方法概述}
+
+图3.1展示了本章提出的域泛化总体框架。
 
 \begin{figure}[htp]
 \centering
@@ -116,6 +118,8 @@ $\mu(F)$、$\sigma(F) \in \mathbf{R}^{B \times C}$表示实例特征图的通道
 \mu(F)_{b,c} = \frac{1}{HW} \sum_{h=1}^{H} \sum_{w=1}^{W} F_{b,c,h,w}\\
 \sigma(F)_{b,c} = \sqrt{\frac{1}{HW} \sum_{h=1}^{H} \sum_{w=1}^{W} \left( F_{b,c,h,w} - \mu(F)_{b,c} \right)^2}
 \end{gather}
+
+图3.2给出了特征级风格混淆模块（Mixstyle）的结构示意。
 
 \begin{figure}[htp]
 \centering
@@ -275,6 +279,7 @@ GRL则将上述最大化问题转化为最小化问题：
 \end{table}
 
 
+图\ref{fig:S2M_data}展示了自建S2M-5数据集中仿真与实测样例。
 \begin{figure}[htbp]  % 推荐的浮动参数，给LaTeX排版灵活性
   \centering          % 整体居中
   
@@ -850,6 +855,8 @@ S2M-5 数据集的准确率与 F1-score 分别达 93.70\%、93.79\%，
 
 \subsubsection{数据增强可视化分析}
 
+图\ref{fig:sample_feature_visualization_aba_1}给出了像素级数据增强示例。
+
 \begin{figure}[htbp]
   \centering
   \subfloat[源域仿真图像]{\label{源域仿真图像} \includegraphics[width=0.21\textwidth]{chap3_vision/simulate.png}} \hspace{0.8em}
@@ -868,6 +875,8 @@ S2M-5 数据集的准确率与 F1-score 分别达 93.70\%、93.79\%，
 这些复合增强策略不仅拓展了视觉多样性，更在物理机理上迫近了真实 SAR 图像的复杂退化模型。
 通过引入这些多样化的增强样本，模型得以学习到更具泛化能力的特征表示，从而提升了在实测数据上的识别性能。
 
+
+图\ref{fig:sample_feature_visualization_data}展示了基于像素级数据增强训练后的ResNet50特征可视化结果。
 
 \begin{figure}[htbp]
   \centering
@@ -891,6 +900,8 @@ S2M-5 数据集的准确率与 F1-score 分别达 93.70\%、93.79\%，
 
 
 \subsubsection{消融实验特征可视化分析}
+
+图\ref{fig:sample_feature_visualization_aba_2}和图\ref{fig:s2m5_feature_visualization_aba}分别给出了SAMPLE与S2M-5上的消融特征可视化结果。
 
 \begin{figure}[htbp]
   \centering

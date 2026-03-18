@@ -1,4 +1,4 @@
-\chapter{面向目标域数据少样本的域适应SAR目标识别方法}
+\chapter{面向目标域数据少样本的域适应SAR目标识别\\方法}
 % \chapter{面向少实测样本的域适应SAR目标识别方法}
 
 \section{引言}
@@ -33,6 +33,8 @@
 
 \subsection{方法概述}
 
+图\ref{fig:chap2_framework}给出了本章方法的整体框架。
+
 \begin{figure}[htp]
 \centering
 \includegraphics[width=\textwidth, keepaspectratio]{域自适应框图2}
@@ -60,6 +62,8 @@
 在无监督域适应任务中，由于不同域之间的图像对应关系未知，只能使用非配对式的图像翻译模型。
 而当目标域可用于训练参考的数据量不足时，必须选择能充分利用信息、在小样本条件下有效工作的图像翻译模型。
 针对此，本研究将对比学习和生成对抗模型进行结合，引入了一种新颖的非配对式图像翻译模型（Contrastive Unpaired Translation，CUT）作为像素级域对齐模块。
+
+图\ref{fig:chap2_cut}展示了基于对比学习的CUT结构。
 
 \begin{figure}[htp]
 \centering
@@ -113,6 +117,8 @@ CUT基于对比学习的思想，对每个生成的图像块将其在源图像�
 为此，本研究舍弃了特征对齐范式，转而针对少目标域样本条件基于类混淆损失和随机数据增强（RandAugment）设计了类混淆域适应模块：
 以 “类混淆” 为核心归纳偏置，通过估计并最小化目标域中分类器的类间混淆程度，同时增强混淆矩阵在数据增强下的一致性，
 实现跨场景的域自适应性能提升。类混淆损失仅依赖目标域分类器预测结果，不依赖特定标签集或域配置，具备极强的通用性。
+
+图\ref{fig:chap2_ccblock}给出了类混淆块（CC-Block）结构。
 
 如图\ref{fig:chap2_ccblock}所示，类混淆块（Class Confusion Block, CC-Block）是类混淆域适应模块的核心组件，负责准确量化目标域中的类混淆程度，包含概率校准、
 不确定性加权和类别归一化三个关键步骤：
@@ -227,6 +233,7 @@ SAMPLE数据集包含充足的仿真与实测成对SAR图像，是跨域SAR目�
 \end{table}
 
 % 正文区域的图片排版代码
+为便于直观比较仿真域与实测域在视觉统计上的差异，图\ref{fig:sample_data}给出了SAMPLE数据集样例。
 \begin{figure}[htbp]  % 推荐的浮动参数，给LaTeX排版灵活性
   \centering          % 整体居中
   
