@@ -58,6 +58,12 @@
 \usepackage{mynudt}
 \usepackage{makecell} 
 
+% 段落排版优化：降低“孤短尾行”出现概率（尽量使段末行不少于约 1/3 行）
+\AtBeginDocument{%
+	\setlength{\parfillskip}{0pt plus 0.67\textwidth}%
+	\emergencystretch=1.5em%
+}
+
 \classification{TP957}
 \serialno{23033116}
 \confidentiality{公开}

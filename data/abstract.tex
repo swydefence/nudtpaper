@@ -3,7 +3,7 @@
 基于深度学习的SAR自动目标识别技术虽取得了显著进展，但在实际应用中仍面临三大核心挑战：
 实测训练数据获取困难、仿真与实测数据间域偏移显著，以及边缘平台资源受限与国产化部署需求迫切。
 本文面向实测数据受限条件下的跨域SAR目标识别需求，
-针对"目标域数据少样本"和"目标域数据不可见"两种典型场景，
+针对“目标域数据少样本”和“目标域数据不可见”两种典型场景，
 分别研究域适应和域泛化SAR目标识别方法，
 并进一步实现模型在国产AI芯片平台上的轻量化部署与验证。主要研究内容与贡献如下：
 
@@ -28,21 +28,21 @@
 
 （3）设计并验证了面向国产AI芯片的跨域SAR目标识别模型轻量化部署方案。
 以第二章域适应训练所得ResNet50和第三章域泛化训练所得ResNet50为教师模型，
-分别设计并验证"ResNet50教师网络—MobileNetV2学生网络"的知识蒸馏框架，
+分别设计并验证“ResNet50教师网络—MobileNetV2学生网络”的知识蒸馏框架，
 通过软硬标签联合监督将两类跨域判别知识迁移至轻量级结构，实现参数规模约7倍压缩；
 基于华为昇腾模型压缩工具AMCT设计INT8后训练均匀量化方案，
 采用权重逐通道对称量化与激活IFMR非对称校准的混合策略，进一步压缩模型体积并降低推理时延；
 依托华为Atlas 200I DK A2开发者套件构建从模型导出、AMCT量化、ATC转换到AscendCL板端推理的完整部署流程。
 实验从识别精度、模型大小、推理时延等多维度验证了轻量化方案的有效性，
 确认了跨域SAR目标识别模型在国产AI芯片平台上的可部署性与工程应用潜力，
-形成了"跨域识别模型训练—轻量化压缩—国产化部署"的完整技术闭环。
+形成了“跨域识别模型训练—轻量化压缩—国产化部署”的完整技术闭环。
 \end{cabstract}
 \ckeywords{合成孔径雷达；自动目标识别；跨域迁移学习；域适应；域泛化；知识蒸馏；模型量化；华为atlas 200I DK A2}
 
 \begin{eabstract}
-Synthetic Aperture Radar (SAR), with its all-day, all-weather active imaging capability, has become a critical tool for military reconnaissance and battlefield situational awareness. Although deep learning-based SAR automatic target recognition (ATR) has achieved remarkable progress, practical applications still face three core challenges: difficulty in acquiring real measured training data, significant domain shift between simulated and measured data, and urgent demands for lightweight deployment on resource-constrained edge platforms with domestic AI chips. This thesis addresses the cross-domain SAR target recognition problem under real-data limited conditions, investigates domain adaptation and domain generalization methods for two typical scenarios---few target-domain samples and invisible target-domain data---and further realizes lightweight deployment and verification on a domestic AI chip platform. The main contributions are as follows:
+Synthetic Aperture Radar (SAR), with its all-day, all-weather active imaging capability, has become a critical tool for military reconnaissance and battlefield situational awareness. Although deep learning-based SAR automatic target recognition (ATR) has achieved remarkable progress, practical applications still face three core challenges: difficulty in acquiring real measured training data, significant domain shift between simulated and measured data, and urgent demands for lightweight deployment on resource-constrained edge platforms with domestic AI chips. This thesis addresses cross-domain SAR target recognition under real-data-limited conditions, investigates domain adaptation and domain generalization methods for two typical scenarios---few target-domain samples and invisible target-domain data---and further realizes lightweight deployment and verification on a domestic AI chip platform, as detailed below.
 
-(1) A few-shot domain adaptation method for SAR target recognition based on pixel-level domain alignment and class confusion loss is proposed. To address the excessive dependence of existing unsupervised domain adaptation methods on large amounts of target-domain data, a contrastive learning-based unpaired image translation model (CUT) is introduced to replace the conventional CycleGAN, achieving high-quality pixel-level domain alignment under few-shot conditions via PatchNCE loss. A class confusion loss (CC-Loss) with random data augmentation consistency regularization is designed to directly optimize the target-domain decision boundaries through probability calibration and uncertainty weighting, eliminating the reliance on complete statistical distribution of target-domain data. Experiments on the SAMPLE dataset demonstrate that the proposed method achieves 99.15\% accuracy under the full-sample setting and a breakthrough accuracy of 92.45\% under the extreme 1-shot condition, significantly outperforming existing methods.
+(1) A few-shot domain adaptation method for SAR target recognition based on pixel-level domain alignment and class confusion loss is proposed. To address the excessive dependence of existing unsupervised domain adaptation methods on large amounts of target-domain data, a contrastive learning-based unpaired image translation model (CUT) is introduced to replace the conventional CycleGAN, achieving high-quality pixel-level domain alignment under few-shot conditions via PatchNCE loss. A class confusion loss (CC-Loss) with random data augmentation consistency regularization is designed to directly optimize the target-domain decision boundaries through probability calibration and uncertainty weighting, eliminating the reliance on complete statistical distribution of target-domain data. Experiments on the SAMPLE dataset demonstrate that the proposed method achieves 99.15\% accuracy under the full-sample setting and a breakthrough accuracy of 92.45\% under the extreme 1-shot condition, significantly outperforming existing methods under severe data scarcity.
 
 (2) A domain generalization method for SAR target recognition based on multi-level data augmentation and adversarial learning is proposed. For the extreme scenario where target-domain data is completely invisible, a domain generalization framework integrating three synergistic modules is designed: pixel-level data augmentation based on SAR imaging characteristics (Gaussian noise injection, high-frequency spectral perturbation, and decibel transformation), feature-level style confusion via the Mixstyle mechanism that mixes instance-level feature statistics to simulate diverse domain styles, and domain adversarial learning that constructs a minimax game using gradient reversal layers to strip domain-specific information and learn domain-invariant features. Experiments on the SAMPLE and S2M-5 datasets validate the effectiveness, achieving recognition accuracies of 96.93\% and 93.70\% respectively, with a cross-dataset performance drop of only 3.23 percentage points, demonstrating excellent cross-domain robustness.
 
