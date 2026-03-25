@@ -1,17 +1,25 @@
 \begin{cabstract}
-合成孔径雷达（SAR）凭借其全天时、全天候的主动成像能力，已成为军事侦察与战场态势感知的关键手段。
-基于深度学习的SAR自动目标识别技术虽取得了显著进展，但在实际应用中仍面临三大核心挑战：
-实测训练数据获取困难、仿真与实测数据间域偏移显著，以及边缘平台资源受限与国产化部署需求迫切。
-本文面向实测数据受限条件下的跨域SAR目标识别需求，
+合成孔径雷达（Synthetic Aperture Radar, SAR）凭借其全天时、全天候的主动成像能力，
+已成为军事侦察与战场态势感知的关键手段。
+受SAR成像机理影响，图像中普遍存在相干斑噪声，且目标在不同传感器参数、
+观测角度与成像条件下呈现显著的特征差异，
+使得传统人工判读方式难以满足复杂场景下快速、准确、自动化识别的应用需求。
+近年来，基于深度学习的SAR自动目标识别技术取得了显著进展，但在实际应用中仍面临三大核心挑战：
+实测训练数据获取困难、跨传感器数据间域偏移显著、以及边缘平台部署资源受限。
+
+本文面向目标域实测数据受限条件下的跨域SAR目标识别需求，
 针对“目标域数据少样本”和“目标域数据不可见”两种典型场景，
-分别研究域适应和域泛化SAR目标识别方法，
+分别研究域适应和域泛化SAR目标识别方法。
+其中，域适应问题旨在利用可访问的少量目标域数据缩小源域与目标域之间的分布差异。
+域泛化问题则侧重于挖掘源域中的域不变信息，以提升模型对不可见目标域的泛化能力。
 并进一步实现模型在国产AI芯片平台上的轻量化部署与验证。主要研究内容与贡献如下：
 
 （1）提出了一种基于像素级域对齐和类混淆损失的少目标域样本域适应SAR目标识别方法。
-针对现有无监督域适应方法过度依赖大量目标域数据的问题，
-引入基于对比学习的非配对图像翻译模型（CUT）替代传统CycleGAN，
-利用块噪声对比估计损失实现少样本条件下的高质量像素级域对齐；
-设计类混淆损失（CC-Loss）与随机数据增强一致性正则化机制，
+针对现有的SAR图像域适应方法过度依赖大量目标域数据的问题，
+在像素级上，本文引入基于对比学习的非配对图像翻译模型
+替代传统的循环生成对抗模型（CycleGAN），
+利用块噪声对比估计损失实现少样本条件下的高质量像素级域对齐。
+在特征级上，本文设计类混淆损失与随机数据增强一致性正则化机制，
 通过概率校准与不确定性加权直接优化目标域判别边界，
 摆脱对目标域数据完整统计分布的依赖。
 基于SAMPLE数据集的实验表明，所提方法在全样本条件下达到99.15\%的识别准确率，
@@ -19,34 +27,36 @@
 
 （2）提出了一种基于多层级数据增强和对抗学习的域泛化SAR目标识别方法。
 针对目标域数据完全不可见的极端场景，
-设计了像素级数据增强、特征级风格混淆和域对抗学习三大模块协同工作的域泛化框架。
+本文设计了像素级数据增强、特征级风格混淆和域对抗学习三大模块协同工作的域泛化框架。
 像素级模块基于SAR成像特性设计高斯噪声注入、高频频域扰动和分贝化变换，扩展源域数据分布多样性；
-特征级模块通过Mixstyle机制混合实例级特征统计量，在深层特征空间模拟多样化域风格；
+特征级模块基于实例归一化设计域风格混淆机制，通过混合实例级特征统计量，在深层特征空间模拟多样化域风格；
 域对抗学习模块利用梯度反转层构建极小极大博弈，剥离域特异性信息以学习域不变特征。
 在SAMPLE和S2M-5两个数据集上的实验验证了方法的有效性，
-分别达到96.93\%和93.70\%的识别准确率，且跨数据集性能降幅仅为3.23\%，展现了优异的跨域鲁棒性。
+分别达到96.93\%和93.70\%的识别准确率，展现了优异的域泛化鲁棒性。
 
 （3）设计并验证了面向国产AI芯片的跨域SAR目标识别模型轻量化部署方案。
-以第二章域适应训练所得ResNet50和第三章域泛化训练所得ResNet50为教师模型，
-分别设计并验证“ResNet50教师网络—MobileNetV2学生网络”的知识蒸馏框架，
+以第二章域适应方法和第三章域泛化方法训练所得的两个蕴含跨域信息的ResNet50权重为基础，
+设计并验证了“ResNet50教师网络—MobileNetV2学生网络”的知识蒸馏框架，
 通过软硬标签联合监督将两类跨域判别知识迁移至轻量级结构，实现参数规模约7倍压缩；
 基于华为昇腾模型压缩工具AMCT设计INT8后训练均匀量化方案，
 采用权重逐通道对称量化与激活IFMR非对称校准的混合策略，进一步压缩模型体积并降低推理时延；
 依托华为Atlas 200I DK A2开发者套件构建从模型导出、AMCT量化、ATC转换到AscendCL板端推理的完整部署流程。
-实验从识别精度、模型大小、推理时延等多维度验证了轻量化方案的有效性，
+部署实验从识别精度、模型大小、推理时延等多维度验证了轻量化方案的有效性，
 确认了跨域SAR目标识别模型在国产AI芯片平台上的可部署性与工程应用潜力，
 形成了“跨域识别模型训练—轻量化压缩—国产化部署”的完整技术闭环。
 \end{cabstract}
 \ckeywords{合成孔径雷达；自动目标识别；跨域迁移学习；域适应；域泛化；知识蒸馏；模型量化；华为atlas 200I DK A2}
 
 \begin{eabstract}
-Synthetic Aperture Radar (SAR), with its all-day, all-weather active imaging capability, has become a critical tool for military reconnaissance and battlefield situational awareness. Although deep learning-based SAR automatic target recognition (ATR) has achieved remarkable progress, practical applications still face three core challenges: difficulty in acquiring real measured training data, significant domain shift between simulated and measured data, and urgent demands for lightweight deployment on resource-constrained edge platforms with domestic AI chips. This thesis addresses cross-domain SAR target recognition under real-data-limited conditions, investigates domain adaptation and domain generalization methods for two typical scenarios---few target-domain samples and invisible target-domain data---and further realizes lightweight deployment and verification on a domestic AI chip platform, as detailed below.
+Synthetic Aperture Radar (SAR), with its all-time and all-weather active imaging capability, has become a key means for military reconnaissance and battlefield situational awareness. Owing to the SAR imaging mechanism, SAR images are generally affected by speckle noise, and targets exhibit significant feature variations under different sensor parameters, viewing angles, and imaging conditions, making traditional manual interpretation inadequate for rapid, accurate, and automated recognition in complex scenarios. In recent years, deep learning-based SAR automatic target recognition (ATR) has made remarkable progress. However, practical applications still face three core challenges: difficulty in acquiring measured training data, significant domain shifts across sensor data, and limited deployment resources on edge platforms.
 
-(1) A few-shot domain adaptation method for SAR target recognition based on pixel-level domain alignment and class confusion loss is proposed. To address the excessive dependence of existing unsupervised domain adaptation methods on large amounts of target-domain data, a contrastive learning-based unpaired image translation model (CUT) is introduced to replace the conventional CycleGAN, achieving high-quality pixel-level domain alignment under few-shot conditions via PatchNCE loss. A class confusion loss (CC-Loss) with random data augmentation consistency regularization is designed to directly optimize the target-domain decision boundaries through probability calibration and uncertainty weighting, eliminating the reliance on complete statistical distribution of target-domain data. Experiments on the SAMPLE dataset demonstrate that the proposed method achieves 99.15\% accuracy under the full-sample setting and a breakthrough accuracy of 92.45\% under the extreme 1-shot condition, significantly outperforming existing methods under severe data scarcity.
+This thesis focuses on cross-domain SAR target recognition under the condition of limited measured target-domain data, and investigates domain adaptation and domain generalization methods for two typical scenarios, namely few target-domain samples and unavailable target-domain data. In the domain adaptation setting, the objective is to reduce the distribution discrepancy between the source and target domains by utilizing a small amount of accessible target-domain data. In the domain generalization setting, the emphasis is placed on mining domain-invariant information from the source domain to improve the model generalization ability on unseen target domains. Furthermore, lightweight deployment and validation of the model on a domestic AI chip platform are realized. The main research contents and contributions are summarized as follows.
 
-(2) A domain generalization method for SAR target recognition based on multi-level data augmentation and adversarial learning is proposed. For the extreme scenario where target-domain data is completely invisible, a domain generalization framework integrating three synergistic modules is designed: pixel-level data augmentation based on SAR imaging characteristics (Gaussian noise injection, high-frequency spectral perturbation, and decibel transformation), feature-level style confusion via the Mixstyle mechanism that mixes instance-level feature statistics to simulate diverse domain styles, and domain adversarial learning that constructs a minimax game using gradient reversal layers to strip domain-specific information and learn domain-invariant features. Experiments on the SAMPLE and S2M-5 datasets validate the effectiveness, achieving recognition accuracies of 96.93\% and 93.70\% respectively, with a cross-dataset performance drop of only 3.23 percentage points, demonstrating excellent cross-domain robustness.
+(1) A domain adaptation method for SAR target recognition with limited target-domain samples is proposed based on pixel-level domain alignment and class confusion loss. To address the problem that existing SAR image domain adaptation methods rely excessively on large amounts of target-domain data, a contrastive learning-based unpaired image translation model is introduced at the pixel level to replace the conventional CycleGAN, and high-quality pixel-level domain alignment under few-shot conditions is achieved by using patch-wise noise contrastive estimation loss. At the feature level, a class confusion loss and a consistency regularization mechanism based on random data augmentation are designed. Through probability calibration and uncertainty weighting, the proposed method directly optimizes the target-domain decision boundary and avoids dependence on the complete statistical distribution of target-domain data. Experiments on the SAMPLE dataset show that the proposed method achieves a recognition accuracy of 99.15\% under the full-sample setting and still reaches 92.45\% under the extreme 1-shot setting, demonstrating excellent robustness in few-shot scenarios.
 
-(3) A lightweight deployment scheme for cross-domain SAR target recognition models on domestic AI chips is designed and verified. The ResNet50 models trained by the Chapter-2 domain adaptation method and the Chapter-3 domain generalization method are both used as teacher networks, and a unified knowledge distillation framework with MobileNetV2 as the student network is designed and validated for both branches. Through joint soft-hard label supervision, cross-domain discriminative knowledge from both teachers is transferred to lightweight architectures, achieving approximately 7$\times$ parameter compression. An INT8 post-training uniform quantization scheme based on the Huawei Ascend Model Compression Toolkit (AMCT) is designed with a hybrid strategy of per-channel symmetric weight quantization and IFMR asymmetric activation calibration, further compressing model size and reducing inference latency. A complete deployment pipeline from model export, AMCT quantization, ATC conversion to AscendCL on-board inference is constructed on the Huawei Atlas 200I DK A2 developer kit. Experiments validate the effectiveness of the lightweight scheme from multiple dimensions including recognition accuracy, model size, and inference latency, confirming the deployability and engineering application potential of cross-domain SAR target recognition models on domestic AI chip platforms, forming a complete technical closed loop of ``cross-domain recognition model training---lightweight compression---domestic platform deployment''.
+(2) A domain generalization method for SAR target recognition is proposed based on multi-level data augmentation and adversarial learning. For the extreme scenario in which target-domain data are completely unavailable, a domain generalization framework is designed, in which pixel-level data augmentation, feature-level style confusion, and domain adversarial learning work collaboratively. Based on the characteristics of SAR imaging, the pixel-level module introduces Gaussian noise injection, high-frequency spectral perturbation, and decibel transformation to enrich the diversity of source-domain data distributions. The feature-level module designs a domain style confusion mechanism based on instance normalization. By mixing instance-level feature statistics, it simulates diverse domain styles in the deep feature space. The domain adversarial learning module employs a gradient reversal layer to construct a minimax game, thereby removing domain-specific information and learning domain-invariant features. Experiments on the SAMPLE and S2M-5 datasets verify the effectiveness of the proposed method, achieving recognition accuracies of 96.93\% and 93.70\%, respectively, and demonstrating excellent robustness in domain generalization.
+
+(3) A lightweight deployment scheme for cross-domain SAR target recognition models on domestic AI chips is designed and validated. Based on two ResNet50 models containing cross-domain information, obtained from the domain adaptation method in Chapter 2 and the domain generalization method in Chapter 3, a knowledge distillation framework with a ResNet50 teacher network and a MobileNetV2 student network is designed and validated. Through joint supervision with soft and hard labels, two types of cross-domain discriminative knowledge are transferred to a lightweight architecture, achieving an approximately sevenfold reduction in parameter scale. An INT8 post-training uniform quantization scheme is further designed based on the Huawei Ascend Model Compression Toolkit (AMCT). By adopting a hybrid strategy of per-channel symmetric quantization for weights and IFMR-based asymmetric calibration for activations, the model size is further compressed and the inference latency is reduced. Based on the Huawei Atlas 200I DK A2 developer kit, a complete deployment pipeline is established, covering model export, AMCT quantization, ATC conversion, and AscendCL-based on-board inference. Deployment experiments validate the effectiveness of the lightweight scheme from multiple dimensions, including recognition accuracy, model size, and inference latency, confirming the deployability and engineering potential of cross-domain SAR target recognition models on domestic AI chip platforms and forming a complete technical closed loop of ``cross-domain recognition model training---lightweight compression---domestic deployment''.
 
 \end{eabstract}
 \ekeywords{Synthetic Aperture Radar, Automatic Target Recognition, Cross-Domain Transfer Learning, Domain Adaptation, Domain Generalization, Knowledge Distillation, Model Quantization, Huawei Atlas 200I DK A2}

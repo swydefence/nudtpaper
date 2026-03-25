@@ -30,6 +30,7 @@
 最后从识别精度、资源消耗与部署便捷性等多个维度开展实验分析，
 形成“跨域识别模型轻量化—国产平台部署—端侧性能验证”的完整技术链路，
 以实现“实测数据受限条件下SAR目标识别模型需兼顾跨域适应/泛化能力与国产化部署能力”的总体需求。
+
 如图\ref{fig:chap4_pipeline}所示，本章整体流程可划分为四个阶段：
 （1）分别以第二章训练得到的域适应ResNet50模型和第三章训练得到的域泛化ResNet50模型为教师模型，设计基于知识蒸馏的轻量化学生模型训练方案；
 （2）基于AMCT工具链设计INT8后训练均匀量化方案，进一步压缩模型参数表示精度；
@@ -94,7 +95,7 @@ ResNet50与MobileNetV2的参数量比约为7.5:1，属于蒸馏研究中经验�
 
 \begin{figure}[htbp]
 	\centering
-	\includegraphics[width=0.9\textwidth]{chap4/knowledge_distall.png}
+	\includegraphics[width=0.98\textwidth]{chap4/knowledge_distall.png}
 	\caption{基于逻辑的教师-学生知识蒸馏框架图}
 	\label{fig:chap4_kd}
 \end{figure}
@@ -545,6 +546,18 @@ C++实现的核心流程与Python方式一致，
 % 基于部署链路下的统一评测配置（含ONNX/OM转换与板端一致预处理）统计，
 % 与第三章纯训练框架下结果在实验设置上存在差异，应以同一评测下的相对变化趋势为主。
 
+
+表\ref{tab:chap4_acc_chap2}和表\ref{tab:chap4_acc_chap3}分别给出了第二章域适应模型与第三章域泛化模型在轻量化前后的识别性能对比。
+从蒸馏收益角度分析：
+两条部署分支中，基于MobileNetV2的蒸馏学生模型在参数规模仅为教师模型约1/7的条件下，
+均较好地继承了教师模型的跨域判别知识。
+其中第二章分支在SAMPLE数据集上的多种少样本设置下，相较源教师模型的识别精度下降均控制在1\%到2\%。
+第三章分支在SAMPLE和S2M-5数据集上的识别精度下降也均保持在了1\%到3\%，
+说明本章所提“软硬标签联合蒸馏”方案，
+使得学生模型MobileNetV2有效继承了教师模型的跨域判别知识。
+
+
+% 第一个表格
 \begin{table}[htb]
 	\centering
 	\begin{minipage}[t]{0.8\linewidth}
@@ -552,7 +565,7 @@ C++实现的核心流程与Python方式一致，
 	\label{tab:chap4_acc_chap2}
 		\begin{tabularx}{\linewidth}{>{\centering\bfseries\arraybackslash}m{3.2cm}*{4}{>{\centering\arraybackslash}X}}
 			\toprule[1.5pt]
-			\multirow{2}{*}模型 & \multicolumn{4}{c}SAMPLE数据集准确率（\%） \\
+			\multirow{2}{*}{模型} & \multicolumn{4}{c}{SAMPLE数据集准确率（\%）} \\
 			\cmidrule(lr){2-5}
 			 & all & 10-shot & 5-shot & 1-shot \\
 			\midrule[1pt]
@@ -565,6 +578,7 @@ C++实现的核心流程与Python方式一致，
 	\end{minipage}
 \end{table}
 
+% 第二个表格
 \begin{table}[htb]
 	\centering
 	\begin{minipage}[t]{0.98\linewidth}
@@ -572,7 +586,9 @@ C++实现的核心流程与Python方式一致，
 	\label{tab:chap4_acc_chap3}
 		\begin{tabularx}{\linewidth}{>{\centering\bfseries\arraybackslash}m{3.2cm}*{4}{>{\centering\arraybackslash}X}}
 			\toprule[1.5pt]
-			模型 & SAMPLE准确率(\%) & SAMPLE Macro F1(\%) & S2M-5准确率(\%) & S2M-5 Macro F1(\%) \\
+			\multirow{2}{*}{模型} & \multicolumn{2}{c}{SAMPLE数据集} & \multicolumn{2}{c}{S2M-5数据集} \\
+			\cmidrule(lr){2-3} \cmidrule(lr){4-5}
+			 & 准确率(\%) & Macro F1(\%) & 准确率(\%) & Macro F1(\%) \\
 			\midrule[1pt]
 			ResNet50 FP16 & 98.14 & 97.93 & 94.87 & 94.12 \\
 			ResNet50 INT8 & 98.14 & 97.93 & 94.87 & 94.12 \\
@@ -582,15 +598,6 @@ C++实现的核心流程与Python方式一致，
 		\end{tabularx}
 	\end{minipage}
 \end{table}
-
-表\ref{tab:chap4_acc_chap2}和表\ref{tab:chap4_acc_chap3}分别给出了第二章域适应模型与第三章域泛化模型在轻量化前后的识别性能对比。
-从蒸馏收益角度分析：
-两条部署分支中，基于MobileNetV2的蒸馏学生模型在参数规模仅为教师模型约1/7的条件下，
-均较好地继承了教师模型的跨域判别知识。
-其中第二章分支在SAMPLE数据集上的多种少样本设置下，相较源教师模型的识别精度下降均控制在1\%到2\%。
-第三章分支在SAMPLE和S2M-5数据集上的识别精度下降也均保持在了1\%到3\%，
-说明本章所提“软硬标签联合蒸馏”方案，
-使得学生模型MobileNetV2有效继承了教师模型的跨域判别知识。
 
 从量化收益角度分析：
 两条分支的ResNet50教师模型的INT8量化版本识别精度均与FP16版本完全一致，
@@ -605,7 +612,11 @@ INT8离散化对其敏感度较高。
 验证了本章“蒸馏—量化”联合优化链路的有效性。
 
 
+
 \subsection{模型压缩与端侧效率分析}
+
+表\ref{tab:chap4_efficiency}从参数量、模型大小与端侧单图推理时延三个维度，
+综合给出了本章轻量化部署方案的压缩与效率表现。
 
 \begin{table}[htb]
 	\centering
@@ -625,8 +636,6 @@ INT8离散化对其敏感度较高。
 	\end{minipage}
 \end{table}
 
-表\ref{tab:chap4_efficiency}从参数量、模型大小与端侧单图推理时延三个维度，
-综合给出了本章轻量化部署方案的压缩与效率表现。
 
 从知识蒸馏的压缩收益看：
 MobileNetV2学生模型的参数量约为ResNet50教师模型的1/7，
