@@ -193,11 +193,12 @@ MobileNetV2在深度可分离卷积基础上引入了倒残差结构（Inverted 
 	残差连接建立在瓶颈两端的低维空间，在降低参数量的同时保留了特征流动路径。
 	其结构如图\ref{fig:chap4_inverted_res}所示：
 
-	\begin{figure}[htbp]
-	\centering
-	\includegraphics[width=0.8\textwidth]{chap4/mobilenetc2_inverted_res.png}
+	\begin{figure}[htbp]  
+	\centering          
+	\subfloat[残差结构]{\label{残差结构} \includegraphics[width=0.44\textwidth]{chap4/残差结构.png}} \hspace{0.6em}
+	\subfloat[倒残差结构]{\label{倒残差结构} \includegraphics[width=0.44\textwidth]{chap4/倒残差结构.png}} 
 	\caption[MobileNetV2倒残差结构示意图]{MobileNetV2倒残差结构示意图}
-	\label{fig:chap4_inverted_res}
+	\label{fig:chap4_inverted_res}                  
 	\end{figure}
 
 
@@ -691,7 +692,7 @@ MobileNetV2学生模型的参数量约为ResNet50教师模型的1/7，
 
 \begin{figure}[htbp]
 	\centering
-	\includegraphics[width=0.8\textwidth]{chap4/200IDK_pic.jpg}
+	\includegraphics[width=0.78\textwidth]{chap4/200IDK_pic.jpg}
 	\caption{基于Atlas 200I DK的SAR目标识别系统展示图}
 	\label{fig:chap4_system_demo}
 \end{figure}

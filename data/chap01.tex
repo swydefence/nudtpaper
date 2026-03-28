@@ -118,11 +118,13 @@ SAR成像技术的应用场景已从早期军事侦察逐步演进至战场态�
 域泛化的目标是从一个或几个不同但相关的源域（训练集）学习一个模型，在不可见的目标域（测试集）上得到很好的泛化\cite{zhou2022domain}。
 针对不同应用场景，在SAR目标识别领域引入域适应或域泛化等跨域迁移学习技术以解决训练和测试数据不同源情况下的跨域目标识别问题，具有重要的理论研究和实际应用价值，
 域适应和域泛化的实现方式如图\ref{fig:DA_DG}所示，本节后续将分别介绍域适应和域泛化技术的研究现状。
-\begin{figure}[htp]
-\centering
-\includegraphics[width=\textwidth, keepaspectratio]{图1.1}
-\caption{域适应和域泛化实现对比}
-\label{fig:DA_DG}
+
+\begin{figure}[htbp]  
+  \centering          
+  \subfloat[域适应实现]{\label{域适应实现} \includegraphics[width=0.44\textwidth]{chap01/域适应实现.png}} \hspace{0.6em}
+  \subfloat[域泛化实现]{\label{域泛化实现} \includegraphics[width=0.48\textwidth]{chap01/域泛化实现.png}} 
+  \caption{域适应和域泛化实现对比} 
+  \label{fig:DA_DG}                  
 \end{figure}
 
 \subsubsection{域适应的研究现状}
@@ -433,12 +435,12 @@ Yuan等人\cite{yuan2024filling}提出了一个单源域泛化SAR舰船检测框
 
 
 
-\subsection{本文结构安排}
+\section{本文结构安排}
 
 本文围绕实测数据受限条件下的跨域SAR目标识别需求，
 从域适应、域泛化到模型轻量化与国产AI芯片平台部署，
 系统构建了覆盖算法设计、模型训练、模型压缩与工程部署全流程的技术体系。
-全文共分为五章，各章内容安排如下，本文结构安排如图\ref{fig:chap1_structure}所示。
+全文共分为五章，各章内容安排如下：
 
 \textbf{第一章：绪论。}
 本章首先阐述了SAR目标识别的研究背景与意义，
@@ -482,11 +484,11 @@ Yuan等人\cite{yuan2024filling}提出了一个单源域泛化SAR舰船检测框
 并从开放场景跨域识别、大规模预训练模型应用、多模态融合以及端云协同推理架构四个方面
 对未来研究方向进行了展望。
 
-本文的具体结构安排如图\ref{fig:chap1_structure}所示。
+本文的总体结构安排如图\ref{fig:chap1_structure}所示。
 
 \begin{figure}[htbp]
 	\centering
-	\includegraphics[width=\textwidth, keepaspectratio]{论文结构图.png}
+	\includegraphics[width=\textwidth, keepaspectratio]{论文结构图v2.png}
 	\caption{本文结构安排}
 	\label{fig:chap1_structure}
 \end{figure}
