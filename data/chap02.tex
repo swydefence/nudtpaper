@@ -62,7 +62,7 @@
 先前的研究中发现，图像到图像翻译模型可以显著缩小像素级的域差距\cite{chen2022pixel,youk2023transformer}。
 在无监督域适应任务中，由于不同域之间的图像对应关系未知，只能使用非配对式的图像翻译模型。
 而当目标域可用于训练参考的数据量不足时，必须选择能充分利用信息、在小样本条件下有效工作的图像翻译模型。
-针对此，本研究将对比学习和生成对抗模型进行结合，引入了对比非配对图像翻译模型（Contrastive Unpaired Translation，CUT）作为像素级域对齐模块。
+针对此，本研究将对比学习和生成对抗模型进行结合，引入了对比非配对图像翻译模型（Contrastive Unpaired Translation，CUT）作为像素级域对齐模块的核心。
 图\ref{fig:chap2_cut}具体展示了本小节基于CUT构建的像素级域对齐模块。
 
 \begin{figure}[htp]
@@ -72,40 +72,55 @@
 \label{fig:chap2_cut}
 \end{figure}
 
+CUT模型的核心思想是在图像的特征空间中最大化输入（源域图像）和输出（生成的中间域图像）之间对应预设图像块（Patch）的互信息，
+从而在不受制于配对数据或循环一致性损失（Cycle-Consistency Loss）的条件下，有效保留图像的内容与结构特征。
 
-如图\ref{fig:chap2_cut}所示，输入两组来自不同域且不配对的SAR图像：$X = \{ x \in \mathcal{X} \}$，$Y = \{ y \in \mathcal{Y} \}$。CUT的生成器$G$分为编码器和解码器两个部分，CUT首先使用编码器$G_{l,\text{enc}}$将输入图像$X$分解为多个特征图：
+具体而言，CUT的生成器 $G$ 可视为由特征编码器 $G_{\text{enc}}$ 和解码器 $G_{\text{dec}}$ 两部分组成。给定源域图像 $x \in X$，
+生成器将其转换为具有目标域风格的中间域图像 $\hat{y} = G(x)$。为了实施对比学习，CUT 抽取编码器网络不同深度的特征图，
+以捕获从低级边缘纹理到高级语义的丰富级联信息。设 $G_{\text{enc}}^l$ 表示提取第 $l$ 层特征的映射，
+得到的各层特征图分别经过两层多层感知机（Multi-Layer Perceptron, MLP）所构成的投影网络 $H_l$ 进行降维与编码，
+得到用于对比学习的特征集合 $\{z_l\}_{l=1}^L$：
 \begin{equation}
-Z_l = H_l\left(G_{l,\text{enc}}(X)\right)
+z_l = H_l\left(G_{\text{enc}}^l(x)\right)
 \end{equation}
-其中$l$代表层索引，$H_l$是一个双层的多层感知机网络。接着利用解码器$G_{l,\text{dec}}$将特征图映射为生成图像$\hat{Y} = G(X)$。生成的图像仍要经过编码得到特征编码：
+其中，$L$ 为选定的网络层数。同理，将生成图像 $\hat{y}$ 再次输入到编码器中，经过相同的提取与映射操作，可以得到对应的生成特征集合 $\{\hat{z}_l\}_{l=1}^L$：
 \begin{equation}
-\hat{Z}_l = H_l\left(G_{l,\text{enc}}(\hat{Y})\right)
+\hat{z}_l = H_l\left(G_{\text{enc}}^l(\hat{y})\right)
 \end{equation}
-用于计算块噪声对比估计（PatchNCE）损失。PatchNCE损失用于比较生成图像$\hat{Y}$中的每个图像块
-与其在源图像$X$中对应位置图像块，使得对应位置的特征尽可能保持一致，同时将源图像$X$中的其他位置的图像块视为负样本，使得不同位置的特征差距尽可能大。NCE指的是噪声对比估计，这个损失函数鼓励编码器学习一种表示，使得对应图像块在特征空间中更接近。同时，它确保了非对应图像块之间的距离更远，从而最大化互信息。$\text{PatchNCE}$损失具体定义为：
+
+深层网络中的每个特征图空间位置，实际上对应于原始图像中特定大小的感受野（即图像块）。
+为了保证图像转换前后的内容一致性，引入了图像块噪声对比估计（PatchNCE）损失。
+该损失基于对比学习的思想，旨在促使生成的图像块与其在源图像中对应位置的图像块（正样本）在特征空间中紧密相连，
+同时拉大其与源图像中其他无关位置的图像块（负样本）的特征距离。
+
+具体层面而言，设 $s \in \{1, \dots, S_l\}$ 为第 $l$ 层特征图上的某个空间位置，
+那么 $\hat{z}_l^s$ 即可作为生成图像在该层的查询特征（Query），在其源图像中同位置提取到的对应特征 $z_l^s$ 作为正样本，
+而同层中其他空间位置的特征元素 $z_l^{S \setminus s}$ 则自然构成了海量的负样本。
+对比学习主要由这三个信号驱动，为了防止特征发散，
+首先将这些特征投影至 $K$ 维以获得归一化的向量 $\mathbf{v}, \mathbf{v}^+ \in \mathbb{R}^K, \mathbf{v}^- \in \mathbb{R}^{N \times K}$，
+其中 $\mathbf{v}_n^-$ 表示第 $n$ 个负样本向量（共 $N$ 个）。
+随后，基于标准化后的样本构筑一个 $N+1$ 的分类问题，利用信息噪声对比估计（InfoNCE）最大化互信息，其损失计算等式如下：
 \begin{equation}
-L_{\text{PatchNCE}}(G,H,X) = \mathbb{E}_{X \sim \mathcal{X}} \sum_{l=1}^{L} \sum_{s=1}^{S_l} l_{\text{NCE}} \left( \hat{z}_l^s, z_l^s, \hat{z}_l^{S \setminus s} \right)
+l_{\text{NCE}}(\mathbf{v}, \mathbf{v}^+, \mathbf{v}^-) = - \log \left[ \frac{\exp(\mathbf{v} \cdot \mathbf{v}^+ / \tau)}{\exp(\mathbf{v} \cdot \mathbf{v}^+ / \tau) + \sum_{n=1}^{N} \exp(\mathbf{v} \cdot \mathbf{v}_n^- / \tau)} \right]
 \end{equation}
-其中，$l$和$s$分别代表层索引和层内的空间位置，$\hat{z}_l^s$是查询键所对应的图像块的特征向量，$z_l^{S \setminus s}$是来自负图像块的特征向量的堆叠。而$l_{\text{NCE}}$代表着信息噪声对比估计（$\text{InfoNCE}$）损失函数，其被用于在对比学习中最大化互信息。
-对比学习的问题有三个信号组成：查询键、正样本和负样本，要做的就是让查询键和正样本信号相关联和负样本形成对比。
-首先将查询键、正样本以及$N$个负样本，分别映射成$K$维向量$\mathbf{v}, \mathbf{v}^+ \in \mathbb{R}^K, \mathbf{v}^- \in \mathbb{R}^{N \times K}$，其中$\mathbf{v}_n^- \in \mathbb{R}^K$表示第$n$个负样本将这些样本归一化至单位球中，防止空间扩张或坍缩。
-这样就形成了一个$N+1$的分类问题。$l_{\text{NCE}}$交叉熵损失计算如下，其中$\tau$是比例超参，常被称为温度系数，表示正样本被选中的概率。
+其中 $\tau$ 是控制平滑程度的温度（Temperature）超参数，表示样本相似度计算时的尺度放缩因子。
+综合所有提取层并累积各空间位置的计算，针对源域图像的整体 PatchNCE 损失具体定义为：
 \begin{equation}
-l_{\text{NCE}}(\mathbf{v}, \mathbf{v}^+, \mathbf{v}^-) = -\log\left[ \frac{\exp(\mathbf{v} \cdot \mathbf{v}^+ / \tau)}{\exp(\mathbf{v} \cdot \mathbf{v}^+ / \tau) + \sum_{n=1}^{N} \exp(\mathbf{v} \cdot \mathbf{v}^- / \tau)} \right]
+L_{\text{PatchNCE}}(G,H,X) = \mathbb{E}_{x \sim X} \sum_{l=1}^{L} \sum_{s=1}^{S_l} l_{\text{NCE}} \left( \hat{z}_l^s, z_l^s, z_l^{S \setminus s} \right)
 \end{equation}
-在图像对抗生成部分，CUT 仍然是使用 GAN 的判别器对抗损失，本研究中采用是交叉熵损失，保证生成的图像能和目标域的图像尽可能相似，这部分的损失公式如下：
+
+在对抗生成阶段，作为图像到图像的翻译模型，CUT 依然采用 GAN 的判别器对抗框架，通过不断优化使生成图像的视觉分布逼近真实的目标域图像 $Y$ 集合：
 \begin{equation}
 L_{\text{GAN}}(G,D,X,Y) = \mathbb{E}_{y \sim Y} \log D(y) + \mathbb{E}_{x \sim X} \log\bigl(1 - D(G(x))\bigr)
 \end{equation}
-其中，$D$ 是判别器，本小节中使用的是两层卷积层结构的二元分类器，$y$ 是来自目标域的真实图像，而 $x$ 是来自源域的输入图像。
-最终的优化目标损失函数中还添加了一个一致性损失 $L_{\text{PatchNCE}}(G,H,Y)$ 来最小化目标域图像的变化 $\mathbb{E}_y \| G(y) - y \|_1$，
-避免生成器对生成图像目标特性进行不必要的改变。综上所述，总损失包括三部分：
-对抗性损失$L_{\text{GAN}}(G,D,X,Y)$、对比损失$L_{\text{PatchNCE}}(G,H,X)$和一致性损失$L_{\text{PatchNCE}}(G,H,Y)$，总的损失函数为三项损失的和，具体公式如下：
+其中，本节使用的判别器 $D$ 采用基于两轮卷积架构构建的局部分类器对风格进行研判。此外，为了防止生成网络对已经具有目标域风格的图像进行过度转换，借鉴了 CycleGAN 中的自身映射（Identity mapping）机制，该模块引入了对目标域图像自身的对比约束项 $L_{\text{PatchNCE}}(G,H,Y)$。
+综上所述，像素级域对齐模块最终的优化目标包含三个衡量维度：对抗性分布匹对损失 $L_{\text{GAN}}$、旨在约束源端重构信息的对比拉近项 $L_{\text{PatchNCE}}(G,H,X)$，以及致力于维持目标端特征稳固的对比保留项 $L_{\text{PatchNCE}}(G,H,Y)$。最终重构目标损失函数可表示为：
 \begin{equation}
 L_{\text{cut}} = L_{\text{GAN}}(G,D,X,Y) + L_{\text{PatchNCE}}(G,H,X) + L_{\text{PatchNCE}}(G,H,Y)
 \end{equation}
-CUT关注图像内部的图像块而不是整幅图像，可以实现更精确的目标特性保留，并在有限数据的情况下进行高效学习。
-CUT基于对比学习的思想，对每个生成的图像块将其在源图像中对应位置图像块作为正样本，并将源图像中不同位置的图像块作为负样本，
+
+综上所述，CUT更关注图像内部的图像块而不是整幅图像，可以实现更精确的目标特性保留，并在有限数据的情况下进行高效学习。
+基于对比学习的思想，对每个生成的图像块将其在源图像中对应位置图像块作为正样本，并将源图像中不同位置的图像块作为负样本，
 以实现保留图像空间结构特征的同时差异化风格。其正样本和负样本均来自同一图像，减少了大型数据集的需求，并简化了学习过程。
 所提出的模型由单个生成器和判别器组成，因此相对其他模型参数量更小，更不容易过拟合，因此整体更适用于少目标域样本条件下的域适应任务。
 
