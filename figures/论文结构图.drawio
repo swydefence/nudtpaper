@@ -1,4 +1,4 @@
-<mxfile host="Electron" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/22.0.3 Chrome/114.0.5735.289 Electron/25.8.4 Safari/537.36" modified="2026-03-30T03:07:08.173Z" etag="qu4RWRGLjjMwSu7zQf3p" version="22.0.3" type="device">
+<mxfile host="Electron" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/22.0.3 Chrome/114.0.5735.289 Electron/25.8.4 Safari/537.36" modified="2026-03-31T17:57:00.880Z" etag="Vrwzktw81AiDmn2G50OJ" version="22.0.3" type="device">
   <diagram name="论文结构图" id="thesis_structure">
     <mxGraphModel dx="1402" dy="1636" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
       <root>
@@ -13,11 +13,11 @@
         <mxCell id="arrow_title_ch1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#37474f;strokeWidth=2;" parent="1" source="title" target="ch1" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="scene_label_left" value="&lt;font style=&quot;font-size: 15px;&quot;&gt;场景一：目标域数据少样本&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=10;fontStyle=3;fontColor=#c62828;" parent="1" vertex="1">
-          <mxGeometry x="261" y="120" width="200" height="30" as="geometry" />
+        <mxCell id="scene_label_left" value="&lt;font style=&quot;font-size: 15px; font-style: normal;&quot;&gt;条件一：目标域数据少样本&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=10;fontStyle=3;fontColor=#c62828;" parent="1" vertex="1">
+          <mxGeometry x="262" y="118" width="200" height="30" as="geometry" />
         </mxCell>
-        <mxCell id="scene_label_right" value="&lt;font style=&quot;font-size: 15px;&quot;&gt;场景二：目标域数据不可见&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=10;fontStyle=3;fontColor=#1565c0;" parent="1" vertex="1">
-          <mxGeometry x="466" y="120" width="200" height="30" as="geometry" />
+        <mxCell id="scene_label_right" value="&lt;font style=&quot;font-size: 15px; font-style: normal;&quot;&gt;条件二：目标域数据不可见&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=10;fontStyle=3;fontColor=#1565c0;" parent="1" vertex="1">
+          <mxGeometry x="467" y="118" width="200" height="30" as="geometry" />
         </mxCell>
         <mxCell id="ch2" value="&lt;font style=&quot;font-size: 16px;&quot;&gt;第二章&lt;br&gt;面向目标域数据少样本的域适应SAR目标识别方法&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=11;fontStyle=1;arcSize=15;shadow=0;" parent="1" vertex="1">
           <mxGeometry x="80" y="170" width="370" height="45" as="geometry" />
@@ -26,7 +26,7 @@
           <mxGeometry relative="1" as="geometry">
             <Array as="points">
               <mxPoint x="455" y="120" />
-              <mxPoint x="270" y="120" />
+              <mxPoint x="265" y="120" />
             </Array>
           </mxGeometry>
         </mxCell>
