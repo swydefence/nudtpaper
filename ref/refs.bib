@@ -9,7 +9,7 @@
   year={2021},
   volume={1},
   number={1},
-  pages={135-148}
+  pages={135--148} % codex修改：页码分隔符规范化
 }
 
 
@@ -110,7 +110,9 @@
   journal={Journal of Technology Economics},
   volume={44},
   number={1},
-  year={2025}
+  pages={14--27}, % codex修改：补全页码
+  year={2025},
+  doi={10.12404/j.issn.1002-980X.J2409181} % codex修改：补全 DOI
 }
 
 
@@ -120,7 +122,10 @@
   title={Transfer adaptation learning for target recognition in SAR images: A survey},
   author={Yang, Xinpeng and Jiao, Lianmeng and Pan, Quan},
   journal={IEEE Journal of Selected Topics in Applied Earth Observations and Remote Sensing},
+  volume={17}, % codex修改：补全卷号
+  pages={13577--13601}, % codex修改：补全页码
   year={2024},
+  doi={10.1109/JSTARS.2024.3434448}, % codex修改：补全 DOI
   publisher={IEEE}
 }
 
@@ -173,10 +178,10 @@
 author    = {董纯柱 and 胡利平 and 朱国庆 and 等},
 title     = {地面车辆目标高质量SAR图像快速仿真方法},
 journal   = {雷达学报},
-date      = {2015},
+year      = {2015}, % codex修改：将 date 规范为 year
 volume    = {4},
 number    = {3},
-pages     = {351-360}
+pages     = {351--360} % codex修改：页码分隔符规范化
 }
 
 
@@ -184,10 +189,10 @@ pages     = {351-360}
 author    = {胡利平 and 董纯柱 and 刘锦帆 and others},
 title     = {基于SAR仿真图像的地面车辆非同源目标识别},
 journal   = {系统工程与电子技术},
-date      = {2021},
+year      = {2021}, % codex修改：将 date 规范为 year
 volume    = {43},
 number    = {12},
-pages     = {3518-3525}
+pages     = {3518--3525} % codex修改：页码分隔符规范化
 }
 
 
@@ -246,6 +251,7 @@ pages     = {3518-3525}
   author={Liu, Ming-Yu and Breuel, Thomas and Kautz, Jan},
   journal={Advances in neural information processing systems},
   volume={30},
+  pages={700--708}, % codex修改：补全页码
   year={2017}
 }
 
@@ -273,6 +279,7 @@ pages     = {3518-3525}
   author={Goodfellow, Ian J and Pouget-Abadie, Jean and Mirza, Mehdi and Xu, Bing and Warde-Farley, David and Ozair, Sherjil and Courville, Aaron and Bengio, Yoshua},
   journal={Advances in neural information processing systems},
   volume={27},
+  pages={2672--2680}, % codex修改：补全页码
   year={2014}
 }
 
@@ -302,7 +309,7 @@ pages     = {3518-3525}
   journal = {IEEE Transactions on Image Processing},
   year = {2020},
   volume = {29},
-  pages = {7997-8011},
+  pages = {7997--8011}, % codex修改：页码分隔符规范化
 }
 
 @article{benjdira2019unsupervised,
@@ -320,7 +327,7 @@ pages     = {3518-3525}
   journal = {International Journal of Remote Sensing},
   year = {2020},
   volume = {41},
-  pages = {7343 - 7367},
+  pages = {7343--7367}, % codex修改：页码分隔符规范化
 }
 
 
@@ -339,6 +346,7 @@ pages     = {3518-3525}
   author={Long, Mingsheng and Zhu, Han and Wang, Jianmin and Jordan, Michael I},
   journal={Advances in neural information processing systems},
   volume={29},
+  pages={136--144}, % codex修改：补全页码
   year={2016}
 }
 
@@ -359,7 +367,7 @@ pages     = {3518-3525}
   year = {2020},
   doi = {10.1109/tpami.2020.3001338},
   volume = {43},
-  pages = {4441-4452},
+  pages = {4441--4452}, % codex修改：页码分隔符规范化
   abstract = {One of the main challenges for developing visual recognition systems working in the wild is to devise computational models immune from the domain shift problem, i.e., accurate when test data are drawn from a (slightly) different data distribution than training samples. In the last decade, several research efforts have been devoted to devise algorithmic solutions for this issue. Recent attempts to mitigate domain shift have resulted into deep learning models for domain adaptation which learn domain-invariant representations by introducing appropriate loss terms, by casting the problem within an adversarial learning framework or by embedding into deep network specific domain normalization layers. This paper describes a novel approach for unsupervised domain adaptation. Similarly to previous works we propose to align the learned representations by embedding them into appropriate network feature normalization layers. Opposite to previous works, our Domain Alignment Layers are designed not only to match the source and target feature distributions but also to automatically learn the degree of feature alignment required at different levels of the deep network. Differently from most previous deep domain adaptation methods, our approach is able to operate in a multi-source setting. Thorough experiments on four publicly available benchmarks confirm the effectiveness of our approach.}
 }
 
@@ -371,7 +379,7 @@ pages     = {3518-3525}
   year = {2021},
   doi = {10.1109/TMM.2022.3146744},
   volume = {25},
-  pages = {1665-1673},
+  pages = {1665--1673}, % codex修改：页码分隔符规范化
   abstract = {Unsupervised domain adaptation (UDA) aims to transfer knowledge learned from a fully-labeled source domain to a different unlabeled target domain. Most existing UDA methods learn domain-invariant feature representations by minimizing feature distances across domains. In this work, we build upon contrastive self-supervised learning to align features so as to reduce the domain discrepancy between training and testing sets. Exploring the same set of categories shared by both domains, we introduce a simple yet effective framework CDCL, for domain alignment. In particular, given an anchor image from one domain, we minimize its distances to cross-domain samples from the same class relative to those from different categories. Since target labels are unavailable, we use a clustering-based approach with carefully initialized centers to produce pseudo labels. In addition, we demonstrate that CDCL is a general framework and can be adapted to the data-free setting, where the source data are unavailable during training, with minimal modification. We conduct experiments on two widely used domain adaptation benchmarks, i.e., Office-31 and VisDA-2017, for image classification tasks, and demonstrate that CDCL achieves state-of-the-art performance on both datasets.}
 }
 
@@ -382,7 +390,7 @@ pages     = {3518-3525}
   year = {2022},
   doi = {10.1109/TIP.2022.3222634},
   volume = {31},
-  pages = {7403-7418},
+  pages = {7403--7418}, % codex修改：页码分隔符规范化
   abstract = {Unsupervised domain adaptation (UDA) carries out knowledge transfer from the labeled source domain to the unlabeled target domain. Existing feature alignment methods in UDA semantic segmentation achieve this goal by aligning the feature distribution between domains. However, these feature alignment methods ignore the domain-specific knowledge of the target domain. In consequence, 1) the correlation among pixels of the target domain is not explored; and 2) the classifier is not explicitly designed for the target domain distribution. To conquer these obstacles, we propose a novel cluster alignment framework, which mines the domain-specific knowledge when performing the alignment. Specifically, we design a multi-prototype clustering strategy to make the pixel features within the same class tightly distributed for the target domain. Subsequently, a contrastive strategy is developed to align the distributions between domains, with the clustered structure maintained. After that, a novel affinity-based normalized cut loss is devised to learn task-specific decision boundaries. Our method enhances the model’s adaptability in the target domain, and can be used as a pre-adaptation for self-training to boost its performance. Sufficient experiments prove the effectiveness of our method against existing state-of-the-art methods on representative UDA benchmarks.}
 }
 
@@ -419,6 +427,7 @@ pages     = {3518-3525}
   author={Long, Mingsheng and Cao, Zhangjie and Wang, Jianmin and Jordan, Michael I},
   journal={Advances in neural information processing systems},
   volume={31},
+  pages={1647--1657}, % codex修改：补全页码
   year={2018}
 }
 
@@ -462,6 +471,7 @@ pages     = {3518-3525}
   author={Bousmalis, Konstantinos and Trigeorgis, George and Silberman, Nathan and Krishnan, Dilip and Erhan, Dumitru},
   journal={Advances in neural information processing systems},
   volume={29},
+  pages={343--351}, % codex修改：补全页码
   year={2016}
 }
 
@@ -471,6 +481,7 @@ pages     = {3518-3525}
   booktitle={Proceedings of the AAAI conference on artificial intelligence},
   volume={32},
   number={1},
+  pages={3934--3941}, % codex修改：补全页码
   year={2018}
 }
 
@@ -637,7 +648,9 @@ pages     = {3518-3525}
   booktitle={Proceedings of the AAAI conference on artificial intelligence},
   volume={32},
   number={1},
-  year={2018}
+  pages={3490--3497}, % codex修改：补全页码
+  year={2018},
+  doi={10.1609/aaai.v32i1.11596} % codex修改：补全 DOI
 }
 
 @article{dou2019domain,
@@ -645,6 +658,7 @@ pages     = {3518-3525}
   author={Dou, Qi and Coelho de Castro, Daniel and Kamnitsas, Konstantinos and Glocker, Ben},
   journal={Advances in neural information processing systems},
   volume={32},
+  pages={6447--6458}, % codex修改：补全页码
   year={2019}
 }
 
@@ -670,6 +684,7 @@ pages     = {3518-3525}
   author={Balaji, Yogesh and Sankaranarayanan, Swami and Chellappa, Rama},
   journal={Advances in neural information processing systems},
   volume={31},
+  pages={1006--1016}, % codex修改：补全页码
   year={2018}
 }
 
@@ -816,7 +831,10 @@ pages     = {3518-3525}
   title={MASFF-Net: Multi-azimuth scattering feature fusion network for SAR target recognition},
   author={Zhang, Huiqiang and Wang, Wei and Deng, Jie and Guo, Yue and Liu, Shengqi and Zhang, Jun},
   journal={IEEE Journal of Selected Topics in Applied Earth Observations and Remote Sensing},
+  volume={18}, % codex修改：补全卷号
+  pages={19425--19440}, % codex修改：补全页码
   year={2025},
+  doi={10.1109/JSTARS.2025.3591795}, % codex修改：补全 DOI
   publisher={IEEE}
 }
 
@@ -924,7 +942,10 @@ pages     = {3518-3525}
   title={Lightweight dual-stream SAR-ATR framework based on an attention mechanism-guided heterogeneous graph network},
   author={Xiong, Xuying and Zhang, Xinyu and Jiang, Weidong and Liu, Tianpeng and Liu, Yongxiang and Liu, Li},
   journal={IEEE Journal of Selected Topics in Applied Earth Observations and Remote Sensing},
-  year={2024},
+  volume={18}, % codex修改：补全卷号
+  pages={537--556}, % codex修改：补全页码
+  year={2025}, % codex修改：按正式卷期修正年份
+  doi={10.1109/JSTARS.2024.3498327}, % codex修改：补全 DOI
   publisher={IEEE}
 }
 
@@ -933,6 +954,7 @@ pages     = {3518-3525}
   author={Li, Weijie and Yang, Wei and Hou, Yuenan and Liu, Li and Liu, Yongxiang and Li, Xiang},
   journal={IEEE Transactions on Image Processing},
   year={2025},
+  doi={10.1109/TIP.2025.3531988}, % codex修改：补全 DOI（暂未检索到正式卷页）
   publisher={IEEE}
 }
 
@@ -940,7 +962,10 @@ pages     = {3518-3525}
   title={Soft Segmented Randomization: Enhancing Domain Generalization in SAR ATR for Synthetic-to-Measured},
   author={Kim, Minjun and Jang, Ohtae and Song, Haekang and Shin, Heesub and Ok, Jaewoo and Back, Minyoung and Youn, Jaehyuk and Kim, Sungho},
   journal={IEEE Access},
+  volume={12}, % codex修改：补全卷号
+  pages={175801--175816}, % codex修改：补全页码
   year={2024},
+  doi={10.1109/ACCESS.2024.3504574}, % codex修改：补全 DOI
   publisher={IEEE}
 }
 
@@ -948,7 +973,11 @@ pages     = {3518-3525}
   title={Irasnet: Improved feature-level clutter reduction for domain generalized sar-atr},
   author={Jang, Oh-Tae and Kim, Min-Jun and Kim, Sung-Ho and Shin, Hee-Sub and Kim, Kyung-Tae},
   journal={IEEE Transactions on Aerospace and Electronic Systems},
+  volume={61}, % codex修改：补全卷号
+  number={6}, % codex修改：补全期号
+  pages={15395--15411}, % codex修改：补全页码
   year={2025},
+  doi={10.1109/TAES.2025.3589337}, % codex修改：补全 DOI
   publisher={IEEE}
 }
 
@@ -956,7 +985,11 @@ pages     = {3518-3525}
   title={Filling and Disentanglement: Towards Low-and High-Order Parallel Single-Domain Generalization for SAR Ship Detection},
   author={Yuan, Yuxuan and Tang, Luyao and Xu, Ying and Lin, Chuyang and Chen, Chaoqi and Huang, Yue and Ding, Xinghao},
   journal={IEEE Transactions on Aerospace and Electronic Systems},
-  year={2024},
+  volume={61}, % codex修改：补全卷号
+  number={2}, % codex修改：补全期号
+  pages={3668--3682}, % codex修改：补全页码
+  year={2025}, % codex修改：按正式卷期修正年份
+  doi={10.1109/TAES.2024.3489572}, % codex修改：补全 DOI
   publisher={IEEE}
 }
 
@@ -1039,6 +1072,9 @@ pages     = {3518-3525}
   title={Unsupervised Cross-Domain Radar Target Recognition Using Multi-Level Alignment},
   author={Luan, Jiawei and Ding, Jinshan and Zhang, Yuhong},
   journal={IEEE Transactions on Radar Systems},
+  volume={3}, % codex修改：补全卷号
+  pages={630--644}, % codex修改：补全页码
   year={2025},
+  doi={10.1109/TRS.2025.3560355}, % codex修改：补全 DOI
   publisher={IEEE}
 }

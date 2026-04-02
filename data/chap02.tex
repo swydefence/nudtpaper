@@ -6,7 +6,7 @@
 近年来，无监督域适应技术在合成孔径雷达（Synthetic Aperture Radar, SAR）目标识别领域取得了显著进展。
 然而，现有方法通常必需大量无标签的目标域数据参与模型训练，在目标域数据受限的少样本场景下面临严峻挑战。
 
-在像素级上，现有研究主要依赖CycleGAN等模型进行图像转换\cite{shi2021unsupervised, chen2022pixel}。
+在像素级上，现有研究主要依赖CycleGAN等模型进行图像转换\cite{shi2021unsupervised, chen2022pixel，luan2025unsupervised}。
 此类模型包含双向的生成器与判别器，并通过循环一致性损失约束转换过程。
 由于判别器的训练依赖充足的目标域真实数据以学习其完整的统计分布，在目标域样本较少时，
 判别器往往无法充分掌握真实的分布特征，进而出现判别能力退化问题。
@@ -68,6 +68,7 @@
 \caption{基于像素级域对齐和类混淆损失的少目标域样本域适应方法框图}
 \label{fig:chap2_framework}
 \end{figure}
+
 \subsection{像素级域对齐模块}
 
 先前的研究中发现，图像到图像翻译模型可以显著缩小像素级的域差距\cite{chen2022pixel,youk2023transformer}。
@@ -78,7 +79,7 @@
 
 \begin{figure}[htp]
 \centering
-\includegraphics[width=0.9\textwidth, keepaspectratio]{cut}
+\includegraphics[width=0.85\textwidth, keepaspectratio]{chap2_vis/cut.pdf}
 \caption{对比非配对图像翻译模型（CUT）工作结构示意图}
 \label{fig:chap2_cut}
 \end{figure}
@@ -154,7 +155,7 @@ L_{\text{cut}} = L_{\text{GAN}}(G,D,X,Y) + L_{\text{PatchNCE}}(G,H,X) + L_{\text
 
 \begin{figure}[htp]
 \centering
-\includegraphics[width=0.7\textwidth, keepaspectratio]{ccblock}
+\includegraphics[width=0.7\textwidth, keepaspectratio]{chap2_vis/ccblock.pdf}
 \caption{类混淆块（CC-Block）结构示意图}
 \label{fig:chap2_ccblock}
 \end{figure}
@@ -352,14 +353,18 @@ $N_{\text{total}}$ 表示参与评估的样本总数量（即 $TP + TN + FP + FN
 
 SAMPLE数据集的仿真数据与实测数据之间存在显著的域差异。
 为了验证本章所提方法在域适应SAR目标识别任务上的性能，
-本节实验使用SAMPLE数据集中的带标签的仿真SAR图像作为源域，无标签的实测SAR图像作为目标域。
-所有SAR图像均采用幅度（Amplitude）格式，以16位无符号整数存储，图像尺寸为128×128。
+本节实验使用SAMPLE数据集中包含2S1、BMP2、BTR70等10类目标的SAR图像进行测试。
+具体而言，将带标签的仿真SAR图像作为源域以有监督的形式参与训练（共计1345个样本），
+并将无标签的实测SAR图像作为目标域构建相应的无监督域适应场景。
+所有SAR图像均采用幅度（Amplitude）格式，以16位无符号整数存储，图像尺寸统一为$128 \times 128$像素，
 并在输入网络前归一化至 $[0, 1]$ 范围。
-为了模拟目标域数据少样本条件下的域适应任务，
-本章分别设置了“all”、“1-shot”、“3-shot”、“5-shot”和“10-shot”五种目标域样本数量的实验场景。
-其中，“all”表示使用所有1345张无标签的实测图像作为无监督的目标域参与训练，
-而“1-shot”、“3-shot”、“5-shot”和“10-shot”分别表示每个类别仅使用1张、3张、5张和10张实测图像参与训练。
-具体实验数据设置如表\ref{tab:DA-dataset-settings}所示。
+
+为了全面模拟并评估模型在目标域数据稀缺条件下的性能，
+本章针对目标域训练集分别设置了“all”、“1-shot”、“3-shot”、“5-shot”和“10-shot”共五种不同样本规模的实验场景。
+其中，“all”场景表示使用目标域全部1345张无标签实测图像参与训练；
+而“1-shot”、“3-shot”、“5-shot”和“10-shot”场景则分别表示每个类别仅使用1张、3张、5张和10张实测图像参与训练，对应的目标域训练样本总数则分别为10、30、50和100个。
+此外，所有场景下的测试集均保持一致，统一使用全部1345张实测SAR图像进行评估。
+各类别样本的具体划分及完整的实验数据设置详见表\ref{tab:DA-dataset-settings}。
 
 
 
@@ -368,17 +373,17 @@ SAMPLE数据集的仿真数据与实测数据之间存在显著的域差异。
   \begin{minipage}[t]{\linewidth}
   \caption[SAMPLE数据集少目标域样本域适应实验数据设置]{SAMPLE数据集少目标域样本域适应实验数据设置}
   \label{tab:DA-dataset-settings}
-    \begin{tabularx}{\linewidth}{>{\centering\bfseries\arraybackslash}m{2cm}*{7}{>{\centering\arraybackslash}X}}
+    \begin{tabularx}{\linewidth}{>{\centering\bfseries\arraybackslash}m{1.5cm} c *{5}{>{\centering\arraybackslash}X} c}
       \toprule[1.5pt]
-      \multirow{3}{*}{\bfseries 类别} & \multicolumn{6}{c}{\bfseries 训练集} & \bfseries 测试集 \\
-      \cmidrule(lr){2-8}
-      & \multirow{2}{*}{\bfseries 源域} & \multicolumn{5}{c}{\bfseries 目标域（无监督）}  & {\bfseries 目标域}  \\ % 修正：增加“测试集”标题
-      \cmidrule(lr){3-8} 
-      & & all & 1-shot & 3-shot & 5-shot & 10-shot & all\\ % 修正：增加“测试集”标题
+      \multirow{3}{*}{\bfseries 类别} & \multicolumn{6}{c}{\bfseries 训练集} & \multirow{3}{*}{\bfseries 测试集} \\
+      \cmidrule(lr){2-7}
+      & \bfseries 源域 & \multicolumn{5}{c}{\bfseries 目标域（无监督）}  & \\
+      \cmidrule(lr){3-7} 
+      & \bfseries （有监督） & all & 1-shot & 3-shot & 5-shot & 10-shot & \\
       \midrule
       2S1 & 174 & 174 & 1 & 3 & 5 & 10 & 174 \\ % 修正：保留7个数据（无多余列）
       BMP2 & 107 & 107 & 1 & 3 & 5 & 10 & 107 \\
-      BTR70 & 92 & 92 & 1 & 3 & 5 & 10 & 92 \\3
+      BTR70 & 92 & 92 & 1 & 3 & 5 & 10 & 92 \\
       M1 & 129 & 129 & 1 & 3 & 5 & 10 & 129 \\ 
       M2 & 128 & 128 & 1 & 3 & 5 & 10 & 128 \\
       M35 & 129 & 129 & 1 & 3 & 5 & 10 & 129 \\
@@ -484,7 +489,7 @@ Shi等人所提方法\cite{shi2024unsupervised}以及MACR\cite{luan2025unsupervi
 （1）Source Only：仅使用源域带标签的仿真SAR图像训练ResNet50模型，不进行任何域适应操作。
 目标域样本不参与训练，仅作为测试集使用，不影响模型性能表现。
 （2）Target Only：直接使用目标域带标签的实测SAR图像训练ResNet50模型。
-在“1shot”等少目标域样本条件下，代表仅使用每类1张、3张、5张和10张实测图像进行训练。
+在“1-shot”等少目标域样本条件下，代表仅使用每类1张、3张、5张和10张实测图像进行训练。
 
 表\ref{tab:chap2_comparison-results}详细展示了本章所提方法与现有的四种通用计算机视觉域适应方法（DAN, DANN, CDAN, DSAN）
 以及五种SAR专用域适应方法（PFDA, VSFA, Sun等人方法, Shi等人方法, MACR）在SAMPLE数据集上的性能对比。
@@ -534,7 +539,7 @@ Shi等人所提方法\cite{shi2024unsupervised}以及MACR\cite{luan2025unsupervi
 “Source Only”方法的平均识别准确率仅为46.29\%，远低于“Target Only”在全样本下的99.95\%。
 这表明仿真SAR图像与实测SAR图像在纹理、相干斑噪声及背景杂波分布上存在显著的统计特性差异（即域偏移），
 导致在仿真数据上训练良好的特征提取器难以直接迁移。 
-另一方面，“Target Only”方法虽然确立了性能上限，但其准确率随样本量的减少呈现断崖式下跌（从99.95\%跌至1-shot下的16.32\%）。
+另一方面，“Target Only”方法虽然确立了性能上限，但其准确率随样本量的减少呈现显著下降（从99.95\%跌至1-shot下的16.32\%）。
 这一数据证实了深度学习模型对大量标注数据的极度依赖，也反衬出在实测SAR数据稀缺场景下，
 探索高效少目标域样本域适应方法的必要性。
 
@@ -598,7 +603,7 @@ VSFA则利用了物理散射拓扑特征。这说明在数据受限时，利用�
 
 为了深入探究本章所提方法中各个核心组件的有效性及其对模型整体性能的贡献，本节在 SAMPLE 数据集上开展了消融实验。
 本章提出的方法主要包含两个核心模块：基于风格迁移模型CUT的像素级域对齐模块和基于类混淆损失CC-Loss的特征级域适应模块。
-为了验证这两个模块在少样本域适应任务中的独立作用与协同效应，我们在“1-shot”和“all”两种具有代表性的实验设置下，
+为了验证这两个模块在少样本域适应任务中的独立作用与协同效应，本节在“1-shot”和“all”两种具有代表性的实验设置下，
 设计了以下四种实验配置进行对比分析：
 
 \begin{itemize}[nosep, leftmargin=*]
@@ -669,7 +674,7 @@ CUT 模块作为像素级域对齐模块，首先解决了最棘手的底层异�
 
 \subsubsection{图像翻译质量可视化分析}
 
-图像翻译模型（CUT）是本章方法实现像素级域对齐的基础，其核心优势在于降低了对目标域大数据量的依赖。为了直观评估其在不同数据量下的鲁棒性，我们将本章采用的基于对比学习的 CUT 模型与 PFDA\cite{chen2022pixel} 和 MACR\cite{luan2025unsupervised} 所使用的基于循环一致性的 CycleGAN 模型进行对比。图 \ref{fig:gan_comparison_multishot} 展示了在目标域样本数量逐渐减少（All $\rightarrow$ 10-shot $\rightarrow$ 5-shot $\rightarrow$ 1-shot）的四种实验设置下，两种模型将 SAMPLE 数据集的仿真 SAR 图像转换为实测风格的生成效果。
+图像翻译模型（CUT）是本章方法实现像素级域对齐的基础，其核心优势在于降低了对目标域大数据量的依赖。为了直观评估其在不同数据量下的鲁棒性，将本章采用的基于对比学习的 CUT 模型与 PFDA\cite{chen2022pixel} 以及 MACR\cite{luan2025unsupervised} 所使用的基于循环一致性的 CycleGAN 模型进行对比。图 \ref{fig:gan_comparison_multishot} 展示了在目标域样本数量逐渐减少（All $\rightarrow$ 10-shot $\rightarrow$ 5-shot $\rightarrow$ 1-shot）的四种实验设置下，两种模型将 SAMPLE 数据集的仿真 SAR 图像转换为实测风格的生成效果。
 
 \begin{figure}[htbp]
   \centering
@@ -722,7 +727,7 @@ CycleGAN（图(j)）表现出灾难性的“模式崩塌”现象。其生成图
 这种局部对比机制使得 CUT 在 1-shot 条件下依然精准地保留了仿真图像的目标结构，并成功迁移了目标域的相干斑噪声风格。
 
 综上所述，从 All 到 1-shot 的演变过程清晰地揭示了两种模型的特性差异：随着目标域样本量的减少，
-CycleGAN 依赖大数据分布估计的缺陷逐渐暴露，性能呈断崖式下跌；而 CUT 模型始终表现出稳健的图像生成能力。
+CycleGAN 依赖大数据分布估计的缺陷逐渐暴露，性能显著下降；而 CUT 模型始终表现出稳健的图像生成能力。
 这一特性确立了其在少样本域适应任务中的核心地位，为后续特征提取器提供了稳定、高质量的训练数据输入。
 
 
