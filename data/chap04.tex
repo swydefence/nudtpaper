@@ -3,7 +3,7 @@
 
 \section{引言}
 
-面向复杂战场环境和非合作目标场景的SAR目标识别任务，
+在复杂战场环境和非合作目标场景中的SAR目标识别任务，
 不仅面临实测训练数据获取困难、仿真与实测之间域偏移显著等问题，
 还受到边缘平台计算资源有限、存储空间受限以及关键软硬件自主可控需求增强等多重约束。
 第二章和第三章面向不同应用场景分别构建了跨域SAR目标识别模型，
@@ -163,12 +163,14 @@ q_k^S = \frac{\exp(z_{S,k}/T)}{\sum_{j=1}^{K}\exp(z_{S,j}/T)}
 
 该蒸馏方案的设计遵循“冻结教师—软硬标签联合监督—数据一致性保障”的原则，
 具有以下三方面优势：
-\begin{itemize}[nosep,leftmargin=*]
-	\item 冻结教师参数确保两类跨域场景下的蒸馏监督信号稳定，降低蒸馏训练难度，有利于稳定收敛；
-	\item 软标签蒸馏在轻量化结构中保留教师模型的跨域判别边界信息与类间语义关系，使第二章和第三章模型均能在统一学生架构下完成知识迁移；
-	\item 蒸馏后的学生模型参数分布更平滑，在后续量化压缩中表现出更强的鲁棒性，
+
+（1）冻结教师参数确保两类跨域场景下的蒸馏监督信号稳定，降低蒸馏训练难度，有利于稳定收敛。
+
+（2）软标签蒸馏在轻量化结构中保留教师模型的跨域判别边界信息与类间语义关系，使第二章和第三章模型均能在统一学生架构下完成知识迁移。
+
+（3）蒸馏后的学生模型参数分布更平滑，在后续量化压缩中表现出更强的鲁棒性，
 	为“蒸馏—量化”联合优化链路奠定了参数分布基础。
-\end{itemize}
+
 
 
 \subsubsection{MobileNetV2轻量化原理}
@@ -186,27 +188,27 @@ MobileNet系列的核心思想是通过结构重参数化与高效算子设计�
 当$C_{out}$较大时，$\mathrm{Cost}_{ds}\ll\mathrm{Cost}_{std}$，因此深度可分离卷积特别适合边缘端部署。
 
 MobileNetV2在深度可分离卷积基础上引入了倒残差结构（Inverted Residual）与线性瓶颈（Linear Bottleneck）两项核心设计：
-\begin{itemize}[nosep,leftmargin=*]
-	\item \textbf{倒残差结构}：
-	与ResNet直接在高维特征上建立残差连接不同，MobileNetV2先通过$1\times 1$卷积将输入特征通道数$c$扩展至$tc$维（$t$为扩展倍率），
-	在扩展空间内执行$3\times3$深度卷积建模，最后通过$1\times 1$卷积投影回低维空间$c'$。
-	残差连接建立在瓶颈两端的低维空间，在降低参数量的同时保留了特征流动路径。
-	其结构如图\ref{fig:chap4_inverted_res}所示：
 
-	\begin{figure}[htbp]  
-	\centering          
-	\subfloat[残差结构]{\label{残差结构} \includegraphics[width=0.44\textwidth]{chap4/残差结构.png}} \hspace{0.6em}
-	\subfloat[倒残差结构]{\label{倒残差结构} \includegraphics[width=0.44\textwidth]{chap4/倒残差结构.png}} 
-	\caption[MobileNetV2倒残差结构示意图]{MobileNetV2倒残差结构示意图}
-	\label{fig:chap4_inverted_res}                  
-	\end{figure}
+\textbf{倒残差结构}：
+与ResNet直接在高维特征上建立残差连接不同，MobileNetV2先通过$1\times 1$卷积将输入特征通道数$c$扩展至$tc$维（$t$为扩展倍率），
+在扩展空间内执行$3\times3$深度卷积建模，最后通过$1\times 1$卷积投影回低维空间$c'$。
+残差连接建立在瓶颈两端的低维空间，在降低参数量的同时保留了特征流动路径。
+其结构如图\ref{fig:chap4_inverted_res}所示：
+
+\begin{figure}[htbp]  
+\centering          
+\subfloat[残差结构]{\label{残差结构} \includegraphics[width=0.44\textwidth]{chap4/残差结构.png}} \hspace{0.6em}
+\subfloat[倒残差结构]{\label{倒残差结构} \includegraphics[width=0.44\textwidth]{chap4/倒残差结构.png}} 
+\caption[MobileNetV2倒残差结构示意图]{MobileNetV2倒残差结构示意图}
+\label{fig:chap4_inverted_res}                  
+\end{figure}
 
 
-	\item \textbf{线性瓶颈}：
-	在最后的低维投影层去除ReLU等强非线性激活，
-	以避免低维流形经非线性映射后造成有效信息损失。
-	当步长为1且输入输出通道数一致时，可建立短路连接，缓解轻量模型深层训练中的梯度退化问题。
-\end{itemize}
+\textbf{线性瓶颈}：
+在最后的低维投影层去除ReLU等强非线性激活，
+以避免低维流形经非线性映射后造成有效信息损失。
+当步长为1且输入输出通道数一致时，可建立短路连接，缓解轻量模型深层训练中的梯度退化问题。
+
 
 针对SAR图像目标识别任务，MobileNetV2的适配优势主要体现在：
 其浅层卷积仍能保留对目标散射轮廓、亮点结构与阴影区域的感知能力；
@@ -357,22 +359,21 @@ AMCT完成校准后，将量化参数（各层权重与激活的$s$/$z$值）
 \subsubsection{本章量化方案的精度-性能权衡设计}
 
 结合本章部署目标与MobileNetV2模型特点，本小节的量化方案设计遵循以下精度-性能权衡原则：
-\begin{itemize}[nosep,leftmargin=*]
-	\item \textbf{量化位宽选择}：采用INT8位宽作为默认部署配置。
-	INT8量化可将模型体积压缩至FP16的约1/2，
-	同时充分利用昇腾310 NPU的8 TOPS INT8算力，
-	实现推理吞吐的显著提升；
-	\item \textbf{权重逐通道量化}：MobileNetV2的深度可分离卷积中每个通道的权重分布差异较大，
-	逐通道量化相较于逐层量化能显著降低量化误差，
-	尤其对深度卷积层效果更为明显；
-	\item \textbf{激活IFMR校准}：MobileNetV2采用的ReLU6激活函数输出值被截断在$[0,6]$范围内，
-	IFMR校准通过搜索最优截断区间可精确匹配该有界分布特征，
-	减少量化精度损失；
-	\item \textbf{蒸馏-量化协同}：蒸馏训练中软标签损失对学生网络的参数分布起到正则化作用，
-	使权重与激活的数值分布更加集中平滑，
-	降低了量化截断误差和异常值影响，
-	为后训练量化提供了更有利的参数分布基础。
-\end{itemize}
+
+（1）\textbf{量化位宽选择}：采用INT8位宽作为默认部署配置。
+INT8量化可将模型体积压缩至FP16的约1/2，
+同时充分利用昇腾310 NPU的8 TOPS INT8算力，
+实现推理吞吐的显著提升；
+（2）\textbf{权重逐通道量化}：MobileNetV2的深度可分离卷积中每个通道的权重分布差异较大，
+逐通道量化相较于逐层量化能显著降低量化误差，
+尤其对深度卷积层效果更为明显；
+（3）\textbf{激活IFMR校准}：MobileNetV2采用的ReLU6激活函数输出值被截断在$[0,6]$范围内，
+IFMR校准通过搜索最优截断区间可精确匹配该有界分布特征，
+减少量化精度损失；
+（4）\textbf{蒸馏-量化协同}：蒸馏训练中软标签损失对学生网络的参数分布起到正则化作用，
+使权重与激活的数值分布更加集中平滑，
+降低了量化截断误差和异常值影响，
+为后训练量化提供了更有利的参数分布基础。
 
 
 
@@ -461,16 +462,16 @@ C++实现的核心流程与Python方式一致，
 
 本小节设计的基于AscendCL接口的推理流程包括以下环节：
 \begin{enumerate}[nosep,leftmargin=*]
-	\item 调用\texttt{acl.init}完成运行时环境初始化，
-	通过\texttt{acl.rt.set\_device}指定NPU设备并创建计算上下文；
-	\item 调用\texttt{acl.mdl.load\_from\_file}加载OM模型，
+	\item 调用acl.init完成运行时环境初始化，
+	通过acl.rt.set\_device指定NPU设备并创建计算上下文；
+	\item 调用acl.mdl.load\_from\_file加载OM模型，
 	通过模型描述接口获取输入输出张量的维度和数据类型信息；
-	\item 基于\texttt{acl.rt.malloc}申请设备端输入输出内存，
+	\item 基于acl.rt.malloc申请设备端输入输出内存，
 	构造所需的数据集对象；
 	\item 完成图像预处理（128$\times$128缩放、$[0,1]$归一化、NCHW张量重排），
-	将预处理后的numpy数组通过\texttt{acl.rt.memcpy}拷贝至设备端输入缓冲区；
-	\item 调用\texttt{acl.mdl.execute}执行模型推理；
-	\item 将输出结果通过\texttt{acl.rt.memcpy}从设备端拷回主机侧，
+	将预处理后的numpy数组通过acl.rt.memcpy拷贝至设备端输入缓冲区；
+	\item 调用acl.mdl.execute执行模型推理；
+	\item 将输出结果通过acl.rt.memcpy从设备端拷回主机侧，
 	完成Top-1类别解析与置信度提取，最后依次释放数据集、模型、上下文与设备资源。
 \end{enumerate}
 
@@ -479,15 +480,15 @@ C++实现的核心流程与Python方式一致，
 \subsection{端侧推理链路优化}
 
 考虑端侧资源约束，本小节在推理链路中进行了以下三项工程优化：
-\begin{itemize}[nosep,leftmargin=*]
-	\item \textbf{批处理策略优化}：将推理批大小设置为1，
-	以适配SAR目标识别“单帧实时推理”的典型应用需求，
-	同时将板端推理内存峰值控制在可接受范围内；
-	\item \textbf{数据搬运优化}：预分配设备端固定内存缓冲区，
-	避免每次推理时重复申请/释放设备内存，减少主机与设备间冗余数据拷贝，降低I/O开销；
-	\item \textbf{算子图优化}：在ATC模型转换阶段启用图融合（Graph Fusion）与常量折叠（Constant Folding）优化，
-	将连续的Conv-BN-ReLU等算子融合为单一高效算子，减少中间张量的内存分配与访存次数。
-\end{itemize}
+
+（1）\textbf{批处理策略优化}：将推理批大小设置为1，
+以适配SAR目标识别“单帧实时推理”的典型应用需求，
+同时将板端推理内存峰值控制在可接受范围内；
+（2）\textbf{数据搬运优化}：预分配设备端固定内存缓冲区，
+避免每次推理时重复申请/释放设备内存，减少主机与设备间冗余数据拷贝，降低I/O开销；
+（3）\textbf{算子图优化}：在ATC模型转换阶段启用图融合（Graph Fusion）与常量折叠（Constant Folding）优化，
+将连续的Conv-BN-ReLU等算子融合为单一高效算子，减少中间张量的内存分配与访存次数。
+
 
 通过上述优化，模型可在国产AI芯片平台上实现稳定高效的推理运行，
 并具备进一步面向无人平台集成的工程可扩展性。
@@ -530,7 +531,7 @@ C++实现的核心流程与Python方式一致，
 			优化器 & SGD \\
 			初始学习率 & 0.01 \\
 			动量系数 & 0.9 \\
-			权重衰减 & $5\times10^{-4}$ \\
+			权重衰减 & 5e-4 \\
 			学习率调度 & 余弦退火 \\
 			批大小 & 36 \\
 			训练轮数 & 20 \\
@@ -549,7 +550,6 @@ C++实现的核心流程与Python方式一致，
 
 
 表\ref{tab:chap4_acc_chap2}和表\ref{tab:chap4_acc_chap3}分别给出了第二章域适应模型与第三章域泛化模型在轻量化前后的识别性能对比。
-从蒸馏收益角度分析：
 两条部署分支中，基于MobileNetV2的蒸馏学生模型在参数规模仅为教师模型约1/7的条件下，
 均较好地继承了教师模型的跨域判别知识。
 其中第二章分支在SAMPLE数据集上的多种少样本设置下，相较源教师模型的识别精度下降均控制在1\%到2\%。
