@@ -1,5 +1,5 @@
 % !TEX program = xelatex
-% !BIB program = biber
+% !BIB program = bibtex
 %%
 %% This is file `thesis.tex',
 %% generated with the docstrip utility.
@@ -52,9 +52,11 @@
 %7. 如果是专硕，则使用prof选项
 % \documentclass[master,biber,prof]{nudtpaper}
 %
-\documentclass[master,biber,resumebib,ttf]{nudtpaper}
+\documentclass[master,ttf]{nudtpaper}
 
+\ifisbiber
 \addbibresource[location=local]{ref/refs.bib}
+\fi
 \usepackage{mynudt}
 \usepackage{makecell} 
 
