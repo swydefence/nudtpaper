@@ -472,9 +472,9 @@ SAMPLE数据集的仿真数据与实测数据之间存在显著的域差异。
 DAN\cite{long2015learning}、DANN\cite{ganin2015unsupervised}、CDAN\cite{long2018conditional}以及DSAN\cite{zhu2020deep};
 以及五种专为SAR-ATR设计的无监督域适应算法:
 PFDA\cite{chen2022pixel}、VSFA\cite{zhang2023vsfa}、Sun等人所提方法\cite{sun2023gradual}、
-Shi等人所提方法\cite{shi2024unsupervised}以及MACR\cite{luan2025unsupervised}
+Shi等人所提方法\cite{shi2024unsupervised}以及MACR\cite{luan2025unsupervised}。
 
-对比方法具体介绍如下，
+对比方法具体介绍如下：
 \textbf{DAN}（Deep Adaptation Network）\cite{long2015learning}：通过多核极大均值差异MK-MMD度量源域与目标域特征分布差异，并在深度神经网络训练中最小化MK-MMD损失以实现域适应。
 \textbf{DANN}（Domain-Adversarial Neural Network）\cite{ganin2015unsupervised}：引入域判别器，通过对抗学习迫使特征提取器对于源域和目标域数据学习到不可区分的特征表示，从而实现域适应。
 \textbf{CDAN}（Conditional Domain Adversarial Network）\cite{long2018conditional}：在DANN的基础上，结合类别信息与特征表示进行条件对抗训练，以提升域适应效果。
@@ -500,7 +500,7 @@ Shi等人所提方法\cite{shi2024unsupervised}以及MACR\cite{luan2025unsupervi
 \begin{table}[htb]
   \centering
   \begin{minipage}[t]{\linewidth}
-  \caption[基于SAMPLE数据集的域适应对比实验结果]{基于SAMPLE数据集的域适应对比实验结果}
+  \caption[基于SAMPLE数据集的少样本域适应对比实验结果]{针对不同数据量级少样本域适应场景在SAMPLE数据集上的各算法识别精度对比}
   \label{tab:chap2_comparison-results}
     % 修复BUG1：修正表格列格式 正确写法
     % \begin{tabularx}{\linewidth}{>{\centering\bfseries\arraybackslash}m{2cm}>{\centering\bfseries\arraybackslash}m{1.7cm}*{4}{>{\centering\arraybackslash}X}}
@@ -560,9 +560,7 @@ DSAN\cite{zhu2020deep}在“1-shot”下达到了61.83\%的准确率，显著优
 
 \textbf{（3）SAR专用域适应方法的性能分析：少样本鲁棒性的欠缺}
 
-针对SAR目标识别设计的现有方法在全样本（“all”）设置下普遍表现优异(准确率均达到96\%以上)，但在少样本鲁棒性上呈现出显著的两极分化，
-
-PFDA和MACR在数据充足时表现极佳，MACR甚至达到了99.27\%的高准确率。
+针对SAR目标识别设计的现有方法在全样本（“all”）设置下普遍表现优异(准确率均达到96\%以上)，但在少样本鲁棒性上呈现出显著的两极分化，PFDA和MACR在数据充足时表现极佳，MACR甚至达到了99.27\%的高准确率。
 然而，在“1-shot”极端条件下，两者均出现模型不收敛，且在3-shot下性能大幅回落（如PFDA仅为38.17\%）。
 究其原因，PFDA依赖CycleGAN进行像素级风格迁移，MACR所采用的输入对齐模块中也使用了CycleGAN进行对齐。
 生成对抗式模型需要大量目标域样本来准确估计实测域的统计分布。当样本极度稀缺时，
@@ -581,7 +579,6 @@ VSFA则利用了物理散射拓扑特征。这说明在数据受限时，利用�
 \textbf{（4）本章方法的综合优势：多层级域适应与少样本鲁棒性的统一}
 
 与上述所有方法相比，本章所提方法展现出了最优的综合性能，特别是在少样本场景下实现了显著提升。
-
 在“all”设置下，本章方法达到了99.15\%的准确率，与最先进的MACR持平，证明了在数据充足时，本章方法具有充足的域对齐能力。 
 在最具挑战性的“1-shot”设置下，本章方法取得了92.45\%的高准确率。这一结果比次优的VSFA提升超16\%。
 在“3-shot”和“5-shot”设置下，准确率迅速攀升至97\%以上，逼近全样本性能。 
@@ -608,8 +605,11 @@ VSFA则利用了物理散射拓扑特征。这说明在数据受限时，利用�
 
 
 \textbf{（1）Source Only}：不使用任何域适应模块。仅利用带标签的源域（仿真）数据，使用交叉熵损失（$\mathcal{L}_{\text{CE}}$）训练 ResNet50 特征提取器与分类器，直接在目标域（实测）数据上进行测试。
+
 \textbf{（2）CUT Only}：仅使用像素级域对齐模块。首先利用 CUT 模型将源域图像转换为中间域图像，随后利用转换后的带标签中间域图像，使用交叉熵损失训练 ResNet50 网络，不引入目标域数据参与特征提取器的训练。此配置旨在验证像素级风格迁移在缓解域偏移方面的贡献。
+
 \textbf{（3）CC-Loss Only}：仅使用类混淆域适应模块。不进行像素级图像翻译，直接将原始的源域图像和目标域图像输入网络，利用源域的交叉熵损失和目标域的类混淆损失CC-loss联合训练。此配置旨在验证类混淆损失在特征边界优化方面的独立有效性。
+
 \textbf{（4）CUT + CC-Loss}：本章提出的完整方法。首先利用 CUT 进行像素级对齐，再结合 CC-Loss 优化目标域判别边界进行特征级适应，旨在验证多层级域适应策略的协同优势。
 
 
@@ -617,7 +617,7 @@ VSFA则利用了物理散射拓扑特征。这说明在数据受限时，利用�
 \begin{table}[htb]
   \centering
   \begin{minipage}[t]{\linewidth}
-  \caption[基于SAMPLE数据集的少样本域适应消融实验结果]{基于SAMPLE数据集的少样本域适应消融实验结果}
+  \caption[像素级域对齐与类混淆损失的消融实验结果]{像素级域对齐与类混淆损失各消融模块在SAMPLE少样本数据集上的识别精度对比}
   \label{tab:ablation_study_chap2}
     % 使用指定的 tabularx 格式
     \begin{tabularx}{\linewidth}{>{\centering\bfseries\arraybackslash}m{3cm}*{4}{>{\centering\arraybackslash}X}}

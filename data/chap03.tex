@@ -390,7 +390,8 @@ $\mathbf{Macro\ F1}$的取值范围同样为 [0,1]，取值越接近 1，表明�
 CORAL\cite{deepcoral}、DANN\cite{ganin2016domain}、Mixup\cite{zhang2017mixup}、VREx\cite{krueger2021out}；
 以及四种近年来专为 SAR-ATR 设计的前沿域泛化与鲁棒识别算法：
 RN18+\cite{inkawhich2021bridging}、HDANet\cite{li2023hierarchical}、SSR\cite{kim2024soft}、IRSANet\cite{jang2025irasnet}。
-各对比算法的具体介绍如下，
+
+各对比算法的具体介绍如下：
 \textbf{CORAL}：通过对齐源域与增广域特征在深层网络中的二阶协方差矩阵，作为正则化项以约束网络提取域不变特征；
 \textbf{DANN}：引入梯度反转层与域分类器，利用域对抗训练机制促使特征提取器学习使得域分类器失效的域不变表征；
 \textbf{Mixup}：在输入空间及标签空间进行随机线性凸组合，通过生成虚拟插值样本平滑决策边界，增强模型泛化能力；
@@ -414,7 +415,7 @@ RN18+\cite{inkawhich2021bridging}、HDANet\cite{li2023hierarchical}、SSR\cite{k
 \begin{table}[htb]
   \centering
   \begin{minipage}[t]{\linewidth}
-  \caption[对比实验结果]{对比实验结果}
+  \caption[基于SAMPLE与S2M-5数据集的域泛化对比实验结果]{基于SAMPLE与S2M-5数据集的域泛化SAR目标识别各算法识别对比实验结果}
   \label{tab:comparison-results}
     \begin{tabularx}{\linewidth}{>{\centering\bfseries\arraybackslash}X>{\centering\bfseries\arraybackslash}X*{4}{>{\centering\arraybackslash}X}}
       \toprule[1.5pt]
@@ -497,7 +498,7 @@ SAMPLE上准确率达96.93\%、F1-score达96.75\%，S2M-5 上准确率达93.70\%
 \begin{table}[htb]
   \centering
   \begin{minipage}[t]{0.95\linewidth}
-  \caption[消融实验结果]{消融实验结果}
+  \caption[多层级数据增强与对抗学习模块的消融实验结果]{多层级数据增强与对抗学习各模块对域泛化性能影响的消融实验结果}
   \label{tab:transfer-results}
     \begin{tabularx}{\linewidth}{*{6}{>{\centering\arraybackslash}X}}
       \toprule[1.5pt]
@@ -553,7 +554,7 @@ S2M-5 数据集的准确率与 F1-score 分别达 93.70\%、93.79\%，
   \subfloat[高斯噪声增强]{\label{高斯噪声增强} \includegraphics[width=0.21\textwidth]{chap3_vision/noise.png}} \hspace{0.8em}
   \subfloat[高频扰动增强]{\label{高频扰动增强} \includegraphics[width=0.21\textwidth]{chap3_vision/fft.png}} \hspace{0.8em}
   \subfloat[分贝化增强]{\label{分贝化增强} \includegraphics[width=0.21\textwidth]{chap3_vision/decibel.png}} 
-  \caption{像素级数据增强示例}
+  \caption{基于SAR图像特性的像素级数据增强效果示例}
   \label{fig:sample_feature_visualization_aba_1}           
 \end{figure}
 
@@ -563,7 +564,7 @@ S2M-5 数据集的准确率与 F1-score 分别达 93.70\%、93.79\%，
   \subfloat[卷积块2特征]{\label{卷积块2输出特征} \includegraphics[width=0.45\textwidth]{chap3_vision/sample_conv2.png}} \\
   \subfloat[卷积块3特征]{\label{卷积块3输出特征} \includegraphics[width=0.45\textwidth]{chap3_vision/sample_conv3.png}} \hspace{0.8em}
   \subfloat[卷积块4特征]{\label{卷积块4输出特征} \includegraphics[width=0.45\textwidth]{chap3_vision/sample_conv4.png}} \\ 
-  \caption{基于像素级数据增强训练的ResNet50模型特征可视化}
+  \caption{像素级数据增强后ResNet50模型四组卷积块的特征t-SNE可视化}
   \label{fig:sample_feature_visualization_data}
 \end{figure}
 
@@ -579,7 +580,7 @@ S2M-5 数据集的准确率与 F1-score 分别达 93.70\%、93.79\%，
 对不同增强手段带来的“风格”极度敏感，导致各域特征簇呈现孤岛式的分离状态。随着网络深度的增加，经过卷积块2和块3（图3.5b、图3.5c），
 感受野逐步扩大，网络开始捕捉目标的局部组件与结构拓扑，不同域的特征流形开始互相渗透与重叠。到达最深层的卷积块4（图3.5d），
 网络已具备提取高阶抽象语义的能力，图中各颜色散点彻底交织混合，域的边界被完全溶解。这一现象从根本上证明了网络的高层专注于抽象语义分类，
-而浅/中层包含丰富的域风格信息。正因如此，本章设计的特征级风格混合模块（Mixstyle）被科学地部署在卷积块 1-3 之后，
+而浅和中层包含丰富的域风格信息。正因如此，本章设计的特征级风格混合模块（Mixstyle）被科学地部署在卷积块 1-3 之后，
 以精准干预风格扰动而避免破坏深层语义结构。
 
 \subsubsection{消融实验特征可视化分析}
@@ -593,7 +594,7 @@ S2M-5 数据集的准确率与 F1-score 分别达 93.70\%、93.79\%，
   \subfloat[像素级]{\label{像素级} \includegraphics[width=0.42\textwidth]{chap3_aba/pix_aug2.png}} \\
   \subfloat[像素级+特征级]{\label{像素级+特征级} \includegraphics[width=0.42\textwidth]{chap3_aba/pix_fea_aug2.png}} \hspace{0.8em}
   \subfloat[像素级+特征级+对抗学习]{\label{像素级+特征级+对抗学习} \includegraphics[width=0.42\textwidth]{chap3_aba/all2.png}} \\ 
-  \caption{不同模块组合下模型在SAMPLE数据集上的特征可视化}
+  \caption[不同模块组合下模型在SAMPLE数据集上的特征t-SNE可视化]{不同模块组合下模型在SAMPLE数据集上的特征t-SNE可视化}
   \label{fig:sample_feature_visualization_aba_2}
 \end{figure}
 
@@ -603,7 +604,7 @@ S2M-5 数据集的准确率与 F1-score 分别达 93.70\%、93.79\%，
   \subfloat[像素级]{\label{像素级2} \includegraphics[width=0.42\textwidth]{chap3_aba_s2m/s2m_pixel_feature_cropped.png}} \\
   \subfloat[像素级+特征级]{\label{像素级+特征级2} \includegraphics[width=0.42\textwidth]{chap3_aba_s2m/s2m_pixel_cropped.png}} \hspace{0.8em}
   \subfloat[像素级+特征级+对抗学习]{\label{像素级+特征级+对抗学习2} \includegraphics[width=0.42\textwidth]{chap3_aba_s2m/s2m_all_cropped.png}} \\ 
-  \caption{不同模块组合下模型在S2M-5数据集上的特征可视化}
+  \caption[不同模块组合下模型在S2M-5数据集上的特征t-SNE可视化]{不同模块组合下模型在S2M-5数据集上的特征t-SNE可视化}
   \label{fig:s2m5_feature_visualization_aba}
 \end{figure}
 

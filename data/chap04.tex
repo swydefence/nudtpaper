@@ -46,7 +46,7 @@
 \begin{figure}[htbp]
 	\centering
 	\includegraphics[width=\textwidth]{chap4/chap4_lightweight_pipeline.png}
-	\caption{跨域SAR目标识别模型轻量化与部署流程示意图}
+	\caption[跨域SAR目标识别模型轻量化部署流程示意图]{面向国产AI芯片的跨域SAR目标识别模型轻量化与端侧部署整体流程示意图}
 	\label{fig:chap4_pipeline}
 \end{figure}
 
@@ -101,7 +101,7 @@ ResNet50与MobileNetV2的参数量比约为7.5:1，属于蒸馏研究中经验�
 \begin{figure}[htbp]
 	\centering
 	\includegraphics[width=0.98\textwidth]{chap4/knowledge_distall.png}
-	\caption{基于逻辑的教师-学生知识蒸馏框架图}
+	\caption[软标签教师-学生知识蒸馏框架图]{基于ResNet50与MobileNetV2的软标签教师-学生知识蒸馏框架图}
 	\label{fig:chap4_kd}
 \end{figure}
 
@@ -393,7 +393,7 @@ IFMR校准通过搜索最优截断区间可精确匹配该有界分布特征，
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=\textwidth]{chap4/atlas_200idk.png}
-\caption[atlas 200I DK A2开发者套件实物图]{atlas 200I DK A2开发者套件实物图}
+\caption[Atlas 200I DK A2开发者套件实物图]{Atlas 200I DK A2开发者套件接口布局与硬件实物展示图}
 \label{fig:chap4_atlas}
 \end{figure}
 
@@ -408,7 +408,7 @@ Atlas 200I DK A2的内存总规格为4GB，
 \begin{table}[htb]
 	\centering
 	\begin{minipage}[t]{0.85\linewidth}
-	\caption[Atlas 200I DK A2开发者套件关键规格]{Atlas 200I DK A2开发者套件关键规格}
+	\caption[Atlas 200I DK A2开发者套件关键规格配置]{目标部署平台Atlas 200I DK A2开发者套件的关键硬件规格}
 	\label{tab:chap4_atlas_spec}
 		\begin{tabularx}{\linewidth}{>{\centering\bfseries\arraybackslash}m{3.5cm} >{\centering\arraybackslash}X}
 			\toprule[1.5pt]
@@ -444,7 +444,7 @@ Atlas 200I DK A2的内存总规格为4GB，
 \begin{figure}[htbp]
 	\centering
 	\includegraphics[width=\textwidth]{chap4/chap4_atlas_deploy_flow.png}
-	\caption{Atlas 200I DK端部署流程图}
+	\caption[基于AscendCL接口的模型端侧推理流程图]{基于AscendCL接口的模型端侧推理流程图}
 	\label{fig:chap4_deploy_flow}
 \end{figure}
 其中，输入侧保持与训练阶段一致的归一化策略与尺寸设置（128$\times$128、$[0,1]$归一化），
@@ -523,7 +523,7 @@ C++实现的核心流程与Python方式一致，
 \begin{table}[htb]
 	\centering
 	\begin{minipage}[t]{0.7\linewidth}
-	\caption[知识蒸馏训练超参数设置]{知识蒸馏训练超参数设置}
+	\caption[跨域知识蒸馏训练的超参数设置与优化策略]{以ResNet50为教师与MobileNetV2为学生的跨域知识蒸馏训练超参数设置与优化策略}
 	\label{tab:chap4_kd_params}
 		\begin{tabularx}{\linewidth}{>{\centering\bfseries\arraybackslash}m{5cm} >{\centering\arraybackslash}X}
 			\toprule[1.5pt]
@@ -554,7 +554,7 @@ C++实现的核心流程与Python方式一致，
 \begin{table}[htb]
 	\centering
 	\begin{minipage}[t]{0.98\linewidth}
-	\caption[模型压缩率与端侧性能对比]{模型压缩率与端侧性能对比}
+	\caption[模型轻量化压缩效果消融实验结果对比]{知识蒸馏与INT8量化处理前后SAR目标识别模型的参数量、存储空间大小与端侧单图推理时延对比评估}
 	\label{tab:chap4_efficiency}
 		\begin{tabularx}{\linewidth}{>{\centering\bfseries\arraybackslash}m{3.2cm}>{\centering\arraybackslash}m{2cm}*{4}{>{\centering\arraybackslash}X}}
 			\toprule[1.5pt]
@@ -598,7 +598,7 @@ INT8后训练量化在不改变网络结构和参数量的前提下进一步释�
 \begin{table}[htb]
 	\centering
 	\begin{minipage}[t]{0.98\linewidth}
-	\caption[第二章模型轻量化前后识别性能对比]{第二章模型轻量化前后识别性能对比}
+	\caption[少样本域适应SAR目标识别模型轻量化处理前后的精度对比]{少样本域适应SAR目标识别模型轻量化处理前后的精度对比}
 	\label{tab:chap4_acc_chap2}
 		\begin{tabularx}{\linewidth}{>{\centering\bfseries\arraybackslash}m{3.2cm}>{\centering\arraybackslash}m{2cm}*{4}{>{\centering\arraybackslash}X}}
 			\toprule[1.5pt]
@@ -619,7 +619,7 @@ INT8后训练量化在不改变网络结构和参数量的前提下进一步释�
 \begin{table}[htb]
 	\centering
 	\begin{minipage}[t]{0.9\linewidth}
-	\caption[第三章模型轻量化前后识别性能对比]{第三章模型轻量化前后识别性能对比}
+	\caption[域泛化SAR目标识别模型轻量化处理前后的精度对比]{域泛化SAR目标识别模型轻量化处理前后的精度对比}
 	\label{tab:chap4_acc_chap3}
 		\begin{tabularx}{\linewidth}{>{\centering\bfseries\arraybackslash}m{3.2cm}>{\centering\arraybackslash}m{2cm}*{2}{>{\centering\arraybackslash}X}}
 			\toprule[1.5pt]
@@ -677,8 +677,8 @@ INT8后训练量化在不改变网络结构和参数量的前提下进一步释�
 
 \begin{figure}[htbp]
 	\centering
-	\includegraphics[width=0.75\textwidth]{chap4/200IDK_pic.jpg}
-	\caption{基于Atlas 200I DK的SAR目标识别系统展示图}
+	\includegraphics[width=0.70\textwidth]{chap4/200IDK_pic.jpg}
+	\caption{基于Atlas 200I DK的跨域SAR目标识别系统实物展示图}
 	\label{fig:chap4_system_demo}
 \end{figure}
 
