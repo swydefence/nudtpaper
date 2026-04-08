@@ -37,6 +37,13 @@
 该方法主要由两个核心模块组构：像素级域对齐模块与类混淆域适应模块。
 整体网络框架如图\ref{fig:chap2_framework}所示。
 
+\begin{figure}[htp]
+\centering
+\includegraphics[width=\textwidth, keepaspectratio]{域自适应框图2}
+\caption{基于像素级域对齐和类混淆损失的少目标域样本域适应方法框图}
+\label{fig:chap2_framework}
+\end{figure}
+
 首先，在像素级域对齐阶段，本章设计使用一种适用于少样本条件的非配对图像翻译模型（CUT），
 以实现目标域数据受限条件下的高效像素级风格转换。
 相较于依赖循环一致性损失的传统图像翻译方法，该模型通过多层级的图像块噪声对比估计（Patch Noise Contrastive Estimation, PatchNCE），
@@ -62,12 +69,7 @@
 具备高类间区分度且抗噪性强的鲁棒特征，舍弃了复杂的特征空间对抗对齐流程，
 从而在极端少样本条件下达成了识别精度的显著提升。
 
-\begin{figure}[htp]
-\centering
-\includegraphics[width=\textwidth, keepaspectratio]{域自适应框图2}
-\caption{基于像素级域对齐和类混淆损失的少目标域样本域适应方法框图}
-\label{fig:chap2_framework}
-\end{figure}
+
 
 \subsection{像素级域对齐模块}
 
@@ -155,7 +157,7 @@ L_{\text{cut}} = L_{\text{GAN}}(G,D,X,Y) + L_{\text{PatchNCE}}(G,H,X) + L_{\text
 
 \begin{figure}[htp]
 \centering
-\includegraphics[width=0.7\textwidth, keepaspectratio]{chap2_vis/ccblock.pdf}
+\includegraphics[width=0.62\textwidth, keepaspectratio]{chap2_vis/ccblock.pdf}
 \caption{类混淆块（CC-Block）结构示意图}
 \label{fig:chap2_ccblock}
 \end{figure}
