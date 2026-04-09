@@ -17,17 +17,17 @@
   \subfloat[2S1实测]{\label{fig:sample_vis_2s1_r} \includegraphics[width=0.22\textwidth]{2s1_real_A_elevDeg_017_azCenter_010_22_serial_b01.png}} \hspace{0.5em}
   \subfloat[M35仿真]{\label{fig:sample_vis_m35_s} \includegraphics[width=0.22\textwidth]{m35_synth_A_elevDeg_016_azCenter_010_62_serial_t839.png}} \hspace{0.5em}
   \subfloat[M35实测]{\label{fig:sample_vis_m35_r} \includegraphics[width=0.22\textwidth]{m35_real_A_elevDeg_017_azCenter_010_62_serial_t839.png}}
-  \caption{SAMPLE数据集中代表性目标的仿真与实测SAR图像样例}
+  \caption[仿真与实测SAR图像样例]{SAMPLE数据集中代表性目标的仿真与实测SAR图像样例}
   \label{fig:sample_visual_shift}
 \end{figure}
 
-视觉差异之外，域偏移还体现在更稳定的统计分布层面。图\ref{fig:sample_mean_std_shift}给出了SAMPLE数据集中仿真域与实测域样本的均值和标准差统计图。从图中可以看出，两域样本在灰度强度中心、离散程度以及整体分布形态上均存在明显差异，说明仿真数据与实测数据在底层像素统计特征上并不服从同一分布。也就是说，域偏移并不仅仅表现为“看起来不一样”，而是进一步体现在样本均值、方差等基础统计量的系统性偏离上。这种从视觉表观到统计特征的双重失配，会进一步传递到深层特征空间，成为制约仿真-实测迁移性能的核心因素。
+视觉差异之外，域偏移还体现在更稳定的统计分布层面。图\ref{fig:sample_mean_std_shift}给出了公开的SAMPLE数据集中仿真域与实测域样本的均值和标准差统计图。从图中可以看出，两域样本在灰度强度中心、离散程度以及整体分布形态上均存在明显差异，说明仿真数据与实测数据在底层像素统计特征上并不服从同一分布。也就是说，域偏移并不仅仅表现为“看起来不一样”，而是进一步体现在样本均值、方差等基础统计量的系统性偏离上。这种从视觉表观到统计特征的双重失配，会进一步传递到深层特征空间，成为制约仿真-实测迁移性能的核心因素。
 
 \begin{figure}[htbp]
   \centering
   \subfloat[均值统计对比]{\label{fig:sample_mean_hist} \includegraphics[width=0.46\textwidth]{chap01/SAMPLE均值直方图.png}} \hspace{0.6em}
   \subfloat[标准差统计对比]{\label{fig:sample_std_hist} \includegraphics[width=0.46\textwidth]{chap01/SAMPLE标准差直方图.png}}
-  \caption{SAMPLE数据集中仿真域与实测域样本的均值和标准差统计对比}
+  \caption{仿真域与实测域样本的均值和标准差统计对比}{SAMPLE数据集中仿真域与实测域样本的均值和标准差统计对比}
   \label{fig:sample_mean_std_shift}
 \end{figure}
 
@@ -388,7 +388,7 @@ Jang等\cite{jang2025irasnet}提出一种基于特征解耦的域泛化框架，
 但在域差距更大、数据集变化更复杂的场景下，模型泛化性能仍存在波动，
 且部分方法在结构设计和训练流程上较为复杂，仍需进一步兼顾性能、稳定性与可部署性。
 
-\subsection{现状总结}
+\subsection{研究现状总结}
 总体来看，跨域SAR目标识别研究已经从传统的预训练微调与鲁棒特征设计，
 逐步发展为结合像素级对齐、特征级对齐、域随机化、风格混合和对抗学习的系统化技术路线。
 特别是在面向仿真-实测迁移的场景中，研究者已经形成基本共识：仅依赖有限实测样本扩充训练集难以从根本上缓解数据瓶颈，
