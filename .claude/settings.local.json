@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git:*)",
+      "Skill(latex-thesis-zh)",
+      "Bash(latexmk:*)"
+    ]
+  }
+}
