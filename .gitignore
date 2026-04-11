@@ -18,6 +18,7 @@
 *.gz
 *.bcf
 *.xml
+.worktrees/
 
 #################
 ## Eclipse
