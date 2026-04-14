@@ -665,7 +665,7 @@ pdfborder=0 1 1]{hyperref}
   \par
   \vspace*{2.5cm} %插入空白
   {\heiti\sanhao \@optionpaperclass{}\@optiondegreestring{}论文\\}
-  {\heiti\sanhao \ifisprof 专业学位\else 学术学位\fi\\}
+  {\heiti\sanhao \ifisprof （专业学位）\else （学术学位）\fi\\}
   \vspace{12bp}
   {\cusong\erhao[1.25] \@title \par}%
   \vspace{45bp} %从WORD中得来
