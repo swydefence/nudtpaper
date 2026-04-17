@@ -1,14 +1,14 @@
 \begin{cabstract}
-由于实测合成孔径雷达（Synthetic Aperture Radar，SAR）图像获取成本高、周期长，且在复杂任务场景下往往难以获得充足的高质量样本，利用仿真SAR图像训练目标识别模型已成为一种重要替代方案。随着计算机辅助设计与电磁仿真技术的发展，大规模生成具有准确标签的仿真SAR图像已具备可行性。然而，仿真SAR图像与实测SAR图像在背景环境、目标纹理和统计分布等方面均不可避免地存在显著差异，即仿真域与实测域之间存在域偏移，导致基于仿真数据训练的模型难以直接适应实测场景。为此，本文以仿真数据域为源域，实测数据域为目标域，围绕面向仿真-实测迁移的跨域SAR目标识别方法开展研究。重点针对“仿真与少量实测数据协同训练”和“纯仿真数据训练”两类典型场景分别开展创新设计与技术验证，并进一步实现了基于国产AI芯片的模型部署。主要工作如下：
+由于实测合成孔径雷达（Synthetic Aperture Radar，SAR）图像获取成本高、周期长，且在复杂任务场景下往往难以获得充足的高质量样本，利用仿真SAR图像训练目标识别模型已成为一种重要替代方案。然而，仿真SAR图像与实测SAR图像在背景环境、目标纹理和统计分布等方面均不可避免地存在显著差异，即仿真域与实测域之间存在域偏移，导致基于仿真数据训练的模型难以直接适应实测场景。为此，本文以仿真数据域为源域，实测数据域为目标域，围绕面向仿真-实测迁移的跨域SAR目标识别方法开展研究。重点针对“仿真与少量实测数据协同训练”和“纯仿真数据训练”两类典型场景分别开展创新设计与技术验证，并进一步实现了基于国产AI芯片的模型部署。主要工作如下：
 
-（1）针对仿真与少量实测数据协同训练场景下目标域信息不足、域间对齐困难的问题，提出了一种基于像素级域对齐和类混淆损失的域适应SAR目标识别方法。该方法利用基于对比学习的非配对图像翻译模型实现仿真图像向实测风格的像素级迁移，并结合类混淆损失与一致性约束优化少量实测样本条件下的目标域判别边界。实验结果表明，所提方法仅需少量实测数据即可实现从仿真域到实测域的有效迁移，有效缓解了现有域适应方法在实测样本不足条件下仿真域与实测域难以稳定对齐、模型跨域识别能力不足的问题。
+（1）针对仿真与少量实测数据协同训练场景下目标域信息不足、跨域迁移困难的问题，提出了一种基于像素级域对齐和类混淆损失的域适应SAR目标识别方法。该方法利用基于对比学习的非配对图像翻译模型实现仿真图像向实测风格的像素级迁移，并结合类混淆损失与一致性约束优化少量实测样本条件下的目标域判别边界。实验结果表明，所提方法有效缓解了现有域适应方法在实测样本不足条件下跨域迁移失效、模型跨域识别能力不足的问题。
 
-（2）针对纯仿真数据训练场景下训练阶段目标域完全不可见、模型易过拟合于仿真域的问题，提出了一种基于多层级数据增强和对抗学习的域泛化SAR目标识别方法。该方法通过像素级数据增强扩展仿真数据分布，利用特征级风格混淆模拟多样化潜在域特征，并结合域对抗学习约束模型提取域不变特征。实验结果表明，所提方法能够有效提高模型对未知实测数据的泛化能力与跨域稳定性，从而在纯仿真训练条件下显著提升模型面向未见实测场景的识别性能。
+（2）针对纯仿真数据训练场景下训练阶段目标域完全不可见、模型易过拟合于仿真域的问题，提出了一种基于多层级数据增强和对抗学习的域泛化SAR目标识别方法。该方法通过像素级数据增强扩展仿真数据分布，利用特征级风格混淆模拟多样化的潜在域特征分布，并结合域对抗学习约束模型提取域不变特征。实验结果表明，所提方法在纯仿真数据训练条件下显著提升了模型对未见实测数据的泛化能力和识别性能。
 
-（3）针对跨域SAR目标识别模型在国产边缘平台部署过程中参数规模较大、推理开销较高的问题，提出了一种面向华为昇腾芯片的轻量化部署方案。该方案结合知识蒸馏与INT8后训练量化，实现了跨域识别模型的压缩与板端部署验证。实验结果表明，该方案在较好保持跨域识别性能的同时，能够有效降低模型复杂度与推理开销，为跨域SAR目标识别模型在国产边缘设备上的实际部署应用提供了支撑。
+（3）针对跨域SAR目标识别模型在国产边缘平台部署过程中参数规模较大、推理开销较高的问题，提出了一种面向华为昇腾芯片的轻量化部署方案。该方案结合知识蒸馏与INT8后训练量化，实现了跨域识别模型的压缩与边缘设备部署验证。实验结果表明，该方案在较好保持跨域识别性能的同时，能够有效降低模型复杂度与推理开销，为国产边缘设备上的实际部署应用提供了支撑。
 
 \end{cabstract}
-\ckeywords{合成孔径雷达；自动目标识别；跨域迁移学习；域适应；域泛化；知识蒸馏；模型量化；华为Atlas 200I DK A2}
+\ckeywords{合成孔径雷达；自动目标识别；仿真-实测迁移；域适应；域泛化；知识蒸馏；模型量化；}
 
 \begin{eabstract}
 Due to the high cost and lengthy acquisition cycle of measured Synthetic Aperture Radar (SAR) images, as well as the difficulty of obtaining sufficient high-quality samples under complex task scenarios, training target recognition models with simulated SAR images has emerged as an important alternative. With advances in computer-aided design and electromagnetic simulation technologies, large-scale generation of accurately labeled simulated SAR images has become feasible. However, significant discrepancies inevitably exist between simulated and measured SAR images in terms of background environment, target texture, and statistical distribution, i.e., domain shift between the simulated and measured domains, which makes it challenging for models trained on simulated data to adapt directly to measured scenarios. To this end, this thesis designates the simulated data domain as the source domain and the measured data domain as the target domain, and investigates cross-domain SAR target recognition methods oriented toward simulated-to-measured transfer. The research focuses on two representative scenarios---collaborative training with simulated and a small number of measured samples, and training with purely simulated data---conducting innovative method design and technical validation for each, and further realizes model deployment on a domestic AI chip. The main contributions are as follows:
