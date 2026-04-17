@@ -86,6 +86,7 @@
 \RequirePackage{enumitem}
 \RequirePackage{xcolor}
 \RequirePackage{amsmath,amssymb}
+\setcounter{MaxMatrixCols}{15}
 \RequirePackage[Symbolsmallscale]{upgreek}
 \interdisplaylinepenalty=2500
 \RequirePackage{bm}
@@ -96,8 +97,16 @@
 \RequirePackage{indentfirst}
 \RequirePackage{xunicode-addon}
 \RequirePackage{notoccite}
+\RequirePackage{placeins}
+\RequirePackage{makecell}
+\RequirePackage{caption}
+%\RequirePackage{algorithm}
+%\RequirePackage{algpseudocode}
+%\AtEndPreamble{}
 \newcommand{\fttilde}{\fontspec{FreeSerif}\selectfont}
 \newfontfamily{\timesWinfont}{Times New Roman}
+\newfontfamily\arial{Arial}
+\newfontfamily\cambria{Cambria}
 \newcounter{numitemval}
 \newcounter{numitemslt} %selected
 \ifisbiber
@@ -105,7 +114,7 @@
 gbnamefmt=lowercase,gbpub=false,url=false,doi=false]{biblatex}%,backref=true
 \DeclareDelimFormat[bib,biblist]{titletypedelim}{\iffieldequalstr{userd}{chinese}{}{\space}}
 \renewbibmacro{addendum+pubstate}{} %去掉放在addendum中的信息
-\renewcommand{\bibfont}{\timesWinfont} %当Times New Roman PS Std缺字符时可以更换参考文献的英文字体
+\renewcommand{\bibfont}{\timesWinfont} %当Times New Roman缺字符时可以更换参考文献的英文字体
 \setlength{\bibitemsep}{1pt}
 \setlength{\bibnamesep}{0ex}
 \setlength{\bibinitsep}{0ex}
@@ -172,7 +181,7 @@ gbnamefmt=lowercase,gbpub=false,url=false,doi=false]{biblatex}%,backref=true
 \newcommand{\upcite}[1]{\textsuperscript{\newcite{#1}}} % 上标形式引用
 \renewcommand{\cite}[1]{\textsuperscript{\newcite{#1}}} % 上标形式引用
 \fi
-\RequirePackage[colorlinks=true,linkcolor=blue,citecolor=red,
+\RequirePackage[colorlinks=true,linkcolor=black,citecolor=black,
 bookmarksnumbered=true,
 pdfborder=0 1 1]{hyperref}
 \RequirePackage{datetime}
@@ -181,10 +190,17 @@ pdfborder=0 1 1]{hyperref}
 \xeCJKsetcharclass{"2E80}{"FFFF}{1}
 \RequirePackage{pdfpages}
 
+\RequirePackage{cleveref}
+\usepackage{cleveref}
+
+% 不添加“图”字，仅用于编号
+\crefrangeformat{figure}{#3#1#4--#5#2#6}
+\crefformat{figure}{#2#1#3}   % 单图引用时也无“图”
+\Crefname{figure}{}{}         % 禁用自动标签
+
 \newcommand{\installttf}{
     %%%% Windows Thesis Fonts
     \setmainfont{Times New Roman}
-    % \setmainfont{Arial}
     \setsansfont{Arial}
     \setmonofont{Courier New}
     %%%% Using Office Family Fonts
@@ -201,7 +217,6 @@ pdfborder=0 1 1]{hyperref}
 \newcommand{\installotf}{
     %%%% Windows Thesis Fonts
     \setmainfont{Times New Roman}
-    % \setmainfont{Arial}
     \setsansfont{Arial}
     \setmonofont{Courier New}
     %%%% Using Adobe Family Fonts
@@ -218,7 +233,6 @@ pdfborder=0 1 1]{hyperref}
 \newcommand{\installfz}{
     %%%% Windows Thesis Fonts
     \setmainfont{Times New Roman}
-    % \setmainfont{Arial}
     \setsansfont{Arial}
     \setmonofont{Courier New}
     %%%% Using Founder Family Fonts
@@ -235,7 +249,6 @@ pdfborder=0 1 1]{hyperref}
 \newcommand{\installfandol}{
     %%%% Windows Thesis Fonts
     \setmainfont{Times New Roman}
-    % \setmainfont{Arial}
     \setsansfont{Arial}
     \setmonofont{Courier New}
     %%%% Using Fandol Family Fonts
@@ -328,7 +341,7 @@ pdfborder=0 1 1]{hyperref}
   \fi}
 \renewpagestyle{plain}{
 \sethead{}{\raisebox{.65\baselineskip}{\songti \wuhao \ifisanon{~}%
-\else{国防科技大学\@optionpaperclass{}\@optiondegreestring{}论文}\fi}}{}%
+\else{国防科技大学{\ifisprof{专业学位}\else{}\fi}\@optionpaperclass{}\@optiondegreestring{}论文}\fi}}{}%
 \setfoot{}{{\songti \wuhao 第~\thepage~页}}{}%
 \headrule%
 \footrule%
@@ -349,41 +362,15 @@ pdfborder=0 1 1]{hyperref}
     \@mainmattertrue
     \pagenumbering{arabic}
     \pagestyle{plain}}
-% --- Appendix Numbering Logic ---
-\RequirePackage{etoolbox}
-\newcounter{appendices}
-\AtEndDocument{%
-  \if@filesw
-    \immediate\write\@auxout{\string\gdef\string\totalappendices{\the\value{appendices}}}%
-  \fi
-}
-\newcommand{\singleappendixsetup}{%
-  \renewcommand{\thesection}{\arabic{section}}
-  \renewcommand{\thesubsection}{\thesection.\arabic{subsection}}
-  \renewcommand{\thesubsubsection}{\thesubsection.\arabic{subsubsection}}
-  \renewcommand{\thefigure}{\arabic{figure}}
-  \renewcommand{\thetable}{\arabic{table}}
-  \renewcommand{\theequation}{\arabic{equation}}
-}
-\pretocmd{\appendix}{%
-  \ifdefined\totalappendices
-    \ifnum\totalappendices=1
-      \singleappendixsetup
-    \fi
-  \fi
-  \setcounter{appendices}{0}%
-  \pretocmd{\chapter}{\stepcounter{appendices}}{}{}%
-}{}{}
-% --- End Appendix Logic ---
 \renewcommand\backmatter{%
     \if@openright\cleardoublepage\else\clearpage\fi
     \titleformat{\chapter}
-      {\filcenter \heiti \sanhao}
-      {\ifdefined\totalappendices\ifnum\totalappendices=1 附录\else 附录\,\thechapter\fi\else 附录\,\thechapter\fi}
-      {1em}{}
-    \titlecontents{chapter}[0pt]{\vspace{0.25\baselineskip} \heiti \xiaosi[1.25]}
-      {\ifdefined\totalappendices\ifnum\totalappendices=1 附录\else 附录\,\thecontentslabel\fi\else 附录\,\thecontentslabel\fi\quad}{}
-      {\hspace{.5em}\titlerule*{.}\contentspage}
+	  {\filcenter \sanhao}
+	  {{\bfseries\cambria 附录\,\thechapter\,}}
+	  {1em}{\bfseries\songti}
+    \titlecontents{chapter}[0pt]{\vspace{0.25\baselineskip} \xiaosi[1.25]}
+      {{\songti 附录\,}{\arial \thecontentslabel}\quad}{}
+      {\hspace{.5em}\titlerule*{.}{\arial\contentspage}}
     \@mainmattertrue
     \pagestyle{plain}}
 \renewcommand\cleardoublepage{\clearpage\if@openright \ifodd\c@page\else
@@ -403,15 +390,15 @@ pdfborder=0 1 1]{hyperref}
   \vspace*{\fill}
   \clearpage\fi\fi%
 }
-\titlecontents{chapter}[0pt]{\vspace{0.25\baselineskip} \sf\heiti \xiaosi[1.25]}
+\titlecontents{chapter}[0pt]{\vspace{0.25\baselineskip} \heiti \xiaosi[1.25]}
     {第\zhnumber{\thecontentslabel}章\quad}{}
-    {\hspace{.5em}\titlerule*{.}\contentspage}
+    {\hspace{.5em}\titlerule*{.}{\arial\contentspage}}
 \titlecontents{section}[2em]{\songti \xiaosi[1.25]}
     {\thecontentslabel\quad}{}
-    {\hspace{.5em}\titlerule*{.}\contentspage}
+    {\hspace{.5em}\titlerule*{.}{\contentspage}}
 \titlecontents{subsection}[4em]{\songti \xiaosi[1.25]}
     {\thecontentslabel\quad}{}
-    {\hspace{.5em}\titlerule*{.}\contentspage}
+    {\hspace{.5em}\titlerule*{.}{\contentspage}}
 \titlecontents{figure}[0pt]{\songti \xiaosi[1.25]}
     {\makebox[3.5em][l]{图~\thecontentslabel\quad}}{}
     {\hspace{.5em}\titlerule*{.}\contentspage}
@@ -448,7 +435,7 @@ pdfborder=0 1 1]{hyperref}
 \newcommand\cabstractname{摘\hspace{1em}要}
 \newcommand\eabstractname{Abstract}
 \newcommand\ckeywordsname{关键词}
-\newcommand\ckeywords[1]{{\sf\hei\xiaosi \ckeywordsname: #1}}
+\newcommand\ckeywords[1]{{\hei\xiaosi \ckeywordsname: #1}}
 \newcommand\ekeywordsname{Key Words}
 \newcommand\ekeywords[1]{\textbf{\textsf{\xiaosi \ekeywordsname: #1}}}
 \newenvironment{cabstract}{%
@@ -468,7 +455,7 @@ pdfborder=0 1 1]{hyperref}
 \setlength{\topskip}{0pt}
 \setcounter{secnumdepth}{3}
 \setlength{\footnotesep}{2.2ex \@minus 2bp}
-\titleformat{\chapter}[block]{\filcenter\sf \heiti\sanhao[1.25]}{第\zhnumber{\thechapter}章\,}{1em}{}
+\titleformat{\chapter}{\filcenter\sf \heiti\sanhao[1.25]}{第\zhnumber{\thechapter}章\,}{1em}{}
 \titleformat{\section}{\filcenter\bfseries \cusong\sihao[1.25]}{\thesection}{1em}{}
 \titleformat{\subsection}{\sf \heiti\xiaosi[1.25]}{\thesubsection}{1em}{}
 \titleformat{\subsubsection}{\bfseries \cusong\xiaosi[1.25]}{\thesubsubsection}{1em}{}
@@ -551,7 +538,8 @@ pdfborder=0 1 1]{hyperref}
     \setlength{\topsep}{0pt} % 标签与上文的间距
 }}{\end{list}}
 \newenvironment{ack}{%
-    \chapter*{致\hspace{1em}谢}%
+    %\chapter*{致\hspace{1em}谢}%
+    \chapter*{致谢}%
     \addcontentsline{toc}{chapter}{致谢}%
     \ifisanon\color{white}\else\relax\fi%
     \xiaosi%
@@ -560,7 +548,7 @@ pdfborder=0 1 1]{hyperref}
 \newenvironment{resume}{%
     \chapter*{作者在学期间取得的学术成果}
     \addcontentsline{toc}{chapter}{作者在学期间取得的学术成果}
-    \renewcommand{\baselinestretch}{1.5}\xiaosi
+    \xiaosi
     \@afterheading}
     {\par\vspace{2em}\par}
 \renewtheoremstyle{nonumberplain}%
@@ -664,11 +652,14 @@ pdfborder=0 1 1]{hyperref}
   }
   \par
   \vspace*{2.5cm} %插入空白
-  {\heiti\sanhao \@optionpaperclass{}\@optiondegreestring{}论文\\}
-  {\heiti\sanhao \ifisprof （专业学位）\else （学术学位）\fi\\}
-  \vspace{12bp}
-  {\cusong\erhao[1.25] \@title \par}%
-  \vspace{45bp} %从WORD中得来
+  {\heiti\sanhao
+  \linespread{1.25}\selectfont
+  \ifisprof{专业学位}\else\@papertype{}\fi\@optionpaperclass{}\@optiondegreestring{}论文\\
+  （学术学位）% （专业学位）
+	\par}
+	\vspace{12bp}
+	{\cusong\erhao[1.25] \@title \par}%
+	\vspace{45bp} %从WORD中得来
   {\heiti \sihao
     \begin{tabular}{cp{8cm}c}
       \ifismaster
@@ -736,7 +727,9 @@ A \ifisprof{thesis}\else{dissertation} \fi \\
 Submitted in partial fulfillment of the requirements\\
 for the \ifisprof{professional }\else{}\fi degree of \textsf{\@optionpaperclassen{} of \@enpapertype}\\
 in \textsf{\@ensubject}\\
-  \makebox[\textwidth]{\ifisanon{~}\else{Graduate School of National University of Defense Technology}\fi}\\[5mm]
+\makebox[\textwidth]{\ifisanon{~}\else{National University of %
+Defense Technology}\fi}\\[5mm]
+% \ifisanon{~}\else{Changsha, Hunan, P.\ R.\ China}\fi\\[5mm]
 ~\@endate~
   }
   \end{center}\vfill

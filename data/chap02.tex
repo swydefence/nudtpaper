@@ -460,7 +460,7 @@ Shi等人所提方法\cite{shi2024unsupervised}以及MACR\cite{luan2025unsupervi
 \begin{table}[htb]
   \centering
   \begin{minipage}[t]{\linewidth}
-  \caption[基于SAMPLE数据集的域适应对比实验结果]{针对不同实测数据参与量训练场景在SAMPLE数据集上的各域适应算法识别精度对比}
+  \caption[基于SAMPLE数据集的域适应对比实验结果]{针对不同实测数据参与量在SAMPLE数据集上的各域适应算法识别精度对比}
   \label{tab:chap2_comparison-results}
     % 修复BUG1：修正表格列格式 正确写法
     % \begin{tabularx}{\linewidth}{>{\centering\bfseries\arraybackslash}m{2cm}>{\centering\bfseries\arraybackslash}m{1.7cm}*{4}{>{\centering\arraybackslash}X}}
@@ -579,7 +579,7 @@ VSFA则利用了物理散射拓扑特征。这说明在数据受限时，利用�
 \begin{table}[htb]
   \centering
   \begin{minipage}[t]{\linewidth}
-  \caption[像素级域对齐与类混淆损失的消融实验结果]{像素级域对齐与类混淆损失各消融模块在SAMPLE不同实测数据训练场景下的识别精度对比}
+  \caption[像素级域对齐与类混淆损失的消融实验结果]{像素级域对齐与类混淆损失的消融实验结果}
   \label{tab:ablation_study_chap2}
     % 使用指定的 tabularx 格式
     \begin{tabularx}{\linewidth}{>{\centering\bfseries\arraybackslash}m{3cm}*{4}{>{\centering\arraybackslash}X}}
@@ -662,16 +662,16 @@ CUT 模块作为像素级域对齐模块，首先缓解了底层视觉统计差�
 
 \textbf{（1）All 设置（全样本）:}
 如图 \ref{fig:gan_comparison_multishot} 第一行所示，在数据充足（All）的理想设置下，CycleGAN拥有充足的目标域数据进行参考，
-能够生成高质量的风格迁移图像（图\ref{fig:gan_comparison_multishot}（a））。然而，仔细对比可以发现，CUT 生成的图像（图\ref{fig:gan_comparison_multishot}（b））在保留源域高频细节（如目标的强散射点分布）
-方面仍略占优势。此外，从模型原理角度分析，CUT 仅需训练单向生成器,更加简单高效。
-因此，即便在数据充足场景下，本章所选用的 CUT 模型在生成质量与训练效率的综合考量上依然具有很强的竞争力。
+能够生成高质量的风格迁移图像（图\ref{fig:gan_comparison_multishot}（a））。然而，仔细对比可发现，CUT 生成的图像（图\ref{fig:gan_comparison_multishot}（b））在保留源域高频细节（如目标的强散射点分布）
+方面仍略占优势。此外，从模型原理分析，CUT 仅需训练单向生成器,更加简单高效。
+因此，即便在数据充足场景下，本章选用的 CUT 模型在生成质量与训练效率的综合考量上依然具备较强竞争力。
 
 \textbf{（2）10-shot 设置（有限样本）:}  
 当目标域样本减少至 10-shot（图 \ref{fig:gan_comparison_multishot} 第二行）时，两者的性能差距开始显现。
 CycleGAN（图\ref{fig:gan_comparison_multishot}（d））虽仍具备一定的分布拟合能力，生成的图像基本具备了 SAR 目标的形态，
 但细节处（如车辆边缘、阴影区域）已出现模糊，且风格迁移存在不均匀现象。相对而言，CUT（图\ref{fig:gan_comparison_multishot}（e））表现依然稳健，
 在保持目标结构完整性的同时，生成的相干斑噪声更加自然、均匀，视觉感官上与真实 SAR 图像几乎无异。
-这一结果佐证了在有限数据条件下，基于对比学习的非配对翻译机制比基于循环一致性的对抗机制能提供更优质的中间域数据。
+这一结果佐证了在有限的情况下，基于对比学习的非配对翻译机制比基于循环一致性的对抗机制能提供更优质的中间域数据。
 
 \textbf{（3）5-shot 设置（少样本）:}
 随着样本量进一步减少至 5-shot（图 \ref{fig:gan_comparison_multishot} 第三行），CycleGAN 的生成质量出现显著下滑。
