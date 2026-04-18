@@ -435,19 +435,21 @@ pdfborder=0 1 1]{hyperref}
 \newcommand\cabstractname{摘\hspace{1em}要}
 \newcommand\eabstractname{Abstract}
 \newcommand\ckeywordsname{关键词}
-\newcommand\ckeywords[1]{{\hei\xiaosi \ckeywordsname: #1}}
+\newlength{\abstractkeywordssep}
+\setlength{\abstractkeywordssep}{0.75em}
+\newcommand\ckeywords[1]{\par\noindent{\hei\xiaosi \ckeywordsname: #1}}
 \newcommand\ekeywordsname{Key Words}
-\newcommand\ekeywords[1]{\textbf{\textsf{\xiaosi \ekeywordsname: #1}}}
+\newcommand\ekeywords[1]{\par\noindent\textbf{\textsf{\xiaosi \ekeywordsname: #1}}}
 \newenvironment{cabstract}{%
     \chapter{\cabstractname}
     \xiaosi
     \@afterheading}
-    {\par\vspace{2em}\par}
+    {\par\vspace{\abstractkeywordssep}}
 \newenvironment{eabstract}{%
     \chapter{\textsf{\eabstractname}}
     \xiaosi
     \@afterheading}
-    {\par\vspace{2em}\par}
+    {\par\vspace{\abstractkeywordssep}}
 \newcommand{\sectionbreak}{%
 \addpenalty{-300}%
 \vspace*{0pt}%
@@ -459,7 +461,7 @@ pdfborder=0 1 1]{hyperref}
 \titleformat{\section}{\filcenter\bfseries \cusong\sihao[1.25]}{\thesection}{1em}{}
 \titleformat{\subsection}{\sf \heiti\xiaosi[1.25]}{\thesubsection}{1em}{}
 \titleformat{\subsubsection}{\bfseries \cusong\xiaosi[1.25]}{\thesubsubsection}{1em}{}
-\titlespacing{\chapter}{0pt}{2.4ex-\topskip-\heightof{A}}{2.4ex \@minus 2bp}
+\titlespacing{\chapter}{0pt}{0.75em-\topskip-\heightof{A}}{0.75em \@minus 2bp}
 \titlespacing{\section}{0pt}{2ex-\heightof{a}}{2ex \@minus 2bp}
 \titlespacing{\subsection}{2em}{2ex \@minus 2bp}{2ex \@minus 2bp}
 \titlespacing{\subsubsection}{2em}{1ex \@minus 2bp}{1ex \@minus 2bp}
