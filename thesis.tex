@@ -52,7 +52,7 @@
 %7. 如果是专硕，则使用prof选项
 % \documentclass[master,biber,prof]{nudtpaper}
 %
-\documentclass[master,ttf]{nudtpaper}
+\documentclass[master,twoside,ttf]{nudtpaper}
 
 \ifisbiber
 \addbibresource[location=local]{ref/refs.bib}
@@ -95,7 +95,7 @@
 \maketitle
 \frontmatter
 
-\let\cleardoublepage=\clearpage %章节前无需从单数页起始
+% \let\cleardoublepage=\clearpage % 保持注释以确保各章都从奇数页起始
 \tableofcontents
 \listoftables
 \listoffigures
