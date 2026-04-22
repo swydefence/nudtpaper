@@ -209,7 +209,7 @@ SAMPLE数据集已在第二章实验数据集介绍部分进行了详细说明�
   \label{tab:s2m-data}
     % 表格列格式：
     % 第1列：居中+黑体+固定宽度（适配换行）；后5列使用教程中提到的Z列（自动换行+居中）
-    \begin{tabularx}{\linewidth}{>{\centering\bfseries\arraybackslash}m{3.5cm}*{5}{>{\centering\arraybackslash}X}}
+    \begin{tabularx}{\linewidth}{>{\centering\arraybackslash}m{3.5cm}*{5}{>{\centering\arraybackslash}X}}
       \toprule[1.5pt]  % 教程指定的1.5pt粗上框线
       目标类别 & 2S1 & BMP2 & BTR70 & T72 & ZSU23 \\
       \midrule[1pt]    % 教程指定的1pt粗中框线
@@ -293,18 +293,18 @@ $\mathbf{Macro\ F1}$的取值范围同样为 [0,1]，取值越接近 1，表明�
   \begin{minipage}[t]{0.9\linewidth}
   \caption[SAMPLE与S2M-5数据集的具体实验设置]{SAMPLE与S2M-5数据集的具体实验设置}
   \label{tab:dataset-settings}
-    \begin{tabularx}{\linewidth}{>{\centering\bfseries\arraybackslash}m{3cm}*{4}{>{\centering\arraybackslash}X}}
+    \begin{tabularx}{\linewidth}{>{\centering\arraybackslash}m{3cm}*{4}{>{\centering\arraybackslash}X}}
       \toprule[1.5pt]
       % ==========【关键修改 1/2 核心修改处】==========
       % multirow{2}{*} 表示：跨行2行、宽度自适应、内容居中，完美实现Dataset在两行中间
-      \multirow{2}{*}{\bfseries 数据集} & \multicolumn{2}{c}{\bfseries SAMPLE} & \multicolumn{2}{c}{\bfseries S2M-5} \\
-      \cmidrule(lr){2-3} \cmidrule(lr){4-5}
+      \multirow{2}{*}{数据集} & \multicolumn{2}{c}{SAMPLE} & \multicolumn{2}{c}{S2M-5} \\
+      \cmidrule[1pt](lr){2-3} \cmidrule[1pt](lr){4-5}
       % ==========【关键修改 2/2 必改处】==========
       & 训练集 & 测试集 & 训练集 & 测试集 \\ % 这一行的第一列 直接留空即可！！
       \midrule[1pt]
       俯仰角 & $14^{\circ}-16^{\circ}$ & $17^{\circ}$ & $14^{\circ}-17^{\circ}$ & $15^{\circ}\ \&17^{\circ}$ \\
       方位角 & $10^{\circ}-80^{\circ}$ & $10^{\circ}-80^{\circ}$ & $10^{\circ}-80^{\circ}$ & $0^{\circ}-90^{\circ}$ \\
-      \midrule
+      \midrule[1pt]
       2S1 & 116 & 58 & 174 & 142 \\
       BMP2 & 55 & 52 & 107 & 106 \\
       BTR70 & 43 & 49 & 92 & 111 \\
@@ -315,7 +315,7 @@ $\mathbf{Macro\ F1}$的取值范围同样为 [0,1]，取值越接近 1，表明�
       M60 & 116 & 60 & / & / \\
       T72 & 56 & 52 & 108 & 106 \\
       ZSU23 & 116 & 58 & 174 & 143 \\
-      \midrule
+      \midrule[1pt]
       总计 & 806 & 539 & 655 & 608 \\
       \bottomrule[1.5pt]
     \end{tabularx}
@@ -339,7 +339,7 @@ $\mathbf{Macro\ F1}$的取值范围同样为 [0,1]，取值越接近 1，表明�
   \begin{minipage}[t]{0.7\linewidth}
   \caption[域泛化SAR目标识别模型训练超参数与优化策略]{域泛化SAR目标识别模型训练超参数与优化策略}
   \label{tab:model-hyperparams}
-    \begin{tabularx}{\linewidth}{>{\centering\bfseries\arraybackslash}m{5cm} >{\centering\arraybackslash}X}
+    \begin{tabularx}{\linewidth}{>{\centering\arraybackslash}m{5cm} >{\centering\arraybackslash}X}
       \toprule[1.5pt]
       参数 &  \\
       \midrule[1pt]
@@ -393,25 +393,25 @@ RN18+\cite{inkawhich2021bridging}、HDANet\cite{li2023hierarchical}、SSR\cite{k
   \begin{minipage}[t]{\linewidth}
   \caption[基于SAMPLE与S2M-5数据集的域泛化对比实验结果]{基于SAMPLE与S2M-5数据集的域泛化SAR目标识别对比实验结果}
   \label{tab:comparison-results}
-    \begin{tabularx}{\linewidth}{>{\centering\bfseries\arraybackslash}X>{\centering\bfseries\arraybackslash}X*{4}{>{\centering\arraybackslash}X}}
+    \begin{tabularx}{\linewidth}{>{\centering\arraybackslash}X>{\centering\arraybackslash}X*{4}{>{\centering\arraybackslash}X}}
       \toprule[1.5pt]
-      \multirow{2}{*}{\bfseries 方法} & \multirow{2}{*}{\bfseries 类型} & \multicolumn{2}{c}{\bfseries SAMPLE} & \multicolumn{2}{c}{\bfseries S2M-5} \\
-      \cmidrule(lr){3-4} \cmidrule(lr){5-6}
+      \multirow{2}{*}{方法} & \multirow{2}{*}{类型} & \multicolumn{2}{c}{SAMPLE} & \multicolumn{2}{c}{S2M-5} \\
+      \cmidrule[1pt](lr){3-4} \cmidrule[1pt](lr){5-6}
       & & 准确率(\%) & F1-score(\%) & 准确率(\%) &  F1-score(\%) \\
-      \midrule
+      \midrule[1pt]
       ResNet50 & 基线 & 48.37  & 45.54 & 37.25  & 33.54 \\
       A-ConvNet & 基线 & 52.36 & 48.47 & 44.45  &	45.47 \\
-      \midrule
+      \midrule[1pt]
       CORAL & 通用域泛化 & 87.76 &	86.92 & 85.42 & 84.92 \\
       DANN & 通用域泛化 & 90.42 &	89.87 & 81.02 & 79.47 \\
       Mixup & 通用域泛化 & 91.78 & 90.97 & 89.48 & 89.17 \\
       VREx & 通用域泛化 & 92.64 &	92.67 & 90.15 & 90.67  \\
-      \midrule
+      \midrule[1pt]
       RN18+ & SAR-ATR & 94.91 &	94.83 & 74.31 &	72.47  \\
       HDANet & SAR-ATR & 88.21 & 87.79 & 84.67 & 84.79 \\
       SSR & SAR-ATR & 91.69 & 91.65 & 81.64 & 81.56 \\
       IRSANet & SAR-ATR & 95.76 & 95.59 & 88.29 & 88.15 \\
-      \midrule
+      \midrule[1pt]
       本章方法 & SAR-ATR & 96.93 & 96.75 & 93.70 & 93.79 \\
       \bottomrule[1.5pt]
     \end{tabularx}
@@ -497,13 +497,13 @@ IRSANet则耦合了杂波抑制模块与域对抗学习，
     \begin{tabularx}{\linewidth}{*{6}{>{\centering\arraybackslash}X}}
       \toprule[1.5pt]
       & 像素级 & 特征级 & 对抗学习 & 准确率(\%) & F1-score(\%)  \\
-      \midrule
+      \midrule[1pt]
       \multirow{4}{*}{SAMPLE} 
       & $\times$ & $\times$ & $\times$ & 48.37  & 45.54 \\
       & $\surd$ & $\times$ & $\times$ & 81.72 & 82.95 \\
       & $\surd$ & $\surd$ & $\times$ & 92.42 & 91.71 \\
       & $\surd$ & $\surd$ & $\surd$ & 96.93 & 96.75  \\
-      \midrule
+      \midrule[1pt]
       \multirow{4}{*}{S2M-5} 
       & $\times$ & $\times$ & $\times$ & 37.25  & 33.54 \\
       & $\surd$ & $\times$ & $\times$ & 74.92 & 75.61  \\

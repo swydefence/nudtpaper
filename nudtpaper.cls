@@ -539,13 +539,14 @@ pdfborder=0 1 1]{hyperref}
     \setlength{\listparindent}{0pt} % 段落缩进量
     \setlength{\topsep}{0pt} % 标签与上文的间距
 }}{\end{list}}
-\newenvironment{ack}{%
+\NewDocumentEnvironment{ack}{+b}{%
     %\chapter*{致\hspace{1em}谢}%
     \chapter*{致谢}%
     \addcontentsline{toc}{chapter}{致谢}%
-    \ifisanon\color{white}\else\relax\fi%
     \xiaosi%
-    \@afterheading}
+    \@afterheading%
+    % anon 模式保留标题页，但不再排版致谢正文。
+    \ifisanon\relax\else#1\fi}
     {\par\vspace{2em}\par}
 \newenvironment{resume}{%
     \chapter*{作者在学期间取得的学术成果}

@@ -217,7 +217,7 @@ SAMPLE 数据集中采用的 SAR 成像算法为极坐标格式算法（polar fo
   \label{tab:sample-data}
     % 表格列格式：
     % 第1列：居中+黑体+固定宽度（适配换行）；后10列使用教程中提到的Z列（自动换行+居中）
-    \begin{tabularx}{\linewidth}{>{\centering\bfseries\arraybackslash}m{1.5cm}*{5}{>{\centering\arraybackslash}p{0.8cm}}*{5}{>{\centering\arraybackslash}X}}
+    \begin{tabularx}{\linewidth}{>{\centering\arraybackslash}m{1.5cm}*{5}{>{\centering\arraybackslash}p{0.8cm}}*{5}{>{\centering\arraybackslash}X}}
       \toprule[1.5pt]  % 教程指定的1.5pt粗上框线
       目标类别 & 2S1 & BMP2 & BTR70 & T72 & ZSU23 & M1 & M2 & M35 & M548 & M60 \\
       \midrule[1pt]    % 教程指定的1pt粗中框线
@@ -326,14 +326,14 @@ SAMPLE数据集的仿真数据与实测数据之间存在显著的域差异。
   \begin{minipage}[t]{\linewidth}
   \caption[SAMPLE数据集仿真与少量目标域实测样本训练实验数据设置]{SAMPLE数据集仿真与少量目标域实测样本训练实验数据设置}
   \label{tab:DA-dataset-settings}
-    \begin{tabularx}{\linewidth}{>{\centering\bfseries\arraybackslash}m{1.5cm} c *{5}{>{\centering\arraybackslash}X} c}
+    \begin{tabularx}{\linewidth}{>{\centering\arraybackslash}m{1.5cm} c *{5}{>{\centering\arraybackslash}X} c}
       \toprule[1.5pt]
-      \multirow{3}{*}{\bfseries 类别} & \multicolumn{6}{c}{\bfseries 训练集} & \multirow{3}{*}{\bfseries 测试集} \\
-      \cmidrule(lr){2-7}
-      & \bfseries 源域 & \multicolumn{5}{c}{\bfseries 目标域（无监督）}  & \\
-      \cmidrule(lr){3-7} 
-      & \bfseries （有监督） & All & 1-shot & 3-shot & 5-shot & 10-shot & \\
-      \midrule
+      \multirow{3}{*}{类别} & \multicolumn{6}{c}{训练集} & \multirow{3}{*}{测试集} \\
+      \cmidrule[1pt](lr){2-7}
+      & 源域 & \multicolumn{5}{c}{目标域（无监督）}  & \\
+      \cmidrule[1pt](lr){3-7}
+      & （有监督） & All & 1-shot & 3-shot & 5-shot & 10-shot & \\
+      \midrule[1pt]
       2S1 & 174 & 174 & 1 & 3 & 5 & 10 & 174 \\ % 修正：保留7个数据（无多余列）
       BMP2 & 107 & 107 & 1 & 3 & 5 & 10 & 107 \\
       BTR70 & 92 & 92 & 1 & 3 & 5 & 10 & 92 \\
@@ -344,7 +344,7 @@ SAMPLE数据集的仿真数据与实测数据之间存在显著的域差异。
       M60 & 176 & 176 & 1 & 3 & 5 & 10 & 176 \\
       T72 & 108 & 108 & 1 & 3 & 5 & 10 & 108 \\
       ZSU23 & 174 & 174 & 1 & 3 & 5 & 10 & 174 \\
-      \midrule
+      \midrule[1pt]
       Total & 1345 & 1345 & 10 & 30 & 50 & 100 & 1345 \\
       \bottomrule[1.5pt]
     \end{tabularx}
@@ -365,7 +365,7 @@ SAMPLE数据集的仿真数据与实测数据之间存在显著的域差异。
   \begin{minipage}[t]{0.7\linewidth}
   \caption[像素级域对齐模块训练参数]{像素级域对齐模块训练参数}
   \label{tab:cut-model-hyperparams}
-    \begin{tabularx}{\linewidth}{>{\centering\bfseries\arraybackslash}m{5cm} >{\centering\arraybackslash}X}
+    \begin{tabularx}{\linewidth}{>{\centering\arraybackslash}m{5cm} >{\centering\arraybackslash}X}
       \toprule[1.5pt]
       参数 &  \\
       \midrule[1pt]
@@ -384,7 +384,7 @@ SAMPLE数据集的仿真数据与实测数据之间存在显著的域差异。
   \begin{minipage}[t]{0.7\linewidth}
   \caption[类混淆域适应模块训练参数]{类混淆域适应模块训练参数}
   \label{tab:cc-loss-model-hyperparams}
-    \begin{tabularx}{\linewidth}{>{\centering\bfseries\arraybackslash}m{5cm} >{\centering\arraybackslash}X}
+    \begin{tabularx}{\linewidth}{>{\centering\arraybackslash}m{5cm} >{\centering\arraybackslash}X}
       \toprule[1.5pt]
       参数 &  \\
       \midrule[1pt]
@@ -456,27 +456,26 @@ Shi等人所提方法\cite{shi2024unsupervised}以及MACR\cite{luan2025unsupervi
   \caption[基于SAMPLE数据集的域适应对比实验结果]{针对不同实测数据参与量在SAMPLE数据集上的各域适应算法识别精度对比}
   \label{tab:chap2_comparison-results}
     % 修复BUG1：修正表格列格式 正确写法
-    % \begin{tabularx}{\linewidth}{>{\centering\bfseries\arraybackslash}m{2cm}>{\centering\bfseries\arraybackslash}m{1.7cm}*{4}{>{\centering\arraybackslash}X}}
-    \begin{tabularx}{\linewidth}{>{\centering\bfseries\arraybackslash}m{3cm}*{5}{>{\centering\arraybackslash}X}}
+    \begin{tabularx}{\linewidth}{>{\centering\arraybackslash}m{3cm}*{5}{>{\centering\arraybackslash}X}}
       \toprule[1.5pt]
-      \multirow{2}{*}{\bfseries 方法} &  \multicolumn{5}{c}{\bfseries 准确率(\%)}  \\
-      \cmidrule(lr){2-6}
+      \multirow{2}{*}{方法} &  \multicolumn{5}{c}{准确率(\%)}  \\
+      \cmidrule[1pt](lr){2-6}
       & All & 1-shot & 3-shot & 5-shot & 10-shot \\
-      \midrule
+      \midrule[1pt]
       Source Only & 46.29 & 46.29  & 46.29 & 46.29  & 46.29 \\
       Target Only & 99.95 & 16.32 & 32.47 & 54.42 &	80.51 \\
-      \midrule
+      \midrule[1pt]
       DAN\cite{long2015learning} & 78.35 & 51.19 & 58.70 & 62.04 & 69.48 \\
       DANN\cite{ganin2015unsupervised} & 83.65 & 42.14 & 56.45 & 64.37 & 71.35 \\
       CDAN\cite{long2018conditional} & 86.96 & 49.48 & 66.20 & 72.74 & 77.12 \\
       DSAN\cite{zhu2020deep} & 88.95 & 61.83 & 67.87 & 71.12 & 78.15 \\
-      \midrule
+      \midrule[1pt]
       PFDA\cite{chen2022pixel} & 97.09 & — & 38.17 & 41.58 & 54.37 \\
       VSFA\cite{zhang2023vsfa} & 98.18 &  77.58 & 88.61 & 92.35 & 95.61 \\
       Sun等人方法\cite{sun2023gradual} & 96.46 & 55.47 & 68.28 & 72.67 & 81.14 \\
       Shi等人方法\cite{shi2024unsupervised} & 98.49 & 69.25 & 79.14 & 84.36 & 89.78 \\
       MACR\cite{luan2025unsupervised} & 99.27  & — & 45.58 & 50.14 & 67.38 \\
-      \midrule
+      \midrule[1pt]
       本章方法 &  99.15 & 92.45 & 96.78 & 97.15 & 97.95 \\
       \bottomrule[1.5pt]
     \end{tabularx}
@@ -575,16 +574,16 @@ VSFA则利用了物理散射拓扑特征。这说明在数据受限时，利用�
   \caption[像素级域对齐与类混淆损失的消融实验结果]{像素级域对齐与类混淆损失的消融实验结果}
   \label{tab:ablation_study_chap2}
     % 使用指定的 tabularx 格式
-    \begin{tabularx}{\linewidth}{>{\centering\bfseries\arraybackslash}m{3cm}*{4}{>{\centering\arraybackslash}X}}
+    \begin{tabularx}{\linewidth}{>{\centering\arraybackslash}m{3cm}*{4}{>{\centering\arraybackslash}X}}
       \toprule[1.5pt]
-      \multirow{2}{*}{\bfseries 实验配置} & \multicolumn{2}{c}{\bfseries 模块设置} & \multicolumn{2}{c}{\bfseries 准确率(\%)} \\
-      \cmidrule(lr){2-3} \cmidrule(lr){4-5} 
+      \multirow{2}{*}{实验配置} & \multicolumn{2}{c}{模块设置} & \multicolumn{2}{c}{准确率(\%)} \\
+      \cmidrule[1pt](lr){2-3} \cmidrule[1pt](lr){4-5} 
        & 像素级域对齐 & 类混淆域适应 & 1-shot & All \\ 
-      \midrule
+      \midrule[1pt]
       Source Only & $\times$ & $\times$ & 46.29 & 46.29 \\
       CUT Only & $\surd$ & $\times$ & 79.35 & 91.62 \\
       CC-Loss Only & $\times$ & $\surd$ & 71.42 & 94.18 \\
-      CUT + CC-Loss & $\surd$ & $\surd$ & \textbf{92.45} & \textbf{99.15} \\ 
+      CUT + CC-Loss & $\surd$ & $\surd$ & 92.45 & 99.15 \\ 
       \bottomrule[1.5pt]
     \end{tabularx}
   \end{minipage}

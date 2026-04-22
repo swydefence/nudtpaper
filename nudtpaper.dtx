@@ -1583,12 +1583,13 @@ gbnamefmt=lowercase,gbpub=false]{biblatex}%
 % \changes{v1.8}{2010/10/15}{致谢之间要加一个空格}
 %    \begin{macrocode}
 %<*cls>
-\newenvironment{ack}{%
+\NewDocumentEnvironment{ack}{+b}{%
     \chapter*{致\hspace{1em}谢}%
     \addcontentsline{toc}{chapter}{致谢}%
-    \ifisanon\color{white}\else\relax\fi%
     \xiaosi%
-    \@afterheading}
+    \@afterheading%
+    % anon 模式保留标题页，但不再排版致谢正文。
+    \ifisanon\relax\else#1\fi}
     {\par\vspace{2em}\par}
 %</cls>
 %    \end{macrocode}

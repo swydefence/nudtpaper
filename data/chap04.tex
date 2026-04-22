@@ -409,7 +409,7 @@ Atlas 200I DK A2的内存总规格为4GB，
 	\begin{minipage}[t]{0.85\linewidth}
 	\caption[Atlas 200I DK A2开发者套件关键规格配置]{目标部署平台Atlas 200I DK A2开发者套件的关键硬件规格}
 	\label{tab:chap4_atlas_spec}
-		\begin{tabularx}{\linewidth}{>{\centering\bfseries\arraybackslash}m{3.5cm} >{\centering\arraybackslash}X}
+		\begin{tabularx}{\linewidth}{>{\centering\arraybackslash}m{3.5cm} >{\centering\arraybackslash}X}
 			\toprule[1.5pt]
 			参数 & 规格 \\
 			\midrule[1pt]
@@ -515,7 +515,7 @@ C++实现的核心流程与Python方式一致，
 	\begin{minipage}[t]{0.7\linewidth}
 	\caption[跨域知识蒸馏训练的超参数设置与优化策略]{跨域知识蒸馏训练的超参数设置与优化策略}
 	\label{tab:chap4_kd_params}
-		\begin{tabularx}{\linewidth}{>{\centering\bfseries\arraybackslash}m{5cm} >{\centering\arraybackslash}X}
+		\begin{tabularx}{\linewidth}{>{\centering\arraybackslash}m{5cm} >{\centering\arraybackslash}X}
 			\toprule[1.5pt]
 			参数 & 设置值 \\
 			\midrule[1pt]
@@ -546,7 +546,7 @@ C++实现的核心流程与Python方式一致，
 	\begin{minipage}[t]{0.98\linewidth}
 	\caption[模型轻量化压缩效果消融实验结果对比]{知识蒸馏与INT8量化处理前后SAR目标识别模型的参数量、存储空间大小与端侧单图推理时延对比评估}
 	\label{tab:chap4_efficiency}
-		\begin{tabularx}{\linewidth}{>{\centering\bfseries\arraybackslash}m{3.2cm}>{\centering\arraybackslash}m{2cm}*{4}{>{\centering\arraybackslash}X}}
+		\begin{tabularx}{\linewidth}{>{\centering\arraybackslash}m{3.2cm}>{\centering\arraybackslash}m{2cm}*{4}{>{\centering\arraybackslash}X}}
 			\toprule[1.5pt]
 			模型 & 处理方式 & 参数量/M & 大小/MB & Python/ms & C++/ms \\
 			\midrule[1pt]
@@ -590,10 +590,10 @@ INT8后训练量化在不改变网络结构和参数量的前提下进一步释�
 	\begin{minipage}[t]{0.98\linewidth}
 	\caption[域适应SAR目标识别模型轻量化处理前后的精度对比]{面向仿真与少量实测数据协同训练的域适应SAR目标识别模型轻量化处理前后的精度对比}
 	\label{tab:chap4_acc_chap2}
-		\begin{tabularx}{\linewidth}{>{\centering\bfseries\arraybackslash}m{3.2cm}>{\centering\arraybackslash}m{2cm}*{4}{>{\centering\arraybackslash}X}}
+		\begin{tabularx}{\linewidth}{>{\centering\arraybackslash}m{3.2cm}>{\centering\arraybackslash}m{2cm}*{4}{>{\centering\arraybackslash}X}}
 			\toprule[1.5pt]
 			\multirow{2}{*}{模型} & \multirow{2}{*}{处理方式} & \multicolumn{4}{c}{SAMPLE数据集准确率（\%）} \\
-			\cmidrule(lr){3-6}
+			\cmidrule[1pt](lr){3-6}
 			 & & All & 10-shot & 5-shot & 1-shot \\
 			\midrule[1pt]
 			ResNet50 FP16 & 原模型 & 98.89 & 97.18 & 96.54 & 92.21 \\
@@ -611,10 +611,10 @@ INT8后训练量化在不改变网络结构和参数量的前提下进一步释�
 	\begin{minipage}[t]{0.9\linewidth}
 	\caption[域泛化SAR目标识别模型轻量化处理前后的精度对比]{域泛化SAR目标识别模型轻量化处理前后的精度对比}
 	\label{tab:chap4_acc_chap3}
-		\begin{tabularx}{\linewidth}{>{\centering\bfseries\arraybackslash}m{3.2cm}>{\centering\arraybackslash}m{2cm}*{2}{>{\centering\arraybackslash}X}}
+		\begin{tabularx}{\linewidth}{>{\centering\arraybackslash}m{3.2cm}>{\centering\arraybackslash}m{2cm}*{2}{>{\centering\arraybackslash}X}}
 			\toprule[1.5pt]
 			\multirow{2}{*}{模型} & \multirow{2}{*}{处理方式} & \multicolumn{2}{c}{准确率（\%）} \\
-			\cmidrule(lr){3-4}
+			\cmidrule[1pt](lr){3-4}
 			 & & SAMPLE数据集 & S2M-5数据集 \\
 			\midrule[1pt]
 			ResNet50 FP16 & 原模型 & 96.14 & 92.87 \\
