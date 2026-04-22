@@ -729,8 +729,7 @@ A \ifisprof{thesis}\else{dissertation} \fi \\
 Submitted in partial fulfillment of the requirements\\
 for the \ifisprof{professional }\else{}\fi degree of \textsf{\@optionpaperclassen{} of \@enpapertype}\\
 in \textsf{\@ensubject}\\
-\makebox[\textwidth]{\ifisanon{~}\else{National University of %
-Defense Technology}\fi}\\[5mm]
+\makebox[\textwidth]{\ifisanon{~}\else{Graduate School of National University of Defense Technology}\fi}\\[5mm]
 % \ifisanon{~}\else{Changsha, Hunan, P.\ R.\ China}\fi\\[5mm]
 ~\@endate~
   }
