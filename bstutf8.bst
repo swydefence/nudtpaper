@@ -136,7 +136,6 @@ ENTRY { address			% 地址
 %%%%%%%%%%%%%
 % FUNCTION {bbl.anonymous}   { language empty$ { "Anon" }  { "佚名" } if$ }
 FUNCTION {bbl.anonymous} { "" }
-FUNCTION {bbl.etal}        { language empty$ { "et~al" } { "等" } if$ }
 FUNCTION {bbl.sine.loco}   { language empty$ { "S.~l." } { "出版地不详" } if$ }
 FUNCTION {bbl.sine.nomine} { language empty$ { "s.~n." } { "出版者不详" } if$ }
 
@@ -161,6 +160,7 @@ INTEGERS { number.label longest.label.width multiresult
 	   nameptr namesleft numnames lastnamecapitalized namelength charptr }
 INTEGERS { max.num.names.before.forced.et.al }
 INTEGERS { is.for.peer.review }
+INTEGERS { cjkptr cjklen cjkresult }
 
 %%%%%%%%%%%%%
 %% 字符串变量
@@ -174,6 +174,7 @@ STRINGS { s
 	  name.format.string	% 姓名的格式字符串
 	  author.name.in.english % 作者英文姓名
 	  author.name.in.chinese % 作者中文姓名
+	  cjkstr
 }
 
 %%%%%%%%%%%%%%%%%%%%%
@@ -250,6 +251,56 @@ FUNCTION {and} {
 FUNCTION {or} {
     { pop$ #1 }
     { skip$ }
+  if$
+}
+
+FUNCTION {string.contains.cjk.byte}
+{ 'cjkstr :=
+  #0 'cjkresult :=
+  cjkstr text.length$ 'cjklen :=
+  #1 'cjkptr :=
+  { cjkptr cjklen > not }
+  { cjkstr cjkptr #1 substring$ chr.to.int$ #223 >
+      { #1 'cjkresult := }
+      { skip$ }
+    if$
+    cjkresult #1 =
+      { cjklen #1 + 'cjkptr := }
+      { cjkptr #1 + 'cjkptr := }
+    if$
+  }
+  while$
+  cjkresult
+}
+
+FUNCTION {language.is.chinese}
+{ language empty$
+    { #0 }
+    { language "l" change.case$ duplicate$ "zh" =
+        swap$ "chinese" = or
+    }
+  if$
+}
+
+FUNCTION {entry.prefers.chinese.etal}
+{ language.is.chinese
+    { #1 }
+    { author empty$
+        { editor empty$
+            { #0 }
+            { editor string.contains.cjk.byte }
+          if$
+        }
+        { author string.contains.cjk.byte }
+      if$
+    }
+  if$
+}
+
+FUNCTION {bbl.etal}
+{ entry.prefers.chinese.etal
+    { "等" }
+    { "et~al" }
   if$
 }
 
