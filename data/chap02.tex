@@ -428,15 +428,15 @@ PFDA\cite{chen2022pixel}、VSFA\cite{zhang2023vsfa}、Sun等人所提方法\cite
 Shi等人所提方法\cite{shi2024unsupervised}以及MACR\cite{luan2025unsupervised}。
 
 对比方法具体介绍如下：
-\textbf{DAN}\cite{long2015learning}：通过多核极大均值差异MK-MMD度量源域与目标域特征分布差异，并在深度神经网络训练中最小化MK-MMD损失以实现域适应。
-\textbf{DANN}\cite{ganin2015unsupervised}：引入域判别器，通过对抗学习迫使特征提取器对于源域和目标域数据学习到不可区分的特征表示，从而实现域适应。
-\textbf{CDAN}\cite{long2018conditional}：在DANN的基础上，结合类别信息与特征表示进行条件对抗训练，以提升域适应效果。
-\textbf{DSAN}\cite{zhu2020deep}：通过子域对齐策略，细粒度地匹配源域与目标域的子分布，以增强域适应性能。
-\textbf{PFDA}\cite{chen2022pixel}：基于像素级风格迁移模型和特征级域对抗学习，对齐源域和目标域像素级和特征级的分布，以提升SAR目标识别模型的域适应能力。
-\textbf{VSFA}\cite{zhang2023vsfa}：基于视觉特征重建与散射拓扑特征融合，利用两阶段损失对齐仿真与实测域的类级别分布，以实现仿真至实测SAR图像的域适应。
-\textbf{Sun等人所提方法}\cite{sun2023gradual}：提出渐进式域适应框架，通过特征对齐学习与基于图像相似性的伪标签去噪自训练，逐步缩小域间差异，以实现SAR目标识别模型的域适应。
-\textbf{MACR}\cite{luan2025unsupervised}：基于输入–特征–输出三级协同对齐策略，融合风格迁移、对抗学习与知识蒸馏机制，全方位减小多层级域差异，以强化SAR目标识别的跨域类别一致性。
-\textbf{Shi等人所提方法}\cite{shi2024unsupervised}：基于域级–类级双粒度对齐，利用梯度加权对抗学习、原型对比学习及属性散射中心辅助机制，实现全局与类级的特征对齐，以提升仿真到实测的跨域SAR目标识别性能。
+DAN\cite{long2015learning}：通过多核极大均值差异MK-MMD度量源域与目标域特征分布差异，并在深度神经网络训练中最小化MK-MMD损失以实现域适应。
+DANN\cite{ganin2015unsupervised}：引入域判别器，通过对抗学习迫使特征提取器对于源域和目标域数据学习到不可区分的特征表示，从而实现域适应。
+CDAN\cite{long2018conditional}：在DANN的基础上，结合类别信息与特征表示进行条件对抗训练，以提升域适应效果。
+DSAN\cite{zhu2020deep}：通过子域对齐策略，细粒度地匹配源域与目标域的子分布，以增强域适应性能。
+PFDA\cite{chen2022pixel}：基于像素级风格迁移模型和特征级域对抗学习，对齐源域和目标域像素级和特征级的分布，以提升SAR目标识别模型的域适应能力。
+VSFA\cite{zhang2023vsfa}：基于视觉特征重建与散射拓扑特征融合，利用两阶段损失对齐仿真与实测域的类级别分布，以实现仿真至实测SAR图像的域适应。
+Sun等人所提方法\cite{sun2023gradual}：提出渐进式域适应框架，通过特征对齐学习与基于图像相似性的伪标签去噪自训练，逐步缩小域间差异，以实现SAR目标识别模型的域适应。
+MACR\cite{luan2025unsupervised}：基于输入–特征–输出三级协同对齐策略，融合风格迁移、对抗学习与知识蒸馏机制，全方位减小多层级域差异，以强化SAR目标识别的跨域类别一致性。
+Shi等人所提方法\cite{shi2024unsupervised}：基于域级–类级双粒度对齐，利用梯度加权对抗学习、原型对比学习及属性散射中心辅助机制，实现全局与类级的特征对齐，以提升仿真到实测的跨域SAR目标识别性能。
 
 除了对比方法以外，本节还设计了两项基准实验指标：
 （1）Source Only：仅使用源域带标签的仿真SAR图像训练 ResNet50 模型，不进行任何域适应操作。
