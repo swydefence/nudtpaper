@@ -215,9 +215,12 @@ SAMPLE 数据集中采用的 SAR 成像算法为极坐标格式算法（polar fo
   % 标题格式：中括号内为索引短标题，外部为完整标题（贴合教程规范）
   \caption[SAMPLE数据集十类目标型号与数量]{SAMPLE数据集十类目标型号与数量}
   \label{tab:sample-data}
+    \begingroup
+    \footnotesize
+    \setlength{\tabcolsep}{3pt}
     % 表格列格式：
-    % 第1列：居中+黑体+固定宽度（适配换行）；后10列使用教程中提到的Z列（自动换行+居中）
-    \begin{tabularx}{\linewidth}{>{\centering\arraybackslash}m{1.5cm}*{5}{>{\centering\arraybackslash}p{0.8cm}}*{5}{>{\centering\arraybackslash}X}}
+    % 第1列适当加宽以容纳行标题；后10列均分剩余宽度，并收紧列间距避免超出版心
+    \begin{tabularx}{\linewidth}{>{\centering\arraybackslash}m{1.8cm}*{10}{>{\centering\arraybackslash}X}}
       \toprule[1.5pt]  % 教程指定的1.5pt粗上框线
       目标类别 & 2S1 & BMP2 & BTR70 & T72 & ZSU23 & M1 & M2 & M35 & M548 & M60 \\
       \midrule[1pt]    % 教程指定的1pt粗中框线
@@ -227,6 +230,7 @@ SAMPLE 数据集中采用的 SAR 成像算法为极坐标格式算法（polar fo
       仿真目标图像数量 & 174 & 107 & 92 & 108 & 174 & 129 & 128 & 129 & 128 & 176 \\
       \bottomrule[1.5pt] % 教程指定的1.5pt粗下框线
     \end{tabularx}
+    \endgroup
   \end{minipage}
 \end{table}
 
@@ -628,55 +632,55 @@ CUT 模块作为像素级域对齐模块，首先缓解了底层视觉统计差�
 
 \subsubsection{图像翻译质量可视化分析}
 
-图像翻译模型（CUT）是本章方法实现像素级域对齐的基础，其核心优势在于降低了对目标域大数据量的依赖。为了直观评估其在不同数据量下的鲁棒性，将本章采用的基于对比学习的 CUT 模型与 PFDA\cite{chen2022pixel} 以及 MACR\cite{luan2025unsupervised} 所使用的基于循环一致性的 CycleGAN 模型进行对比。图 \ref{fig:gan_comparison_multishot} 展示了在目标域样本数量逐渐减少（All $\rightarrow$ 10-shot $\rightarrow$ 5-shot $\rightarrow$ 1-shot）的四种实验设置下，两种模型将 SAMPLE 数据集的仿真 SAR 图像转换为实测风格的生成效果。
+图像翻译模型（CUT）是本章方法实现像素级域对齐的基础，其核心优势在于降低了对目标域大数据量的依赖。为了直观评估其在不同数据量下的鲁棒性，将本章采用的基于对比学习的 CUT 模型与 PFDA\cite{chen2022pixel} 以及 MACR\cite{luan2025unsupervised} 所使用的基于循环一致性的 CycleGAN 模型进行对比。图~\ref{fig:gan_comparison_multishot} 展示了在目标域样本数量逐渐减少（All $\rightarrow$ 10-shot $\rightarrow$ 5-shot $\rightarrow$ 1-shot）的四种实验设置下，两种模型将 SAMPLE 数据集的仿真 SAR 图像转换为实测风格的生成效果。
 
 \begin{figure}[htbp]
   \centering
   % 第一行：All (数据充足)
-  \subfloat[All: CycleGAN]{\includegraphics[width=0.3\textwidth]{chap2_vis/cyclegan_all.png}} \hspace{0.2em}
-  \subfloat[All: CUT]{\includegraphics[width=0.3\textwidth]{chap2_vis/cut_all.png}} \hspace{0.2em}
-  \subfloat[All: 真实参考]{\includegraphics[width=0.3\textwidth]{chap2_vis/real_1shot_ref.png}} \\
+  \subfloat[All: CycleGAN]{\includegraphics[width=0.285\textwidth]{chap2_vis/cyclegan_all.png}} \hspace{0.2em}
+  \subfloat[All: CUT]{\includegraphics[width=0.285\textwidth]{chap2_vis/cut_all.png}} \hspace{0.2em}
+  \subfloat[All: 真实参考]{\includegraphics[width=0.285\textwidth]{chap2_vis/real_1shot_ref.png}} \\
   % 第二行：10-shot (有限样本)
-  \subfloat[10-shot: CycleGAN]{\includegraphics[width=0.3\textwidth]{chap2_vis/cyclegan_10shot.png}} \hspace{0.2em}
-  \subfloat[10-shot: CUT]{\includegraphics[width=0.3\textwidth]{chap2_vis/cut_10shot.png}} \hspace{0.2em}
-  \subfloat[10-shot: 真实参考]{\includegraphics[width=0.3\textwidth]{chap2_vis/real_1shot_ref.png}} \\
+  \subfloat[10-shot: CycleGAN]{\includegraphics[width=0.285\textwidth]{chap2_vis/cyclegan_10shot.png}} \hspace{0.2em}
+  \subfloat[10-shot: CUT]{\includegraphics[width=0.285\textwidth]{chap2_vis/cut_10shot.png}} \hspace{0.2em}
+  \subfloat[10-shot: 真实参考]{\includegraphics[width=0.285\textwidth]{chap2_vis/real_1shot_ref.png}} \\
   % 第三行：5-shot (少样本)
-  \subfloat[5-shot: CycleGAN]{\includegraphics[width=0.3\textwidth]{chap2_vis/cyclegan_5shot.png}} \hspace{0.2em}
-  \subfloat[5-shot: CUT]{\includegraphics[width=0.3\textwidth]{chap2_vis/cut_5shot.png}} \hspace{0.2em}
-  \subfloat[5-shot: 真实参考]{\includegraphics[width=0.3\textwidth]{chap2_vis/real_1shot_ref.png}} \\
+  \subfloat[5-shot: CycleGAN]{\includegraphics[width=0.285\textwidth]{chap2_vis/cyclegan_5shot.png}} \hspace{0.2em}
+  \subfloat[5-shot: CUT]{\includegraphics[width=0.285\textwidth]{chap2_vis/cut_5shot.png}} \hspace{0.2em}
+  \subfloat[5-shot: 真实参考]{\includegraphics[width=0.285\textwidth]{chap2_vis/real_1shot_ref.png}} \\
   % 第四行：1-shot (极端少样本)
-  \subfloat[1-shot: CycleGAN]{\includegraphics[width=0.3\textwidth]{chap2_vis/cyclegan_1shot.png}} \hspace{0.2em}
-  \subfloat[1-shot: CUT]{\includegraphics[width=0.3\textwidth]{chap2_vis/cut_1shot.png}} \hspace{0.2em}
-  \subfloat[1-shot: 真实参考]{\includegraphics[width=0.3\textwidth]{chap2_vis/real_1shot_ref.png}} 
+  \subfloat[1-shot: CycleGAN]{\includegraphics[width=0.285\textwidth]{chap2_vis/cyclegan_1shot.png}} \hspace{0.2em}
+  \subfloat[1-shot: CUT]{\includegraphics[width=0.285\textwidth]{chap2_vis/cut_1shot.png}} \hspace{0.2em}
+  \subfloat[1-shot: 真实参考]{\includegraphics[width=0.285\textwidth]{chap2_vis/real_1shot_ref.png}} 
   \caption[不同数据量条件下CycleGAN 与 CUT 的图像翻译效果对比]{不同数据量条件下（All、10-shot、5-shot、1-shot）CycleGAN 与 CUT 的图像翻译效果演变对比}
   \label{fig:gan_comparison_multishot}
 \end{figure}
 
 \textbf{（1）All 设置（全样本）：}
-如图 \ref{fig:gan_comparison_multishot} 第一行所示，在数据充足（All）的理想设置下，CycleGAN 拥有充足的目标域数据进行参考，
+如图~\ref{fig:gan_comparison_multishot} 第一行所示，在数据充足（All）的理想设置下，CycleGAN 拥有充足的目标域数据进行参考，
 能够生成高质量的风格迁移图像（图\ref{fig:gan_comparison_multishot}（a））。然而，仔细对比可发现，CUT 生成的图像（图\ref{fig:gan_comparison_multishot}（b））在保留源域高频细节（如目标的强散射点分布）
 方面仍略占优势。此外，从模型原理分析，CUT 仅需训练单向生成器，更加简单高效。
 因此，即便在数据充足场景下，本章选用的 CUT 模型在生成质量与训练效率的综合考量上依然具备较强竞争力。
 
 \textbf{（2）10-shot 设置（有限样本）：}  
-当目标域样本减少至 10-shot（图 \ref{fig:gan_comparison_multishot} 第二行）时，两者的性能差距开始显现。
+当目标域样本减少至 10-shot（图~\ref{fig:gan_comparison_multishot} 第二行）时，两者的性能差距开始显现。
 CycleGAN（图\ref{fig:gan_comparison_multishot}（d））虽仍具备一定的分布拟合能力，生成的图像基本具备了 SAR 目标的形态，
 但细节处（如车辆边缘、阴影区域）已出现模糊，且风格迁移存在不均匀现象。相对而言，CUT（图\ref{fig:gan_comparison_multishot}（e））表现依然稳健，
 在保持目标结构完整性的同时，生成的相干斑噪声更加自然、均匀，视觉感官上与真实 SAR 图像几乎无异。
 这一结果佐证了在有限的情况下，基于对比学习的非配对翻译机制比基于循环一致性的对抗机制能提供更优质的中间域数据。
 
 \textbf{（3）5-shot 设置（少样本）：}
-随着样本量进一步减少至 5-shot（图 \ref{fig:gan_comparison_multishot} 第三行），CycleGAN 的生成质量出现显著下滑。
+随着样本量进一步减少至 5-shot（图~\ref{fig:gan_comparison_multishot} 第三行），CycleGAN 的生成质量出现显著下滑。
 部分图像仅能呈现模糊的目标轮廓，且伴随明显的噪点和纹理失真（图\ref{fig:gan_comparison_multishot}（g）），
 表明 5 张样本已不足以支撑生成对抗网络对复杂 SAR 图像分布的有效学习。
 而此时的 CUT 模型生成的图像（图\ref{fig:gan_comparison_multishot}（h））在纹理细节上依然丰富，背景杂波的统计特性与真实参考图像更为接近，
 证明了其在少样本区间的学习效率远高于传统 GAN 模型。
 
 \textbf{（4）1-shot 设置（极端少样本）：}
-最后，在仅有单张目标域样本的 1-shot 极端条件下（图 \ref{fig:gan_comparison_multishot} 第四行），
+最后，在仅有单张目标域样本的 1-shot 极端条件下（图~\ref{fig:gan_comparison_multishot} 第四行），
 CycleGAN（图\ref{fig:gan_comparison_multishot}（j））出现了明显的模式崩塌现象。其生成图像中车辆几何轮廓保留不足，并伴随较多与目标无关的伪影。
 这在理论上归因于 CycleGAN 的判别器试图拟合整个目标域的数据分布 $P_{data}(y)$。在数据极度匮乏时，判别器无法建立有效的分类边界，
-导致生成器梯度方向迷失，这也解释了表 \ref{tab:chap2_comparison-results} 中 PFDA 方法在 1-shot 设置下无法收敛的原因。
+导致生成器梯度方向迷失，这也解释了表~\ref{tab:chap2_comparison-results} 中 PFDA 方法在 1-shot 设置下无法收敛的原因。
 相比之下，CUT（图\ref{fig:gan_comparison_multishot}（k））凭借 PatchNCE 损失函数，通过最大化输入与输出对应图像块（Patch）之间的互信息，在单张图像内部挖掘监督信号。
 这种局部对比机制使得 CUT 在 1-shot 条件下依然精准地保留了仿真图像的目标结构，并成功迁移了目标域的相干斑噪声风格。
 
@@ -691,7 +695,7 @@ CycleGAN 依赖大数据分布估计的缺陷逐渐暴露，性能显著下降�
 为了深入揭示本章所提方法中像素级域对齐模块（CUT）与类混淆域适应模块（CC-Loss）在特征空间中的作用机制，
 以及它们在不同数据量约束下的理论有效性，本节利用 t-SNE 算法对消融实验中的四种配置进行了特征降维可视化。
 “Source Only” 设置下模型未进行任何域适应训练，其特征分布作为在不同实验设置下共享的基准线，
-因此图 \ref{fig:chap2_ablation_tsne_comparison} 采用第一行基线、第二行全样本、第三行少样本的层级结构展示了消融实验中不同设置下模型提取的特征分布情况。
+因此图~\ref{fig:chap2_ablation_tsne_comparison} 采用第一行基线、第二行全样本、第三行少样本的层级结构展示了消融实验中不同设置下模型提取的特征分布情况。
 其中红色点代表源域的仿真数据，蓝色点代表目标域的实测数据。
 \begin{figure}[htbp]
   \centering
@@ -712,7 +716,7 @@ CycleGAN 依赖大数据分布估计的缺陷逐渐暴露，性能显著下降�
   \label{fig:chap2_ablation_tsne_comparison}
 \end{figure}
 
-\textbf{Source Only 设置（基线）：}首先，如图 \ref{fig:chap2_ablation_tsne_comparison}(a) 所示，在未采取域适应措施的基准模型中，
+\textbf{Source Only 设置（基线）：}首先，如图~\ref{fig:chap2_ablation_tsne_comparison}(a) 所示，在未采取域适应措施的基准模型中，
 特征空间呈现出明显的域间分离状态。源域（红色）与目标域（蓝色）的特征簇基本分离，且同一类别的特征距离较远。
 从原理上分析，这是由于仿真 SAR 图像与实测图像在相干斑噪声模型和背景杂波统计上存在根本差异，
 导致提取的深层特征在特征空间中发生了严重的协变量偏移。模型在源域学到的判别边界无法有效覆盖目标域特征簇，
