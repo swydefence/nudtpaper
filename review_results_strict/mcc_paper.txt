@@ -1,0 +1,1473 @@
+                    This article has been accepted for publication in IEEE Transactions on Pattern Analysis and Machine Intelligence. This is the author's version which has not been fully edited and
+                                              content may change prior to final publication. Citation information: DOI 10.1109/TPAMI.2024.3392565
+
+
+IEEE TRANSACTIONS ON PATTERN ANALYSIS AND MACHINE INTELLIGENCE                                                                                                                              1
+
+
+
+
+            One Fits Many: Class Confusion Loss for
+                 Versatile Domain Adaptation
+                      Ying Jin, Zhangjie Cao, Ximei Wang, Jianmin Wang, and Mingsheng Long
+
+      Abstract—In the open world, various label sets and domain configurations give rise to a variety of Domain Adaptation (DA) setups,
+      including closed-set, partial-set, open-set, and universal DA, as well as multi-source and multi-target DA. It is notable that existing DA
+      methods are generally designed only for a specific setup, and may under-perform in setups they are not tailored to. This paper shifts the
+      common paradigm of DA to Versatile Domain Adaptation (VDA), where one method can handle several different DA setups without any
+      modification. Towards this goal, we first delve into a general inductive bias: class confusion, and then uncover that reducing such pairwise
+      class confusion leads to significant transfer gains. With this insight, we propose one general class confusion loss (CC-Loss) to learn many
+      setups. We estimate class confusion based only on classifier predictions and minimize the class confusion to enable accurate target
+      predictions. Further, we improve the loss by enforcing the consistency of confusion matrices under different data augmentations to
+      encourage its invariance to distribution perturbations. Experiments on 2D vision and 3D vision benchmarks show that the CC-Loss
+      performs competitively in different mainstream DA setups. Code is available at https://github.com/thuml/Transfer-Learning-Library.
+
+      Index Terms—Transfer learning, domain adaptation, versatile domain adaptation, class confusion loss
+
+                                                                                          F
+
+
+
+1    I NTRODUCTION                                                                            uration is unavailable in an unlabeled target domain without
+                                                                                              any prior knowledge, and the domain configuration may
+    The scarcity of labeled data hinders deep neural networks
+                                                                                              change from time to time for online applications. Therefore,
+(DNNs) from wide use in real applications. This challenge
+                                                                                              we may be stuck in choosing a proper method tailored to the
+gives rise to Domain Adaptation (DA) [50], [60], an important
+                                                                                              suitable DA setup. Towards this dilemma, a natural question
+technology that aims to transfer knowledge from a labeled
+                                                                                              arises: could one general method address all the domain
+source domain to an unlabeled target domain in the presence
+                                                                                              adaptation settings? Such a method naturally eliminates
+of the distribution shift. A rich line of DNN-based meth-
+                                                                                              the aforementioned difficulties and generally solves domain
+ods [21], [43], [44], [46], [73]–[75], [91] have been proposed for
+                                                                                              adaptation in practice. In this paper, we define Versatile
+unsupervised domain adaptation (UDA), a closed-set setup
+                                                                                              Domain Adaptation (VDA) as a line of versatile approaches
+with one source domain and one target domain sharing the
+                                                                                              able to tackle a variety of setups without any modification.
+same label set. Recently, several setups with more practical
+                                                                                                  Towards VDA, the biggest challenge is that the method is
+label set configurations were proposed, such as partial-set DA
+                                                                                              required to be independent of any specific label set or domain
+(PDA) in which the source label set subsumes the target label
+                                                                                              configurations. Thus it should be designed based on the
+set [7], [88], open-set DA (OSDA) with the target label set
+                                                                                              common assumptions shared by all the setups. Unfortunately,
+subsuming the source label set [6], [64], and universal DA
+                                                                                              existing DA methods are generally designed only for a
+(UniDA) that removes all the label set constraints on the
+                                                                                              specific setup, relying on the corresponding label set and
+source and target domains [20], [86]. Meanwhile, different
+                                                                                              domain configurations. As a result, they are prone to under-
+domain configurations are also considered, such as multi-
+                                                                                              perform in setups that they are not tailored to. For instance,
+source DA (MSDA) with multiple source domains [82],
+                                                                                              the widely-used inductive bias of domain alignment [21]
+[92], and multi-target DA (MTDA) with multiple target
+                                                                                              demands that the source and target domains share the same
+domains [55]. Fig. 1 highlights the difference between these
+                                                                                              label set. Further, when applied to setups with different
+domain adaptation settings, each of which has been studied
+                                                                                              label sets, some specially-designed weighting mechanisms
+specifically through a variety of methods [7], [41], [55], [63],
+                                                                                              should be introduced. PADA [8], a classic PDA method,
+[82], [88].
+                                                                                              excels at selecting out outlier classes but fails to detect open
+    Despite the success of different methods in each domain
+                                                                                              class samples in OSDA, while DADA [55], an outstanding
+adaptation setting, in practical applications, determining the
+                                                                                              method tailored to MTDA, which considers generalizability
+setup accurately is infeasible since it is difficult to confirm the
+                                                                                              to arbitrary target domains, has weak advantage in MSDA
+label set configurations and domain configurations during
+                                                                                              with only one target domain but multiple source domains.
+the data acquisition process. For instance, the label set config-
+                                                                                              Hence, existing DA methods are not versatile enough to
+                                                                                              handle practical setups with complex variations.
+•   The authors are with the School of Software, BNRist, Tsinghua University,                     In this paper, we adopt a new inductive bias, class
+    Beijing 100084, China. E-mail: sherryying003@gmail.com.
+•   Y. Jin and Z. Cao contributed equally to this work.                                       confusion, to enable versatile domain adaptation. Class
+•   Corresponding author: Mingsheng Long, mingsheng@tsinghua.edu.cn.                          confusion indicates the tendency that a classifier confuses the
+•   A preliminary conference version of this paper appeared in [30].                          predictions between the correct and ambiguous classes for
+Manuscript received June, 2022; revised April, 2024.                                          target examples. We propose a novel loss, Class Confusion
+
+      Authorized licensed use limited to: National Univ of Defense Tech. Downloaded on July 01,2024 at 05:24:16 UTC from IEEE Xplore. Restrictions apply.
+                    © 2024 IEEE. Personal use is permitted, but republication/redistribution requires IEEE permission.See https://www.ieee.org/publications/rights/index.html for more information.
+                     This article has been accepted for publication in IEEE Transactions on Pattern Analysis and Machine Intelligence. This is the author's version which has not been fully edited and
+                                               content may change prior to final publication. Citation information: DOI 10.1109/TPAMI.2024.3392565
+
+
+IEEE TRANSACTIONS ON PATTERN ANALYSIS AND MACHINE INTELLIGENCE                                                                                                                               2
+
+
+
+
+                                           Label                  Partial                          Open-Set                           Universal
+              Unsupervised
+                                       Configurations
+            Domain Adaptation
+
+                 𝒮        𝒯
+                                                             Domain Adaptation
+
+                                                                   𝒮         𝒯
+                                                                                                Domain Adaptation
+
+                                                                                                       𝒮       𝒯
+                                                                                                                                   Domain Adaptation
+
+                                                                                                                                        𝒮           ?
+                                                                                                                                                                           ···
+
+                                                  Domain                        Multi-Source                       Multi-Target
+               Unsupervised                    Configurations                 Domain Adaptation                  Domain Adaptation
+             Domain Adaptation                                                        𝒮!
+                                                                                               𝒯
+                                                                                                                              𝒯!                                ···
+
+
+
+                                                                                      …
+
+
+
+
+                                                                                                                              …
+                 𝒮        𝒯                                                                                            𝒮
+                                                                                      𝒮"                                      𝒯"
+
+                                                    Versatile Domain Adaptation (VDA)
+
+
+Fig. 1: Versatile Domain Adaptation (VDA) subsumes typical domain adaptation setups: (1) Unsupervised Domain
+Adaptation (UDA); (2) Partial Domain Adaptation (PDA); (3) Open-Set Domain Adaptation (OSDA); (4) Universal Domain
+Adaptation (UniDA); (5) Multi-Source Domain Adaptation (MSDA); (6) Multi-Target Domain Adaptation (MTDA). The
+proposed Class Confusion Loss (CC-Loss) is a versatile method that solves all these domain adaptation setups.
+
+
+Loss (CC-Loss), which estimates and minimizes the class                                                    uates MCC only on 2D computer vision benchmarks
+confusion of the classifier in the target domain and enforces                                              and in the UDA, PDA, MSDA, MTDA settings. In
+the consistency of the confusion matrix under augmentations.                                               the journal version, for the first time, we evaluate
+The CC-Loss only relies on the target predictions, with no ex-                                             our method on the mainstream DA setups including
+tra requirements, which is generally applicable to all the DA                                              OSDA, and UniDA. We also extend our experiments
+setups aforementioned. We conduct extensive experiments                                                    to 3D recognition. Results show that CC-Loss achieves
+on DA benchmarks in both 2D and 3D vision, and show that                                                   competitive performance in several benchmarks and
+our method outperforms the previous methods in different                                                   all these mainstream DA settings.
+DA setups, proving the versatility and effectiveness of our
+method.
+                                                                                               2      R ELATED W ORK
+    This journal paper with the CC-Loss extends our confer-
+ence paper [30], coined as MCC, in a number of perspectives:                                      The proposed versatile domain adaptation aims to cover
+                                                                                               the mainstream domain adaptation settings. Here, we intro-
+   •     Setup: Our conference version can only solve UDA,                                     duce these different domain adaptation settings based on the
+         PDA, MSDA, and MTDA but fail to extend to OSDA                                        label set configurations and domain configurations. At last,
+         and UniDA setups [30], since it lacks the ability to deal                             we also give a brief description of consistency regularization.
+         with open classes in the target domain. In the journal
+         version, we expand the DA settings to OSDA and                                        2.1     Label Set Configuration
+         UniDA by introducing a new entry in the classifier to
+         classify the open class and including this extra class                                Unsupervised Domain Adaptation (UDA). Most of the
+         into the computation of class confusion. The journal                                  existing domain adaptation researches focused on UDA, in
+         version covers the mainstream DA settings, which                                      which numerous UDA methods were proposed based on
+         demonstrates the broad application of our approaches                                  either Moment Matching or Adversarial Training.
+         and matches our intention for VDA.                                                        Moment Matching methods aim at minimizing the distri-
+   •     Method: The journal version improves the MCC                                          bution discrepancy across domains. Deep Coral [71] aligns
+         approach by stabilizing the estimation of the con-                                    second-order statistics between distributions. DDC [75] and
+         fusion matrix with a consistency regularization under                                 DAN [43] utilize Maximum Mean Discrepancy [24]. JAN [46]
+         different augmentations. Specifically, we minimize                                    defines Joint Maximum Mean Discrepancy. SWD [34] intro-
+         the L2 distance between the confusion matrices. We                                    duces Sliced Wasserstein Distance and CAN [31] leverages
+         integrate them as the Class Confusion Loss (CC-                                       Contrastive Domain Discrepancy.
+         Loss). Experimental results show that consistency                                         Adversarial Training methods were inspired by the
+         regularization enables a more accurate estimation                                     Generative Adversarial Networks (GANs) [22], aiming at
+         of the confusion matrix. Further comparison with                                      learning domain invariant features in an adversarial manner.
+         prior works shows that the proposed class confusion                                   DANN [21] introduces a domain discriminator to distinguish
+         consistency outperforms conventional consistency                                      source and target features, while the feature extractor strives
+         regularization in domain adaptation tasks.                                            to fool it. ADDA [74], MADA [53] and MCD [65] extend
+   •     Experiment: Our conference version empirically eval-                                  this architecture to multiple feature extractors and classifiers.
+
+       Authorized licensed use limited to: National Univ of Defense Tech. Downloaded on July 01,2024 at 05:24:16 UTC from IEEE Xplore. Restrictions apply.
+                     © 2024 IEEE. Personal use is permitted, but republication/redistribution requires IEEE permission.See https://www.ieee.org/publications/rights/index.html for more information.
+                    This article has been accepted for publication in IEEE Transactions on Pattern Analysis and Machine Intelligence. This is the author's version which has not been fully edited and
+                                              content may change prior to final publication. Citation information: DOI 10.1109/TPAMI.2024.3392565
+
+
+IEEE TRANSACTIONS ON PATTERN ANALYSIS AND MACHINE INTELLIGENCE                                                                                                                              3
+
+Motivated by Conditional GANs [47], CDAN [44] aligns                                          extend adversarial training and moment-matching to MSDA,
+domain features in a class-conditional adversarial game.                                      respectively. LtC-MSDA [77] and STEM [49] deal with MSDA
+CyCADA [28] adapts features in both pixel and feature                                         by learning to combine knowledge and ensembling teacher
+levels. TADA [79] introduces the first transferable attention                                 and student models, respectively.
+mechanism. SymNet [89] uses a symmetric classifier, and
+                                                                                              Multi-Target Domain Adaptation (MTDA). In MTDA, we
+DTA [35] introduces a new adversarial dropout.
+                                                                                              need to transfer a learning model to multiple unlabeled target
+    There are other approaches to domain adaptation. For
+                                                                                              domains. DADA [55] is the first approach to MTDA through
+instance, SE [19] is based on the teacher-student [72] archi-
+                                                                                              disentangling domain-invariant representations, which is
+tecture. TransNorm [78] tackles DA with a new transferable
+                                                                                              representative in this setup. CGCT [62] designs a curriculum
+backbone. TAT [42] proposes transferable adversarial training
+                                                                                              graph co-teaching framework for MTDA.
+to guarantee adaptability. BSP [12] balances between transfer-
+                                                                                                 However, these domain adaptation methods considering
+ability and discriminability. AFN [83] enlarges feature norm
+                                                                                              domain configurations often assume that the label sets in
+to enhance feature transferability. Some methods [29], [69],
+                                                                                              the source and target domains are identical. Consequently,
+[94], [95] also utilize the less-reliable pseudo labeling and
+                                                                                              they are incapable of coping with the scenarios where the
+clustering, e.g. TPN [51] is based on pseudo class-prototypes.
+                                                                                              label sets in the source and target domain are different (PDA,
+Partial Domain Adaptation (PDA). In PDA, the target label                                     OSDA, and UniDA), which impedes them from serving as
+set is a subset of the source label set. PDA has a new challenge                              versatile domain adaptation approaches.
+to detect source private classes, which may cause negative
+transfer between domains. A rich line of PDA methods are
+                                                                                              2.3     Consistency Regularization
+based on the weighting mechanism to down-weight source
+private class samples in the training process [7]–[9], [38],                                      Consistency regularization [2], [33], [61] is a widely-used
+[88]. By contrast, other researches adopt a hard selection                                    regularization technique on unlabeled data to encourage the
+strategy to select and discard samples in the source private                                  output to be smooth with respect to the inputs [66], which is
+classes [11], [13], [93].                                                                     motivated by the facts that the laws of physics governing the
+                                                                                              system of interest are usually described by smooth models
+Open Set Domain Adaptation (OSDA). In OSDA, the                                               based on differential equations [1]. It is one of the most
+source label set is a subset of the target label set. The target                              important techniques in the recent advances [48], [70], [90]
+label set contains open classes that are not in the source label                              in semi-supervised learning. Different from the conventional
+set and are totally unknown in the training stage. We are                                     instance-level consistency, in this paper, we propose a matrix-
+required to not only correctly classify all target data in the                                level consistency to make the estimated class confusion matrix
+shared label set, but also decide whether a target datum                                      more robust across distributional perturbations.
+belongs to any open class. Different methods are proposed
+to detect data in open classes [3], [5], [6], [41], [64]. Fang
+et al. [18] provide a theoretical generalization bound for                                    3      V ERSATILE D OMAIN A DAPTATION
+open-set domain adaptation.                                                                       In this paper, we study Versatile Domain Adaptation
+Universal Domain Adaptation (UniDA). Universal domain                                         (VDA) where one method can tackle various setups without
+adaptation removes all constraints on the label sets and aims                                 any modification. We justify the versatility of a method
+for a most general domain adaptation setting. Prior works                                     by six existing setups including four setups with different
+address UniDA by developing a weighting mechanism and                                         label set configurations: Unsupervised Domain Adapta-
+setting a threshold on the weights to filter out the samples                                  tion (UDA) [21], Partial Domain Adaptation (PDA) [7],
+that belong to the private label sets [20], [86]. UniDA includes                              Open Set Domain Adaptation (OSDA) [6], and Universal
+all the previous domain adaptation settings on label sets                                     Domain Adaptation (UniDA) [86], and two setups with
+including UDA, PDA, and OSDA. Thus UniDA approaches                                           different domain configurations: Multi-Source Domain Adap-
+can address all the domain adaptation setups with different                                   tation (MSDA) [54], and Multi-Target Domain Adaptation
+label set configurations in name. However, as shown in                                        (MTDA) [55]. In different DA setups, we are given a labeled
+our experiments, for each particular DA setting, current                                      source domain S = {(xs , ys )} (or multiple source domains
+UniDA methods do not perform as well as the methods                                           {S1 , S2 , ..., SS }) associated with a source label set Cs , and
+specially designed for this setting. In other words, UniDA                                    an unlabeled target domain T = {xt } (or multiple target
+methods cannot tackle VDA well. In addition, UniDA is                                         domains {T1 , T2 , ..., TT }) associated with a target label set Ct .
+only “universal” over label set configurations but considers                                  The label set or domain configuration of each setup is shown
+nothing about other factors such as domain configurations.                                    in Table 1. Tailored to a specific setup, existing methods fail
+                                                                                              to readily handle these setups. On contrast, we propose a
+2.2   Domain Configuration                                                                    generic loss, Class Confusion Loss (CC-Loss) for VDA.
+                                                                                                  Our key insight is that the class confusion in the target
+    Thus, we still need to design a method that outperforms
+                                                                                              domain reflects the tendency that a classifier confuses the
+(or at least performs comparably to) prior works in different
+                                                                                              predictions between the correct and ambiguous classes. As
+settings beyond label set configurations.
+                                                                                              shown in Fig. 2(b), we train a source classifier in the source
+Multi-Source Domain Adaptation (MSDA). In MSDA,                                               domain on the VisDA-2017 dataset and use it to predict
+there are multiple source domains of different distributions.                                 target samples. We find that the probability that the classifier
+MDAN [92] provides theoretical insights for MSDA, while                                       misclassifies cars as trucks on the target domain is as high
+Deep Cocktail Network [82] (DCTN) and M3 SDA [54]                                             as 25%. These observations give us a fresh perspective to
+
+      Authorized licensed use limited to: National Univ of Defense Tech. Downloaded on July 01,2024 at 05:24:16 UTC from IEEE Xplore. Restrictions apply.
+                    © 2024 IEEE. Personal use is permitted, but republication/redistribution requires IEEE permission.See https://www.ieee.org/publications/rights/index.html for more information.
+                    This article has been accepted for publication in IEEE Transactions on Pattern Analysis and Machine Intelligence. This is the author's version which has not been fully edited and
+                                              content may change prior to final publication. Citation information: DOI 10.1109/TPAMI.2024.3392565
+
+
+IEEE TRANSACTIONS ON PATTERN ANALYSIS AND MACHINE INTELLIGENCE                                                                                                                              4
+
+TABLE 1: The label set and domain configurations of different                                 of class confusion, we achieve versatile learning algorithms
+domain adaptation setups.                                                                     that addresses various domain adaptation settings.
+ DA Setup                  Source Domain             Target Domain          Label Set
+ Unsupervised DA                   S                         T                 C s = Ct       4      CC-L OSS : C LASS C ONFUSION L OSS
+ Partial DA                        S                         T                 C s ⊃ Ct           We aim at designing a proper criterion to measure the
+ Open Set DA                       S                         T                 C s ⊂ Ct
+ Universal DA                      S                         T                 Cs ? C t
+                                                                                              pairwise class confusion on the target domain. In this section,
+ Multi-Source DA           {S1 , S2 , ..., SS }              T                 C s = Ct       we only discuss the data in the target domain, so we omit
+ Multi-Target DA                   S                 {T1 , T2 , ..., TT }      C s = Ct       the domain subscript t for clarity, e.g., X means Xt . Denote
+                                                                                              the classifier output (after the softmax function) on the target
+                                                                                              domain as Y  b = (G ◦ F )(X) ∈ RB×K , where B is the batch
+           Person Car Plant Truck                         Person Car Plant Truck              size, and we denote the number of source classes as K for
+                                                                                              clarity (K = |Cs |). F is the feature extractor and G is the
+  Person 0.93                                Person 0.82
+                                                                                              classifier. We denote by y         b ·j and Ybij the i-row, the j -th
+                                                                                                                          b i· , y
+    Car           0.90                             Car           0.70           0.15          column and the ij -th entry of a matrix Y      b.
+
+   Plant                 0.92                     Plant                 0.80                  4.1     Class Confusion Block
+   Truck                         0.89         Truck              0.25           0.65          Probability Calibration. According to [25], DNNs tend
+                                                                                              to make overconfident predictions, hindering them from
+              (a) Source                                     (b) Target
+                                                                                              directly reasoning about the class confusion. Therefore, we
+                                                                                              adopt temperature re-scaling [25], [27], a simple yet effective
+Fig. 2: Demonstrations of error matrices of source-only                                       technique, to alleviate the negative effect of overconfident
+models trained on VisDA-2017 [56]. We select four typical                                     predictions. Using temperature scaling, the recalibrated
+classes for clarity. (a)–(b): The error matrices when the model                               probability Ybij is derived as
+is evaluated on the source and target domains respectively,
+where errors higher or equal to 0.1 are shown. Severe class                                                                        exp (Zij /T )
+                                                                                                                        Ybij = PK                      ,                                 (1)
+confusion (e.g. Car and Truck) appears on target examples.                                                                      j 0 =1 exp (Zij 0 /T )
+
+                                                                                              where Zij is the logit output of the classifier layer (before
+utilize class confusion for versatile domain adaptation: Once                                 softmax) and T is the temperature hyper-parameter for
+the class confusion is minimized, no matter what domain                                       probability calibration. Obviously, Eq. (1) boils down to the
+adaptation setups we take, the classifier will predict all the                                vanilla softmax function when T = 1.0.
+samples more correctly.                                                                           As Ybij reveals the relationship between the i-th instance
+                                                                                              and the j -th class, we define the class correlation between
+    However, the challenge is that the ground-truth class
+                                                                                              two classes j and j 0 as
+confusion cannot be calculated since the labels in the target
+domain are inaccessible in domain adaptation. We observe                                                                                    T
+                                                                                                                                  Cjj 0 = y
+                                                                                                                                          b ·j b ·j 0 .
+                                                                                                                                               y                                         (2)
+that the confusion between different classes can be naturally
+reflected by the Gram Matrix of classifier predictions, i.e.,                                 It is a coarse estimation of the class confusion. Note that y b ·j
+inner-product between the classifier predictions and their                                    denotes the probabilities that the B examples in each batch
+transposes. With this insight, we calculate the inner-product                                 come from the j -th class. The class correlation measures the
+values from well-calibrated classifier predictions and refine                                 possibility that the classifier simultaneously classifies the B
+them with example weights.                                                                    examples into the j -th and the j 0 -th classes. It is noteworthy
+    Specifically, these pairwise class confusion values demon-                                that such pairwise class correlation has immunity to the
+strate the probability that samples are classified as two                                     impact of some false predictions even with high confidence
+categories simultaneously. For a well-trained classifier, these                               since the class confusion is averaged over all samples.
+values should be small since the classifier is confident of                                   Uncertainty Reweighting. We note that examples are not
+predictions. Oppositely, a weak classifier is prone to be                                     equally important for quantifying class confusion. When
+reluctant between ambiguous categories, leading to high                                       the prediction is closer to a uniform distribution, showing
+confusion values. Unlike MinEnt (Minimum Entropy) that                                        no obvious peak (significantly larger probabilities on some
+boost classifier confidence straightforwardly, our pairwise                                   classes), we consider the classifier as ignorant of this example.
+confusion alleviates the winner-takes-all effects. Meanwhile,                                 On the contrary, when the prediction shows several peaks,
+our confusion only relies on the target predictions, regardless                               it indicates that the classifier is reluctant between several
+of label and domain configurations, which makes CC-Loss                                       ambiguous classes (such as car and truck). Obviously,
+a versatile method that is generally applicable to different                                  these examples that make the classifier ambiguous across
+domain adaptation settings.                                                                   several classes will be more suitable for embodying class
+    To more accurately estimate the class confusion, we de-                                   confusion. As defined in Eq. (2), these examples can be
+sign a consistency regularization to minimize the divergence                                  naturally highlighted with higher probabilities on the several
+of the class confusion under different perturbations on the                                   peaks. To further emphasize these samples, we introduce
+input. The consistency loss enforces the class confusion esti-                                a re-weighting mechanism based on uncertainty so that we
+mation to be stable under perturbations. With the final loss                                  can quantify class confusion more accurately. Here, those
+
+     Authorized licensed use limited to: National Univ of Defense Tech. Downloaded on July 01,2024 at 05:24:16 UTC from IEEE Xplore. Restrictions apply.
+                    © 2024 IEEE. Personal use is permitted, but republication/redistribution requires IEEE permission.See https://www.ieee.org/publications/rights/index.html for more information.
+                   This article has been accepted for publication in IEEE Transactions on Pattern Analysis and Machine Intelligence. This is the author's version which has not been fully edited and
+                                              content may change prior to final publication. Citation information: DOI 10.1109/TPAMI.2024.3392565
+
+
+IEEE TRANSACTIONS ON PATTERN ANALYSIS AND MACHINE INTELLIGENCE                                                                                                                             5
+
+
+                                                          "&                                        "
+                                                                                                    𝑪
+                    𝑿&                                    𝒁                                                              Class Confusion Block (CC-Block)
+           ……                                                                CC
+                                                                            Block                                                       Uncertainty
+                                                                                                                                        Re-weighting
+                                                                                                                            Probability            Class Confusion
+                                                                                                   " #$%
+                                                                                                   𝑪                                       𝑾
+                     #$%                                  " #$%
+                                                          𝒁                                                                 Calibration              Computation
+                    𝑿&                                      𝒕
+                                                                             CC
+                                      𝐹                                                                                   "!
+                                                                                                                          𝒁                    "!
+                                                                                                                                               𝒀                            "
+                                                                                                                                                                            𝑪
+                                                                            Block
+ Augmentation
+                                  𝐹       𝐺
+                    𝑿!                                    "!
+                                                          𝒁                                                            Output             Class                        Class
+                                                                            CE-Loss            CC-Loss                 Logits           Probability                  Confusion
+
+
+Fig. 3: The schematic of the CC-Loss function. Given the shared feature extractor F , CC-Loss is defined on the class
+predictions Yb t given by the source classifier G on the target data. CC-Loss is versatile to address various domain adaptation
+setups. (Best viewed in color.)
+
+
+examples with higher certainty in class predictions are more                                 where the confusion value between the j -th and the j 0 -th
+reliable and should contribute more to the pairwise class                                    class, Cjj 0 , is normalized by the sum of the confusion value
+                                                                                                                                       PK
+confusion. We use the entropy function H(p) , −Ep log p in                                   in the j -th row of the confusion matrix j 00 =1 Cjj 00 . Taking
+information theory as an uncertainty measure of distribution                                 the idea of Random Walk, the normalized class confusion in
+p. The entropy (uncertainty) H(y   b i· ) of predicting the i-th                             Eq. (6) has a neat interpretation: It is probable to walk from
+example by the classifier is defined as                                                      one class to another (resulting in the wrong classification) if
+                                       K
+                                       X                                                     the two classes have a high class confusion.
+                      b i· ) = −
+                    H(y                       Ybij log Ybij .                       (3)
+                                       j=1                                                   4.2     Class Confusion Loss
+While entropy is a measure of uncertainty, what we want is                                   Class Confusion Minimization. Given the aforementioned
+a probability distribution that places larger probabilities on                               derivations, we can formally define the loss function to
+examples with larger certainty of class predictions. A de facto                              enable versatile domain adaptation (VDA). Recall that C   b jj 0
+transformation to probability is the softmax function                                        well measures the confusion between each class pair j and
+                           B (1 + exp(−H(y
+                                         b i· )))                                            j 0 . We only need to minimize the cross-class confusion, i.e.,
+               Wii =                                 ,                              (4)
+                           B
+                           P                                                                 j 6= j 0 . Namely, the ideal situation is that no examples are
+                                          b i0 · )))
+                              (1 + exp(−H(y                                                  ambiguously classified into two classes at the same time. In
+                          i0 =1
+                                                                                             this sense, the confusion between labels is defined as
+where Wii is the probability of quantifying the importance
+                                                                                                                        1 X b
+of the i-th example for modeling the class confusion, and W                                                                      Cjj 0 .                 (7)
+is the corresponding diagonal matrix. Note that we take the                                                            K j 0 6=j
+opposite value of the entropy to reflect the certainty. Laplace
+                                                                                             Since the class confusion in Eq. (6) has been normalized,
+Smoothing [68], i.e., adding a constant 1 to each addend of
+                                                                                             minimizing the between-class confusion in Eq. (7) implies that
+the softmax function, is used to form a heavier-tailed weight
+                                                                                             the within-class confusion is maximized.
+distribution, which is suitable for highlighting more certain
+examples as well as avoiding overly penalizing the others.                                   Class Confusion Consistency. Through the above analysis,
+For better scaling, the probability over the examples in each                                we have already attained a much more general inductive
+batch of size B is re-scaled to sum up to B such that the                                    bias of class confusion that is suitable for versatile domain
+average weight for each example is 1.                                                        adaptation. But we can go deeper with the class confusion:
+                                                                                             after delving into the class confusion matrix in Eq. 6, we
+Class Confusion Computation. With the above re-weighting
+                                                                                             found that it is unstable under different data augmentations,
+mechanism, the preliminary definition of class confusion is
+                                                                                             especially the newly proposed ones such as cutout [16]. To
+                                    T                                                        this end, we propose to make the class confusion matrix
+                          Cjj 0 = y
+                                  b ·j  b ·j 0 .
+                                       Wy                                           (5)
+                                                                                             robust to small perturbations on the input.
+The batch-based definition of the class confusion in Eq. (5) is
+                                                                                                 Different from the prior works that constrain the prob-
+native for the mini-batch SGD optimization. However, when
+                                                                                             ability predictions (i.e., y) consistent with respect to input
+the number of classes is large, a severe class imbalance exists
+                                                                                             perturbations [48], [90], this paper proposes a consistency
+in each batch. To tackle this problem, we adopt a category
+                                                                                             regularization on class confusion matrix (i.e., C b ) that is a
+normalization technique used in Random Walk [76]:
+                                                                                             directly derived from the probability predictions (i.e., y).
+                        b jj 0 = P Cjj 0
+                        C                        ,                                  (6)
+                                                                                                 In other words, we enforce the class confusion matrix
+                                  K                                                          generated from the original data to be consistent with the
+                                  j 00 =1 Cjj 00
+
+
+     Authorized licensed use limited to: National Univ of Defense Tech. Downloaded on July 01,2024 at 05:24:16 UTC from IEEE Xplore. Restrictions apply.
+                   © 2024 IEEE. Personal use is permitted, but republication/redistribution requires IEEE permission.See https://www.ieee.org/publications/rights/index.html for more information.
+                    This article has been accepted for publication in IEEE Transactions on Pattern Analysis and Machine Intelligence. This is the author's version which has not been fully edited and
+                                              content may change prior to final publication. Citation information: DOI 10.1109/TPAMI.2024.3392565
+
+
+IEEE TRANSACTIONS ON PATTERN ANALYSIS AND MACHINE INTELLIGENCE                                                                                                                              6
+
+one after augmentation. Specifically, denote Xaug as the aug-                                 Xt . The versatile approach (also termed by CC-Loss for
+mented data. Then, within each batch, the classifier output of                                clarity) proposed in this paper is formulated as
+target images with augmentation is Y     b aug = (G ◦ F )(Xaug ).
+                                                                                                                                                   b aug , (11)
+                                                                                                                                                        
+                                                                                                                     b s , ys ) + µ EXt ⊂T CC Y
+                                                                                                min E(xs ,ys )∈S CE (y                        b t, Y
+                                                                                                                                                     t
+Similarily, we also use the probability calibration as Eq. (1)                                    F,G
+    b aug . To alleviate the influence of unreliable predictions,
+for Y                                                                         where CE is the cross-entropy loss, CC is our proposed CC-
+the uncertainty re-weighting strategy in Eq. (4) is adopted to                 Loss, and µ is a hyper-parameter for the CC-Loss. With this
+highlight the samples with high confidence. Each element of                    joint method, feature extractor F and classifier G of the deep
+the class confusion matrix after augmentation is                               DA model can be trained end-to-end by back-propagation.
+                      aug
+                     Cjj 0 = (y   aug T
+                                b ·j ) W y   aug aug
+                                                  b ·j 0                 (8) Note that, Eq. (11) is a versatile approach to all the DA settings
+                                                                              with different label set configurations because the confusion
+where Waug is computed as Eq. (4). Similar to Eq. (6), we between source outlier classes is negligible compared to the
+apply category normalization to normalize Caug                        b aug
+                                                              jj 0 to Cjj 0 . confusion between target classes.
+With the confusion matrices of augmented data, we derive                           Our conference version cannot deal with target open
+the criterion for Class Confusion Consistency as                               classes but in this journal version, for the DA setups with
+                                                  2                           target open classes including OSDA and UniDA, we add
+                      1 X b                b aug0 .
+                                 Cjj 0 − C    jj                         (9)   an extra class, ‘unknown’, in the classifier to accommodate
+                      K j 0 6=j                                                the data in the target domain open classes. Then, the predic-
+                                                                               tions of source samples ys and target samples yt becomes
+    We emphasize that this class confusion consistency is
+                                                                               |Cs + 1|-dimension. To learn the classifier parameters for the
+different from the one in FixMatch [70]. Here, we mini-
+                                                                              ‘unknown’ class, we select the samples that are likely to be in
+mize the distance of class confusion matrices and the class
+                                                                               open classes by taking the data with the maximal confidence
+confusion is estimated by a batch of data. In FixMatch, it
+                                                                               of the first |Cs | classes smaller than a threshold τopen . We
+minimizes the distance of predictions on each single data
+                                                                               also include the ‘unknown’ class into the class confusion by
+point. This is the first time that the consistency regularization
+                                                                               using the |Cs + 1|-dimensional prediction to compute the
+is performed on the class confusion level. Furthermore, the
+                                                                               class confusion, which aims to avoid mis-classification of the
+consistency regularization does not rely on any specific
+                                                                              ‘unknown’ class with shared classes. Then the loss for our
+domain adaptation module, which satisfies the requirements
+                                                                              versatile approach in domain adaptation settings with open
+of versatile domain adaptation.
+                                                                               classes can be formulated as
+Class Confusion Loss. By integrating both class confusion                         min E(xs ,ys )∈S CE (yb s , ys )
+minimization and consistency regularization, we achieve the                        F,G
+                                                                                                                               
+class confusion loss (CC-Loss) as                                                    + E(xt )∈T I maxj≤|Cs | (y                      b t , |Cs | + 1)
+                                                                                                                  b t )j < τopen CE (y
+                                                                                                            aug
+                                                                                                                
+              b aug = 1
+                            X
+                                               b jj 0 − C
+                                                                
+                                                         b aug0 2 . (10)           + µ EXt ⊂T CC Y  b t, Y
+                                                                                                         b
+                                                                                                            t     .
+   CC Y  b t, Y
+                t                  Cb jj 0 + C
+                                                           jj                                                                                        (12)
+                       K j 0 6=j
+                                                                              Thus, with our new loss design, CC-Loss is also a versatile
+We want to emphasize that the inductive bias of class approach to DA setups with open classes.
+confusion proposed in this work is more general than that
+of domain alignment in previous work [21], [43], [44], [46], 5.2 Different Domain Configurations
+[65]. As discussed in Section 2, many previous methods                             For DA settings with different domain configurations, we
+explicitly align features from the source and target domains, do not need to consider open classes and the loss is similar
+at the risk of deteriorating the feature discriminability and to Eq. (11). But the cross-entropy loss is defined on the union
+impeding the transferability [12]. Further, the inductive bias of all source domains and the CC-Loss is defined on all the
+of class confusion is general and applicable to a variety of target domains:
+domain adaptation setups, while that of domain alignment
+                                                                                                                                                 b aug .
+                                                                                                                                                       
+will suffer when the domains cannot be aligned naturally                        min E(xs ,ys )∈Si Si CE (yb s , ys ) + µ EXt ⊂Si Ti CC Y   b t, Y
+                                                                                                                                                   t
+                                                                                 F,G
+(e.g., the partial-set DA setups [7], [8], [88]).                                                                                                    (13)
+                                                                                              For MSDA, the CC-Loss could utilize useful knowledge in
+5     V ERSATILE L EARNING A LGORITHMS                                                        all source domains to minimize the target class confusion
+                                                                                              by simply merging all the source domains. For MTDA, the
+    The main motivation of this work is to design a ver-                                      CC-Loss could jointly minimize the class confusion over all
+satile approach to all the mainstream DA setups. Here, we                                     the target domains, which is not influenced by the domain
+present how our CC-Loss enables various domain adaptation                                     shifts between target domains and does not need to treat
+settings. Note that our journal version achieves higher                                       each individual target domain separately.
+versatility than our conference version [30] in the label set                                     In a nutshell, our CC-Loss can be seamlessly plugged into
+configurations by allowing open classes in the target domain.                                 standard deep networks to solve domain adaptation settings
+                                                                                              with different domain configurations.
+5.1   Different Label Set Configurations
+    Denote by y b s = (G ◦ F )(xs ) the class prediction for                                  6      2D V ISION E XPERIMENTS
+a source example xs , and by Y    b t = (G ◦ F )(Xt ) the re-                                   We first evaluate CC-Loss on the four 2D vision do-
+calibrated class predictions for a batch of B target examples                                 main adaptation datasets including Office-31, Office-Home,
+
+      Authorized licensed use limited to: National Univ of Defense Tech. Downloaded on July 01,2024 at 05:24:16 UTC from IEEE Xplore. Restrictions apply.
+                    © 2024 IEEE. Personal use is permitted, but republication/redistribution requires IEEE permission.See https://www.ieee.org/publications/rights/index.html for more information.
+                     This article has been accepted for publication in IEEE Transactions on Pattern Analysis and Machine Intelligence. This is the author's version which has not been fully edited and
+                                               content may change prior to final publication. Citation information: DOI 10.1109/TPAMI.2024.3392565
+
+
+IEEE TRANSACTIONS ON PATTERN ANALYSIS AND MACHINE INTELLIGENCE                                                                                                                                   7
+
+                           TABLE 2: Accuracy (%) on Office-31 for UDA. A: Amazon, W: Webcam, D: DSLR.
+
+      Backbone            Method                     A→W                    D→W                W→D                   A→D                 D→A                  W→A                Avg
+                          Source Only              68.4±0.2             96.7±0.1              99.3±0.1             68.9±0.2            62.5±0.3             60.7±0.3               76.1
+                          DAN [43]                 80.5±0.4             97.1±0.2              99.6±0.1             78.6±0.2            63.6±0.3             62.8±0.2               80.4
+                          RTN [45]                 84.5±0.2             96.8±0.1              99.4±0.1             77.5±0.3            66.2±0.2             64.8±0.3               81.6
+                          DANN [21]                82.0±0.4             96.9±0.2              99.1±0.1             79.7±0.4            68.2±0.4             67.4±0.5               82.2
+                          JAN [46]                 85.4±0.3             97.4±0.2              99.8±0.2             84.7±0.3            68.6±0.3             70.0±0.4               84.3
+                          GTA [67]                 89.5±0.5             97.9±0.3              99.8±0.4             87.7±0.5            72.8±0.3             71.4±0.4               86.5
+      ResNet-50
+                          CDAN [44]                94.1±0.1             98.6±0.1             100.0±0.0             92.9±0.2            71.0±0.3             69.3±0.3               87.7
+                          AFN [83]                 88.8±0.5             98.4±0.3              99.8±0.1             87.7±0.6            69.8±0.4             69.7±0.4               85.7
+                          MDD [91]                 94.5±0.3             98.4±0.3             100.0±0.0             93.5±0.2            74.6±0.3             72.2±0.1               88.9
+                          MCC [30]                 95.5±0.2             98.6±0.1             100.0±0.0             94.4±0.3            72.9±0.2             74.9±0.3               89.4
+                          CC-Loss                  94.1±0.2             98.6±0.1              99.8±0.2             95.0±0.3            76.1±0.3             75.6±0.2               89.9
+                          CAN [32]                 94.5±0.3             99.1±0.2              99.8±0.2             95.0±0.3            78.0±0.3             77.0±0.3               90.6
+                          Source Only              89.2±0.3             98.9±0.2             100.0±0.0             88.8±0.3            80.1±0.2             79.8±0.2               89.5
+                          DANN [21]                91.6±0.2             99.0±0.3             100.0±0.0             90.6±0.2            80.2±0.2             80.1±0.3               90.2
+                          CAN [32]                 93.8±0.2             99.1±0.2             100.0±0.0             93.2±0.3            82.1±0.4             81.4±0.3               91.6
+      Vit-B/16
+                          TVT [84]                 96.4±0.2             99.4±0.2             100.0±0.0             96.4±0.3            84.9±0.3             86.1±0.3               93.9
+                          MCC [30]                 96.7±0.3             99.4±0.1             100.0±0.0             96.4±0.2            85.3±0.2             84.3±0.2               93.7
+                          CC-Loss                  97.5±0.2             99.5±0.1             100.0±0.0             96.6±0.1            85.5±0.2             84.6±0.3               93.9
+
+                 TABLE 3: Accuracy (%) on Office-Home for UDA. A: Art, C: Clipart, P: Product, R: Real World.
+
+ Backbone         Method              A→C          A→P         A→R          C →A        C→P        C→R         P→A         P→C         P→R         R→A         R→C         R →P           Avg
+                  ResNet [26]          34.9        50.0        58.0         37.4        41.9        46.2        38.5        31.2        60.4        53.9        41.2        59.9          46.1
+                  DAN [43]             43.6        57.0        67.9         45.8        56.5        60.4        44.0        43.6        67.7        63.1        51.5        74.3          56.3
+                  DANN [21]            45.6        59.3        70.1         47.0        58.5        60.9        46.1        43.7        68.5        63.2        51.8        76.8          57.6
+                  JAN [46]             45.9        61.2        68.9         50.4        59.7        61.0        45.8        43.4        70.3        63.9        52.4        76.8          58.3
+                  CDAN [44]            50.7        70.6        76.0         57.6        70.0        70.0        57.4        50.9        77.3        70.9        56.7        81.6          65.8
+ ResNet-50
+                  AFN [83]             54.4        73.3        77.9         65.2        71.5        73.2        63.6        52.6        78.2        72.3        58.0        82.1          68.5
+                  MDD [91]             54.9        73.7        77.8         60.0        71.4        71.8        61.2        53.6        78.1        72.5        60.2        82.3          68.1
+                  MCC [30]             58.4        79.6        83.0         67.5        77.0        78.5        66.6        54.8        81.8        74.4        61.4        85.6          72.4
+                  CAN [32]             58.3        80.1        83.5         67.2        77.8        79.1        66.9        55.2        82.2        73.5        61.6        85.9          72.6
+                  CC-Loss              58.6        80.4        83.4         67.6        78.6        79.6        67.8        56.4        82.6        74.1        62.0        86.4          73.1
+                  Source Only          66.2        84.3        86.6         77.9        83.3        84.3        76.0        62.7        88.7        80.1        66.2        88.7          78.7
+                  DANN [21]            71.9        80.7        86.7         79.9        80.4        83.5        76.9        70.9        88.3        83.0        72.9        88.4          80.3
+                  TVT [84]             74.9        86.8        89.5         82.8        88.0        88.3        79.8        71.9        90.1        85.5        74.6        90.6          83.6
+ Vit-B/16
+                  MCC [30]             74.5        87.1        89.7         83.0        87.5        88.5        83.2        73.7        90.1        86.0        74.1        91.3          84.1
+                  CAN [32]             75.1        87.6        90.1         83.4        88.2        89.1        82.4        73.0        90.2        85.7        73.9        91.5          84.2
+                  CC-Loss              76.8        88.5        90.7         85.0        90.0        89.7        82.8        72.7        90.5        85.8        74.2        92.0          84.9
+
+
+              TABLE 4: Overview of Dataset Statistics.                                         classifier from scratch. We use Deep Embedded Validation
+                                                                                               (DEV) [87] to select hyper-parameter T and provide parame-
+ Dataset                         Domains                          #Classes #Images
+                                                                                               ter sensitivity analysis. A balance between the cross-entropy
+ Office-31        Amazon (A), Webcam (W), DSLR (D)                    31        4110
+                                                                                               loss and CC-Loss, i.e. µ = 1.0 works well for all experiments.
+                          Art (A), Clip Art (C),                                               We run each experiment for 5 times and report the average.
+ Office-Home                                                          65        15500
+                       Product (P), Real World (R)
+ Visda-2017                   Synthetic, Real                         12       280157
+                  Clipart (c), Infograph (i), Painting (p),                                    6.1     Unsupervised Domain Adaptation (UDA)
+ DomainNet                                                            345      569010
+                   Quickdraw (q), Real (r), Sketch (s)
+                                                                                                  We evaluate CC-Loss in the standard DA setup, UDA, on
+ PointDA        ModelNet (M), ShapeNet (S), ScanNet (S*)              10        32788
+                                                                                               several datasets: Office-31, Office-Home and VisDA-2017.
+                                                                                               As reported in Table 2, 3 and 5, CC-Loss consistently achieves
+                                                                                               competitive performance. Moreover, CC-Loss consistently
+VisDA-2017 and DomainNet. The statistics of datasets are                                       outperforms MCC, which demonstrates the efficacy of
+shown in Table 4. We evaluate CC-Loss as a versatile                                           consistency on class confusion. We also compare CC-Loss
+approach with methods in six domain adaptation setups                                          with the latest state-of-the-art method which takes Vision
+(UDA, PDA, OSDA, UniDA, MSDA, and MTDA). We                                                    Transformer [17] (ViT) as the backbone in Table 2, 3 and 5.
+implement all the methods in the PyTorch framework [52].                                       CC-Loss surpasses all the methods, including those methods
+We use ResNet [26] pre-trained on ImageNet [15] as the                                         that are designed specifically for ViT structure.
+backbone, where we use ResNet-50 for Office-31 and Office-                                        We further analyze the difference between Minimum
+Home datasets, and ResNet-101 for VisDA-2017 and Do-                                           Entropy (MinEnt) [23] and our methods. MinEnt minimizes
+mainNet datasets. We further validate the performance on                                       the entropy of the prediction and indirectly reduces class
+Vit-B/16 [17]. For the classifier, we adopt a fully-connected                                  confusion. We conduct experiments on the Two Moon [42]
+with |Cs | and |Cs | + 1 outputs for DA setting without open                                   to more clearly view the difference. We train a shallow MLP
+classes and with open classes respectively, and train the                                      from scratch and plot the decision boundaries of MinEnt,
+
+      Authorized licensed use limited to: National Univ of Defense Tech. Downloaded on July 01,2024 at 05:24:16 UTC from IEEE Xplore. Restrictions apply.
+                     © 2024 IEEE. Personal use is permitted, but republication/redistribution requires IEEE permission.See https://www.ieee.org/publications/rights/index.html for more information.
+                     This article has been accepted for publication in IEEE Transactions on Pattern Analysis and Machine Intelligence. This is the author's version which has not been fully edited and
+                                               content may change prior to final publication. Citation information: DOI 10.1109/TPAMI.2024.3392565
+
+
+IEEE TRANSACTIONS ON PATTERN ANALYSIS AND MACHINE INTELLIGENCE                                                                                                                               8
+
+                                             TABLE 5: Per-class Accuracy (%) on VisDA-2017 for UDA.
+
+      Backbone        Method               plane       bcybl       bus       car      horse       knife      mcyle        persn       plant      sktb       train     truck       Avg
+                      ResNet [26]           55.1        53.3      61.9      59.1       80.6        17.9        79.7        31.2        81.0       26.5      73.5        8.5       52.4
+                      MinEnt [23]           80.3        75.5      75.8      48.3       77.9        27.3        69.7        40.2        46.5       46.6      79.3       16.0       57.0
+                      DANN [21]             81.9        77.7      82.8      44.3       81.2        29.5        65.1        28.6        51.9       54.6      82.8        7.8       57.4
+                      DAN [43]              87.1        63.0      76.5      42.0       90.3        42.9        85.9        53.1        49.7       36.3      85.8       20.7       61.1
+                      MCD [65]              87.0        60.9      83.7      64.0       88.9        79.6        84.7        76.9        88.6       40.3      83.0       25.8       71.9
+      ResNet-101
+                      CDAN [44]             85.2        66.9      83.0      50.8       84.2        74.9        88.1        74.5        83.4       76.0      81.9       38.0       73.9
+                      AFN [83]              93.6        61.3      84.1      70.6       94.1        79.0        91.8        79.6        89.9       55.6      89.0       24.4       76.1
+                      MCC [30]              88.1        80.3      80.5      71.5       90.1        93.2        85.0        71.6        89.4       73.8      85.0       36.9       78.8
+                      CC-Loss               96.1        88.6      79.4      71.0       94.9        97.4        84.0        79.0        91.8       88.9      87.1       55.3       84.5
+                      CAN [32]              97.0        87.2      82.5      74.3       97.8        96.2        90.8        80.7        96.6       96.3      87.5       59.9       87.2
+                      Source Only           98.2        73.0      82.5      62.0       97.3        63.5        96.5        29.8        68.8       86.7      96.7       23.7       73.2
+                      DANN [21]             94.6        81.6      81.8      69.9       93.5        69.9        88.6        50.5        86.8       88.5      91.5       20.1       76.4
+                      CAN [32]              95.8        85.4      83.7      58.6       95.4        94.5        88.3        67.6        87.5       89.1      91.9       54.2       82.7
+      Vit-B/16
+                      TVT [84]              92.9        85.6      77.5      60.5       93.6        98.2        89.4        76.4        93.6       92.0      91.7       55.7       83.9
+                      MCC [30]              96.6        89.2      81.8      62.8       96.6        98.5        88.3        72.3        95.3       93.1      92.9       57.7       85.4
+                      CC-Loss               95.2        91.8      85.1      68.2       96.6        97.8        89.9        82.3        93.4       95.4      92.8       64.7       87.8
+
+
+
+
+                    (a) MinEnt [23]                                                (b) MCC [30]                                                   (c) CC-Loss
+
+Fig. 4: Decision boundaries on the Two Moon dataset. Blue points indicate target data, and the two different source classes
+are depicted in purple and yellow. CC-Loss shows clearer and more accurate decision boundaries than MinEnt and MCC.
+
+
+MCC, and CC-Loss. As shown in Fig. 4, CC-Loss shows the                                        OSDA approach, ROS. This is because, in our conference
+best performance in utilizing class confusion.                                                 version, we only use a confidence threshold to detect data in
+                                                                                               the target open classes, which, as shown in prior works [41],
+6.2    Partial Domain Adaptation (PDA)                                                         [64], may mis-classify much data in open classes as shared
+                                                                                               classes. In our journal version, we adopt an extra class in
+    Due to the source outlier classes, PDA is a challenging
+                                                                                               the classifier to handle the ‘unknown’ class. Minimizing the
+setup because of the misalignment between the source and
+                                                                                               class confusion on open classes prevents the model from mis-
+target classes. For a fair comparison, we follow the protocol
+                                                                                               classifying open classes with shared classes, which explains
+of PADA [8] and AFN [83], where the first 25 categories (in
+                                                                                               the reason that CC-Loss outperforms OSDA methods. Only
+alphabetic order) of the Office-Home dataset are taken as the
+                                                                                               with an extra entry in the classifier can CC-Loss tackle the
+target domain. As shown in Table 6, even not specially de-
+                                                                                               open classes successfully, which demonstrates the versatility
+signed for the PDA problem, CC-Loss outperforms AFN [83]
+                                                                                               of CC-Loss even for DA setups with open classes.
+with a general large-norm objective and ETN, a method
+specially designed for PDA. Also, CC-Loss outperforms MCC
+(the conference version), which indicates that the consistency                                 6.4     Universal Domain Adaptation (UniDA)
+regularization also works well in the PDA setting.
+                                                                                                   Since both source and target domains can contain outlier
+                                                                                               classes, UniDA is known as the most general domain
+6.3    Open Set Domain Adaptation (OSDA)                                                       adaptation setup including all the label set configurations.
+    OSDA setting requires special techniques to handle                                         We evaluate all the methods in the Office-Home dataset.
+the classification of open classes. We follow the protocol                                     We follow the protocol of UniDA [86], where in alphabetic
+of ROS [5]: in alphabetic order, the first 25 classes are                                      order, the first 10 classes are shared classes, the next 5 classes
+shared classes and the remaining 40 classes are open                                           are source outlier classes, and the remaining classes are
+classes for the Office-Home dataset. Following ROS, we take                                    target outlier classes. Following [20], we report H-Score, the
+                s ∗Acco
+HOS = 2∗AccAccs +Acco as the evaluation metric, where Accs
+                                                                                               harmonic mean of accuracy on common classes and accuracy
+and Acco are the accuracy on the shared and open classes.                                      on unknown classes. The results are shown in Table 8, which
+    We show the results of Office-Home in Table 7. We                                          demonstrates the efficacy of the approach of CC-Loss on
+observe that MCC [30] performs worse than the competitive                                      the UniDA setup. Furthermore, traditional methods such
+
+       Authorized licensed use limited to: National Univ of Defense Tech. Downloaded on July 01,2024 at 05:24:16 UTC from IEEE Xplore. Restrictions apply.
+                     © 2024 IEEE. Personal use is permitted, but republication/redistribution requires IEEE permission.See https://www.ieee.org/publications/rights/index.html for more information.
+                   This article has been accepted for publication in IEEE Transactions on Pattern Analysis and Machine Intelligence. This is the author's version which has not been fully edited and
+                                             content may change prior to final publication. Citation information: DOI 10.1109/TPAMI.2024.3392565
+
+
+IEEE TRANSACTIONS ON PATTERN ANALYSIS AND MACHINE INTELLIGENCE                                                                                                                                               9
+
+       TABLE 6: Accuracy (%) on Office-Home for PDA (ResNet-50). A: Art, C: Clipart, P: Product, R: Real World.
+
+     Method           A→C          A→P          A→R          C→A               C→P       C→R               P→A           P→C           P→R           R→A           R →C          R →P          Avg
+     ResNet [26]       38.6          60.8          75.2          39.9          48.1          52.9          49.7          30.9          70.8          65.4          41.8          70.4          53.7
+     DAN [43]          44.4          61.8          74.5          41.8          45.2          54.1          46.9          38.1          68.4          64.4          51.5          74.3          56.3
+     JAN [46]          45.9          61.2          68.9          50.4          59.7          61.0          45.8          43.4          70.3          63.9          52.4          76.8          58.3
+     PADA [8]          51.2          67.0          78.7          52.2          53.8          59.0          52.6          43.2          78.8          73.7          56.6          77.1          62.0
+     AFN [83]          58.9          76.3          81.4          70.4          73.0          77.8          72.4          55.3          80.4          75.8          60.4          79.9          71.8
+     ETN [9]           59.2          77.0          79.5          62.9          65.7          75.0          68.3          55.4          84.4          75.7          57.7          84.5          70.4
+     DCC [36]          59.0          84.4          83.4          67.8          72.7          79.8          68.4          53.2          83.7          75.8          59.0          88.3          73.0
+     MCC [30]          63.1          80.8          86.0          70.8          72.1          80.1          75.0          60.8          85.9          78.6          65.2          82.8          75.1
+     CC-Loss           61.1          84.4          85.6          72.3          75.9          79.2          75.0          62.0          83.4          78.8          68.4          83.3          75.8
+
+          TABLE 7: HOS (%) on Office-Home for OSDA (ResNet-50). A: Art, C: Clipart, P: Product, R: Real World.
+
+      Method         A→C          A→P          A→R           C→A           C→P           C→R              P→A        P→C           P→R           R→A           R→C           R→P           Avg
+      OSBP [64]       55.1         65.2         72.9             64.3      64.7          70.6              63.2          53.2      73.9              66.7          54.5          72.3      64.7
+      STA [41]        56.3         63.7         62.1             57.9      62.5          66.3              63.1          55.0      69.7              65.0          54.2          66.4      61.9
+      ROS [5]         60.1         69.3         76.5             58.9      65.2          68.6              60.6          56.3      74.4              68.8          60.4          75.7      66.2
+      DCC [36]        52.9         67.4         80.6             49.8      66.6          67.0              59.5          52.8      64.0              56.0          76.9          62.7      64.2
+      MCC [30]        53.6         64.6         65.6             58.3      59.7          65.5              57.1          49.1      67.6              63.1          52.1          63.9      60.0
+      CC-Loss         64.3         73.5         77.3             62.9      69.2          73.0              64.3          56.8      75.4              67.5          63.8          79.5      69.0
+
+      TABLE 8: H-Score (%) on Office-Home for UniDA (ResNet-50). A: Art, C: Clipart, P: Product, R: Real World.
+
+ Method                       A→C           A→P        A→R              C→A           C→P       C→R               P→A           P →C      P→R               R→A           R→C           R →P          Avg
+ ResNet [26]                  44.7          48.0          50.1          46.6          46.9          49.0          47.5          43.1          50.2          48.5          44.5          48.4          47.3
+ DANN [21]                    42.4          48.0          48.9          45.5          46.5          48.4          45.8          42.6          48.7          47.6          42.7          47.4          46.2
+ RTN [45]                     38.4          44.7          45.7          42.6          44.1          45.5          42.6          36.8          45.5          44.6          39.8          44.5          42.9
+ IWAN [88]                    40.5          47.0          47.8          45.0          45.1          47.6          45.8          41.4          47.6          46.3          42.5          46.5          45.3
+ PADA [8]                     34.1          41.9          44.1          40.6          41.5          44.0          37.0          32.6          44.2          43.1          35.8          43.4          40.2
+ OSBP [64]                    39.6          45.1          46.2          45.7          45.2          46.8          45.3          40.5          45.8          45.1          41.6          46.9          44.5
+ UAN [86]                     51.6          51.7          54.3          61.7          57.6          61.9          50.4          47.6          61.5          62.9          52.6          65.2          56.6
+ CMU [20]                     56.0          56.9          59.2          67.0          64.3          67.8          54.7          51.1          66.4          68.2          57.9          69.7          61.6
+ MCC [30]                     52.7          62.7          60.5          58.5          57.4          64.0          61.2          50.4          60.3          59.9          54.8          60.0          58.5
+ DCC [36]                     58.0          54.1          58.0          74.6          70.6          77.5          64.3          73.6          74.9          81.0          75.1          80.4          70.2
+ CC-Loss                      53.1          78.7          82.3          60.5          68.2          74.0          71.1          54.1          79.9          76.2          57.2          77.6          69.4
+ CC-Loss + DCC [36]           60.5          80.3          66.8          78.5          73.8          79.2          71.7          76.0          80.3          82.3          77.4          82.5          75.8
+
+
+
+as CMU [20] and UAN [86] develop a criterion to divide                                              6.5     Multi-Source Domain Adaptation (MSDA)
+target data in shared classes and in open classes, which                                               When applying our method to MSDA, we merge multiple
+requires a manually tuned threshold to detect target open                                           source domains and compare it to existing algorithms
+class data, while CC-Loss directly classifies the ‘unknown’                                         specially designed for MSDA on DomainNet. Following
+class by the classifier with the extra class and requires no                                        prior works [54], we take one domain as the target domain
+more hyper-parameter during the inference time.                                                     and the remaining domains as the multiple source domains,
+                                                                                                    which forms six tasks on DomainNet. As shown in Table 9,
+    CC-Loss outperforms MCC with a large margin. This is                                            based on the inductive bias of minimizing the class confusion,
+because MCC has no extra class in the classifier and can                                            CC-Loss outperforms the strong methods typically designed
+only select samples as the outlier by confidence threshold,                                         for MSDA. Note that these specific methods are of very
+which is vulnerable to over-confident predictions for open                                          complex architecture and loss designs and may be hard to
+class data. Furthermore, CC-Loss also minimizes the class                                           use in practical applications, while CC-Loss only adopts a
+confusion on the ‘unknown’ class classification while MCC                                           simple loss and achieves such a significant improvement.
+does not, so CC-Loss can misclassify fewer samples in open
+classes to shared classes and achieves higher accuracy. The
+success on UniDA demonstrates the versatility of CC-Loss                                            6.6     Multi-Target Domain Adaptation (MTDA)
+across varieties of label set configurations.                                                           We evaluate the MTDA tasks following the protocol
+                                                                                                    of DADA [55], which provides six tasks on DomainNet.
+    Meanwhile, we mention that CC-Loss shows slightly                                               We adopt a strategy that directly merges multiple target
+inferior performance than DCC [36]. We conjecture that                                              domains. As shown in Table 10, many competitive methods
+treating outlier classes as one generic class devastates the                                        are not effective in this challenging setup. However, CC-Loss
+intrinsic structure of outlier classes, which is admittedly                                         outperforms the competitive method DADA [55] by a big
+one limitation of our proposed method. Fortunately, CC-                                             margin (10.4%). CC-Loss minimizes class confusion over all
+Loss can be seamlessly plugged into DCC [36], pushing the                                           the data in all the target domains, which can implicitly utilize
+performance of this method to a higher level.                                                       the relations between target domains for prediction. Note
+
+     Authorized licensed use limited to: National Univ of Defense Tech. Downloaded on July 01,2024 at 05:24:16 UTC from IEEE Xplore. Restrictions apply.
+                   © 2024 IEEE. Personal use is permitted, but republication/redistribution requires IEEE permission.See https://www.ieee.org/publications/rights/index.html for more information.
+                              This article has been accepted for publication in IEEE Transactions on Pattern Analysis and Machine Intelligence. This is the author's version which has not been fully edited and
+                                                                  content may change prior to final publication. Citation information: DOI 10.1109/TPAMI.2024.3392565
+
+
+IEEE TRANSACTIONS ON PATTERN ANALYSIS AND MACHINE INTELLIGENCE                                                                                                                                      10
+
+TABLE 9: Accuracy (%) on DomainNet for MSDA (ResNet-101).                                                              restricted to the 2D vision tasks, so we further conduct
+c:clipart, i:infograph, p:painting, q:quickdraw, r:real, s:sketch.
+                                                                                                                       experiments on 3D vision tasks.
+    Method (:t)                     :c          :i           :p              :q           :r     :s         Avg        Datasets. Domain adaptation has just started to be applied
+    ResNet [26]                   47.6       13.0       38.1             13.3         51.9      33.7         32.9      to 3D vision tasks in the past few years. PointDAN [58]
+    MCD [65]                      54.3       22.1       45.7              7.6         58.4      43.5         38.5      proposes the first 3D vision domain adaptation dataset:
+    DCTN [82]                     48.6       23.5       48.8              7.2         53.5      47.3         38.2      PointDA, which consists of three domains: ModelNet40 [81]
+    M3 SDA [54]                   58.6       26.0       52.3              6.3         62.7      49.5         42.6
+    CMSS [85]                     64.2       28.0       53.6             16.0         63.4      53.8         46.5
+                                                                                                                       (M), ShapeNet [10] (S) and ScanNet [14] (S∗ ) and the samples
+    LtC-MSDA [77]                 63.1       28.7       56.1             16.3         66.1      53.8         47.4      of the 10 shared classes to form a dataset. As shown in Fig. 5,
+    MCC [30]                      65.5       26.0       56.6             16.5         68.0      52.7         47.6      ModelNet40 and ShapeNet contain complete shapes but the
+    CC-Loss                       67.4       28.6       58.6             18.0         72.4      56.0         50.2      ScanNet contains objects with occlusion by scanning realistic
+                                                                                                                       objects, so there are large domain gaps between different
+TABLE 10: Accuracy (%) on DomainNet for MTDA (ResNet-                                                                  domains. The three domains creates six domain adaptation
+101). c: clipart, i: infograph, p: painting, q: quickdraw, r: real,                                                    tasks: M→S, M→S∗ , S→M, S→, S∗ →M, and S∗ →S.
+s:sketch.
+                                                                                                                       Implementation Details. We implement all the methods
+      Method (s:)              c:          i:         p:                q:           r:         s:          Avg        in the PyTorch framework. We use PointNet [57] as the
+                                                                                                                       backbone network. We use optimizer Adam with a learning
+      ResNet [26]            25.6        16.8        25.8             9.2           20.6       22.3         20.1
+      SE [19]                21.3         8.5        14.5             13.8          16.0       19.7         15.6       rate of 0.001, weight decay of 5e − 4 and batch size of 64. We
+      MCD [65]               25.1        19.1        27.0             10.4          20.2       22.5         20.7       use µ = 1.0. We also use DEV to select hyper-parameters. We
+      DADA [55]              26.1        20.0        26.5             12.9          20.7       22.8         21.5       run experiments for 5 times and report the average results.
+      MCC                    33.6        30.0        32.4             13.5          28.0       35.3         28.8
+                                                                                                                       Apart from the conventional domain adaptation methods,
+      CC-Loss                36.1        33.3        34.8             22.2          27.7       37.4         31.9       we also compare CC-Loss with PointDAN, the domain
+                                                                                                                       adaptation method designed specifically for 3D vision.
+
+that the source-only accuracy is rather low on this dataset,                                                           Results. We show the results on the PointDA dataset in
+validating that our method, with well-designed mechanisms,                                                             Table 11. We observe that CC-Loss outperforms all the com-
+is sufficiently robust to wrong predictions.                                                                           pared methods especially PointDAN, which is designed to
+                                                                                                                       address 3D domain adaptation. The results demonstrate that
+                                                                                                                       CC-Loss mitigates domain gaps on 3D vision tasks including
+7       3D V ISION E XPERIMENTS
+                                                                                                                       occlusion, different point densities, etc. In particular, on the
+TABLE 11: Accuracy (%) on 3D Vision Dataset PointDA                                                                    most difficult tasks with the largest domain gaps: M→S∗ and
+(PointNet). M: ModelNet, S: ShapeNet, S∗ : ScanNet.                                                                    S→S∗ , CC-Loss significantly outperforms other methods,
+                                                                                                                       which demonstrates that CC-Loss can mitigate the domain
+ Method                     M→S M→S∗ S→M S→S∗ S∗ →M S∗ →S Avg                                                          shifts on point distributions for point cloud data.
+ ResNet [26]                  42.5        22.3         39.9             23.5          34.2           46.9     34.9
+                                                                                                                           We further visualize the critical points captured by
+ DAN [43]                     57.5        27.9         40.7             26.7          47.3           54.8     42.5     different methods when transferring models from ModelNet
+ DANN [21]                    58.7        29.4         42.3             30.5          48.1           56.7     44.2     to ScanNet, which suffers from a large domain gap. As
+ ADDA [74]                    61.0        30.5         40.4             29.3          48.9           51.1     43.5     shown in Fig. 6, our method shows stronger performance
+ MCD [65]                     62.0        31.0         41.4             31.3          46.8           59.3     45.3
+ PointDAN [58]                64.2        33.0         47.6             33.9          49.1           64.1     48.7     than PointDAN when capturing the critical points. Both
+ MCC [30]                     63.8        34.1         50.1             21.3          50.6           57.1     46.2     the quantitative and visualization results imply the general
+ CC-Loss                      63.5        45.4         40.9             49.4          46.0           63.2     51.4     applicability of CC-Loss to a wide range of tasks.
+
+
+   The experiments above validate the effectiveness of CC-                                                             8   A NALYSIS ON CC-L OSS
+Loss in 2D vision datasets. We note that CC-Loss is not                                                                    Having conducted experiments on both 2D and 3D vision
+                                                                                                                       datasets and in six mainstream domain adaptation setups, we
+              ModelNet
+              ModelNet-10  ShapeNet
+                           ShapeNet-10
+                     ModelNet-10
+                                         ScanNet
+                                        ScanNet-10
+                                  ShapeNet-10   ScanNet-10
+                                                                                  ModelNet ShapeNet
+                                                                        ModelNet-10  ShapeNet-10
+                                                                               ModelNet-10        ScanNet-10
+                                                                                            ShapeNet-10
+                                                                                                            ScanNet
+                                                                                                          ScanNet-10   demonstrate the effectiveness and versatility of our method.
+                                                                                                                       In this section, we dig deeper into our method through a line
+ Bathub
+    Bathub Bathub                                            Keyboard
+                                                       KeyboardKeyboard
+                                                                                                                       of empirical analysis.
+
+    BedBed    Bed                                        Lamp
+                                                                Lamp
+                                                                  Lamp
+                                                                                                                       TABLE 12: Ablation study of CC-Loss on Office-31 for UDA
+                                                                                                                       (ResNet-50).
+Bookshelf
+   Bookshelf
+          Bookshelf                                            Laptop
+                                                         Laptop Laptop
+
+
+                                                                                                                        CC PC UR CN CON A→W D→W W→D A→D D→A W→A Avg
+  Cabinet
+    Cabinet Cabinet                                          Sofa   Sofa
+                                                                      Sofa
+                                                                                                                        3 7 7      7     7      92.2     96.9     100.0   88.6   73.2   64.5     85.9
+                                                                                                                        3 3 7      7     7      93.1     98.5     100.0   91.6   70.9   69.0     87.2
+                                                                                                                        3 3 3      7     7      93.7     98.6     100.0   93.2   72.1   73.7     88.4
+    Chair
+      Chair   Chair                                      Table    Table
+                                                                    Table
+                                                                                                                        3 3 3      3     7      95.5     98.6     100.0   94.4   72.9   74.9     89.4
+                                                                                                                        3 3 3      3     3      94.1     98.6      99.8   95.0   76.1   75.6 89.9
+Fig. 5: PointDA Dataset. The overview of different domains,
+ModelNet, ShapeNet, and ScanNet in PointDA, a 3D vision                                                                Ablation Study. It is interesting to investigate the contri-
+dataset for domain adaptation.                                                                                         bution of each part of the CC-Loss loss: Class Correlation
+
+          Authorized licensed use limited to: National Univ of Defense Tech. Downloaded on July 01,2024 at 05:24:16 UTC from IEEE Xplore. Restrictions apply.
+                              © 2024 IEEE. Personal use is permitted, but republication/redistribution requires IEEE permission.See https://www.ieee.org/publications/rights/index.html for more information.
+                          This article has been accepted for publication in IEEE Transactions on Pattern Analysis and Machine Intelligence. This is the author's version which has not been fully edited and
+                                                    content may change prior to final publication. Citation information: DOI 10.1109/TPAMI.2024.3392565
+
+
+IEEE TRANSACTIONS ON PATTERN ANALYSIS AND MACHINE INTELLIGENCE                                                                                                                                                                                  11
+
+                                                                                                                 1.6                                                                      1.6
+                                                                                                                                                          DANN                                                                      DANN
+                                                                                                                 1.5                                      CDAN                            1.5                                       CDAN
+                                                                                                                                                          CC-Loss                                                                   CC-Loss
+                                                                                                                 1.4                                      Oracle                          1.4                                       Oracle
+
+
+
+
+                                                                                                                                                                             A-distance
+                                                                                                    A-distance
+                                                                                                                 1.3                                                                      1.3
+                                                                                                                 1.2                                                                      1.2
+                                                                                                                 1.1                                                                      1.1
+                                                                                                                 1.0                                                                      1.0
+                                                                                                                                   (a) A → W                                                                (b) D → W
+
+                                                                                                    Fig. 8: A-Distance [4] of the last fc-layer features of task on
+                                                                                                    Office-31 (UDA).
+
+
+
+                                                                                                                                                               100                                                                       100
+                                                                                                                                                               95                                                                        95
+
+
+
+
+                                                                                                                                                                                                                                         Accuracy(%)
+                                                                                                                                                               Accuracy(%)
+                                                                                                                                                               90                                                                        90
+                                                                                                                                                               85                                                                        85
+             (a) Raw                        (b) PointDAN              (c) Our Method                                                                          80                                                                        80
+                                                                                                                                                              75                                                                        75
+                                                                                                                                                              70                                                                        70
+                                                                                                                                                            1.0                                                                       1.0
+Fig. 6: Critical Points in Task M→S∗ . CC-Loss is superior to                                                                                            0.8                                                                       0.8
+PointDAN in capturing the critical points for recognizing objects.                                       0.5                                          0.6                        0.5                                            0.6
+                                                                                                                       1.0                         0.4                                          1.0                          0.4
+                                                                                                                             1.5                0.2                                                   1.5                 0.2
+                                                                                                                             T     2.0                                                                T      2.0       0.0
+                                                                                                                                         2.5 0.0                                                                   2.5
+      Distribution         No obvious peak         One obvious peak       Two obvious peaks                                      (a) MinEnt [23]                                                            (b) CC-Loss
+
+ Predicted Probability
+ over Different Classes                                                                             Fig. 9: Hyper-parameter sensitivity of task A → W on
+                            …    …      …           …    …    …             …    …   …
+                                                                                                    Office-31 (UDA).
+
+   Example Images
+  of Target Domain
+                                                                                                    so low that the influence of higher weight can be neglected.
+                                                                                                    Therefore, the proposed uncertainty re-weighting mechanism
+ Weighting Value (W)            0.230                    0.470                  0.340
+                                                                                                    is effective and reliable.
+ Confusion ( w/o W )            0.141                    0.011                  0.848
+ Confusion ( w/ W )             0.098                    0.016                  0.886               Data Augmentation. Our method includes strong data aug-
+                                                                                                    mentations. To ensure a fair comparison, we apply identical
+Fig. 7: Three typical samples and the corresponding weights                                         strong data augmentations to baseline methods. As shown
+and confusion values.                                                                               in Table 13, the results are consistent with Table 5.
+                                                                                                    Consistency on Class Confusion. Prior works use consis-
+                                                                                                    tency regularization on predictions to enforce the predictions
+(CC), Probability Calibration (PC), Uncertainty Re-weighting                                        to be robust under perturbations [70]. Different from prior
+(UR), Category Normalization (CN) and Consistency (CON).                                            works, our consistency regularization is applied to the
+Results in Table 12 justify that each part has its indispensable                                    confusion matrix for a more accurate confusion estimation.
+contribution. To enable ease of use, we seamlessly integrate                                        We compare the performance of performing consistency on
+these parts into a coherent loss and reduce the number of                                           the predictions (MCC + Ins-Consis) and on the confusion
+hyper-parameters.                                                                                   matrix (MCC + Mat-Consis). Results in Table 14 show
+    Further, we analyze how the specially designed Uncer-                                           that the consistency on confusion matrix outperforms the
+tainty Re-weighting (UR) mechanism works. Fig. 7 shows                                              consistency on predictions, which demonstrates the efficacy
+three typical examples as well as their weights and the                                             of our confusion-based consistency regularization.
+confusion values before and after re-weighting. The classifier
+                                                                                                    Source-free Setting. It is interesting to explore the perfor-
+prediction on the first image shows no obvious peak, while
+                                                                                                    mance of our method in source-free domain adaptation
+the one on the third image shows two obvious peaks
+                                                                                                    (SFDA), where the source data is inaccessible during adap-
+on classes calculator and phone. The third image is
+                                                                                                    tation. As shown in Table 15 and Table 16, we compare our
+more suitable for embodying class confusion. Naturally, its
+                                                                                                    method with traditional UDA methods as well as existing
+confusion value is higher than the first one, and our re-
+                                                                                                    SFDA methods. The results demonstrate that MCC and CC-
+weighting mechanism further highlights the suitable one. On
+                                                                                                    Loss can handle source-free settings since they only relies
+the other hand, as the re-weighting mechanism is defined
+                                                                                                    on target predictions. The performance is competitive, yet
+with entropy, we recognize that it will improperly assign
+                                                                                                    slightly lower than the state-of-the-art method. On the other
+high weights to examples with highly confident predictions,
+                                                                                                    hand, CC-Loss can be combined with existing state-of-the-art
+including the wrong ones. As shown in the second image, its
+                                                                                                    method, and brings about improvements.
+ground truth label is a lamp, but it is classified as a bike.
+In our method, the confusion value of such an example is                                            Theoretical Insight. Ben-David et al. [4] derived the expected
+
+        Authorized licensed use limited to: National Univ of Defense Tech. Downloaded on July 01,2024 at 05:24:16 UTC from IEEE Xplore. Restrictions apply.
+                          © 2024 IEEE. Personal use is permitted, but republication/redistribution requires IEEE permission.See https://www.ieee.org/publications/rights/index.html for more information.
+                                   This article has been accepted for publication in IEEE Transactions on Pattern Analysis and Machine Intelligence. This is the author's version which has not been fully edited and
+                                                                       content may change prior to final publication. Citation information: DOI 10.1109/TPAMI.2024.3392565
+
+
+IEEE TRANSACTIONS ON PATTERN ANALYSIS AND MACHINE INTELLIGENCE                                                                                                                                                                                      12
+
+                           TABLE 13: Comparison of Methods with Strong Data Augmentation (%) on VisDA-2017 for UDA.
+
+           Backbone                  Method                  plane                 bcybl          bus       car         horse           knife              mcyle      persn        plant       sktb          train         truck           Avg
+                                     ResNet [26]             55.1                  53.3           61.9     59.1            80.6          17.9              79.7        31.2        81.0        26.5              73.5       8.5            52.4
+                                     MinEnt [23]             80.8                  76.2           76.6     49.8            81.3          29.9              72.9        41.5        47.4        47.9              79.5      17.7            58.5
+                                     DANN [21]               81.4                  76.4           77.3     48.2            82.8          30.7              71.6        33.7        51.2        54.8              81.4       8.6            58.2
+                                     DAN [43]                86.4                  63.3           76.5     46.5            89.2          43.8              85.2        53.4        50.6        43.2              84.3      23.4            62.2
+           ResNet-101                MCD [65]                86.3                  62.2           82.3     64.4            88.6          79.7              84.8        75.5        83.7        48.4              85.1      25.4            72.2
+                                     CDAN [44]               86.5                  66.4           83.3     53.7            86.3          74.4              87.2        75.3        83.7        75.5              81.2      42.5            74.7
+                                     AFN [83]                93.2                  63.3           82.8     69.9            93.3          77.9              91.3        77.3        89.2        59.4              88.5      32.2            76.5
+                                     CC-Loss                 96.1                  88.6           79.4     71.0            94.9          97.4              84.0        79.0        91.8        88.9              87.1      55.3            84.5
+                                     CAN [32]                96.1                  86.5           82.9     74.1            96.4          95.3              90.2        80.3        95.9        95.6              86.5      58.2            86.5
+                                     Source Only             98.2                  73.0           82.5     62.0            97.3          63.5              96.5        29.8        68.8        86.7              96.7      23.7            73.2
+                                     DANN [21]               90.6                  81.8           82.4     65.2            92.2          68.3              86.1        58.5        86.3        88.4              90.3      24.5            76.2
+           Vit-B/16                  CAN [32]                96.2                  85.9           84.1     59.2            95.5          94.9              88.5        67.9        87.5        89.3              92.4      54.8            83.0
+                                     TVT [84]                93.4                  84.8           80.6     62.5            94.1          97.3              89.5        76.0        90.7        93.2              92.0      56.3            84.2
+                                     CC-Loss                 95.2                  91.8           85.1     68.2            96.6          97.8              89.9        82.3        93.4        95.4              92.8      64.7            87.8
+
+TABLE 14: Comparison of Consistency on VisDA-2017 for UDA (ResNet-101). Ins-Consis: Consistency on Instance Prediction,
+Mat-Consis: Consistency on Class Confusion.
+
+ Method                                                      plane                 bcybl           bus        car          horse               knife        mcyle          persn     plant            sktb         train          truck       Avg
+ MCC                                                          88.1                  80.3           80.5      71.5             90.1             93.2          85.0          71.6       89.4            73.8         85.0           36.9        78.8
+ MCC + Ins-Consis                                             96.7                  88.7           75.5      59.9             94.2             95.8          75.6          75.2       93.3            93.0         86.9           59.6        82.9
+ MCC + Mat-Consis (CC-Loss)                                   96.1                  88.6           79.4      71.0             94.9             97.4          84.0          79.0       91.8            88.9         87.1           55.3        84.5
+
+
+
+          16                                                                                                                         competitive baselines including DANN and CDAN.
+                                               DANN                          95
+          14                                   CDAN
+                                               CC-Loss                       90                                                      Parameter Sensitivity. Temperature factor T and loss co-
+                                                              Accuracy (%)
+
+
+
+
+          12
+                                                                                                             DANN                    efficient µ are the two common hyper-parameters of our
+                                                                             85
+  ideal
+
+
+
+
+          10                                                                                                 CDAN
+                                                                                                             CC-Loss                 method and MinEnt [23] when applying them standalone or
+           8                                                                 80
+                                                                                                                                     with existing methods. We traverse hyper-parameters around
+           6
+           4
+                                                                             75                                                      their optimal values [T ∗ , µ∗ ], as shown in Fig. 9(a) and 9(b),
+               0 1000 2000 3000 4000 5000 6000 7000 8000
+                                Iteration
+                                                                                   2000    4000     6000
+                                                                                             Iteration
+                                                                                                           8000    10000             Compared with another loss, MinEnt, our method is much
+                       (a) ideal error                                           (b) Training curves
+                                                                                                                                     less sensitive to its hyper-parameters.
+                                                                                                                                         We take τopen = 0.7 in Eq. (12) to tackle open-set and
+                                                                                                                                     universal domain adaptation. Here we evaluate the hyper-
+Fig. 10: The ideal error values (%) and training curves
+                                                                                                                                     parameter sensitivity of our method. As shown in Figure 11,
+throughout iterations.
+                                                                                                                                     our method performs stably under different τopen .
+TABLE 15: Accuracy (%) on Office-31 for SFDA. A: Amazon,
+W: Webcam, D: DSLR.
+                                                                                                                                               80                                                    80
+ Method                                     A→W     D →W          W→D              A →D       D→A          W →A        Avg                     70                                                    70   68.0     67.4    68.2     67.9     68.5
+ ResNet-50 [26]                             68.9      68.4             62.5         96.7          60.7      99.3       76.1                    60                                                    60
+                                                                                                                                                    52.9     53.8   53.1    52.7   53.3
+                                                                                                                                     H-Score
+
+
+
+
+                                                                                                                                                                                           H-Score
+
+
+
+
+ DANN [21]                                  79.7      82.0             68.2         96.9          67.4      99.1       82.2
+ DAN [43]                                   78.6      80.5             63.6         97.1          62.8      99.6       80.4                    50                                                    50
+ CDAN+E [44]                                92.9      94.1             71.0         98.6          69.3     100.0       87.7
+ AFN+ENT [83]                               90.7      90.1             73.0         98.6          70.2      99.8       87.1                    40                                                    40
+ CDAN+BSP [12]                              93.0      93.3             73.6         98.2          72.6     100.0       88.5                    30                                                    30
+ CDAN+TransNorm [80]                        94.0      95.7             73.4         98.7          74.2     100.0       89.3
+                                                                                                                                               20                                                    20
+ SHOT-IM [39]                               90.6      91.2             72.5         98.3          71.4     99.9        87.3                         0.60     0.65   0.70    0.75   0.80                   0.60     0.65    0.70     0.75     0.80
+ SHOT [39]                                  94.0      90.1             74.7         98.4          74.3     99.9        88.6
+ MCC [30]                                   91.0      98.4             99.8         92.0          76.5     73.5        88.5                                 (a) A → C                                              (b) C → P
+ CC-Loss                                    91.6      98.5             99.8         92.2          76.8     73.5        88.7
+ SHOT++ [40]                                94.3      90.4             76.2         98.7          75.8     99.9        89.2
+ MA [37]                                    93.7      98.5             99.8         92.7          75.3     77.8        89.6          Fig. 11: Hyper-parameter sensitivity on τopen on Office-
+ CPGA [59]                                  94.4      94.1             98.4         99.8          76.0     76.6        89.9
+ CC-Loss + CPGA                             94.9      94.6             99.4         99.9          76.8     77.5        90.5          Home (UniDA).
+
+
+error ET (h) of a hypothesis h on the target domain ET (h) ≤                                                                         Convergence Speed. We show the training curves through-
+ES (h) + 21 dH∆H (S, T ) + ideal by: the expected error of h                                                                        out iterations in Fig. 10(b). Impressively, our method takes
+on the source domain, ES (h); the A-distance dH∆H (S, T ), a                                                                         only 1500 iterations to reach an accuracy of 90%, while at
+measure of domain discrepancy; and the error ideal of the                                                                           this point the accuracies of CDAN and DANN are still near
+ideal joint hypothesis h∗ on both source and target domains.                                                                         or below 85%. In general, our method is approximately 2×
+As shown in Fig. 8(a) and 8(b), our method has the lowest A-                                                                         faster than the existing methods.
+distance [4], which is close to the oracle one (i.e., supervised                                                                     Confusion Matrices Visualization. We visualize the confu-
+learning on both domains). In Fig. 10(a), the ideal value of our                                                                    sion matrices estimated by MCC [30] and CC-Loss in the
+method is also lower than that of mainstream DA methods,                                                                             VisDA-2017 dataset. As shown in Fig. 12, the consistency
+indicating a better generalization of the CC-Loss over the                                                                           regularization over the confusion matrices with and without
+
+               Authorized licensed use limited to: National Univ of Defense Tech. Downloaded on July 01,2024 at 05:24:16 UTC from IEEE Xplore. Restrictions apply.
+                                   © 2024 IEEE. Personal use is permitted, but republication/redistribution requires IEEE permission.See https://www.ieee.org/publications/rights/index.html for more information.
+                   This article has been accepted for publication in IEEE Transactions on Pattern Analysis and Machine Intelligence. This is the author's version which has not been fully edited and
+                                             content may change prior to final publication. Citation information: DOI 10.1109/TPAMI.2024.3392565
+
+
+IEEE TRANSACTIONS ON PATTERN ANALYSIS AND MACHINE INTELLIGENCE                                                                                                                           13
+
+              TABLE 16: Accuracy (%) on Office-Home for SFDA. A: Art, C: Clipart, P: Product, R: Real World.
+
+   Method                           A →C        A→P         A→R         C →A          C→P      C →R        P→A        P→C         P →R       R→A         R →C        R→P        Avg
+   ResNet-50 [26]                    34.9        50.0        58.0        37.4         41.9       46.2       38.5       31.2        60.4       53.9        41.2        59.9      46.1
+   DANN [21]                         45.6        59.3        70.1        47.0         58.5       60.9       46.1       43.7        68.5       63.2        51.8        76.8      57.6
+   DAN [43]                          43.6        57.0        67.9        45.8         56.5       60.4       44.0       43.6        67.7       63.1        51.5        74.3      56.3
+   CDAN+E [44]                       50.7        70.6        76.0        57.6         70.0       70.0       57.4       50.9        77.3       70.9        56.7        81.6      65.8
+   CDAN+BSP [12]                     52.0        68.6        76.1        58.0         70.3       70.2       58.6       50.2        77.6       72.2        59.3        81.9      66.3
+   SAFN [83]                         52.0        71.7        76.3        64.2         69.9       71.9       63.7       51.4        77.1       70.9        57.1        81.5      67.3
+   CDAN+TransNorm [78]               50.2        71.4        77.4        59.3         72.7       73.1       61.0       53.1        79.5       71.9        59.0        82.9      67.6
+   Source model only                 44.6        67.3        74.8        52.7         62.7       64.8       53.0       40.6        73.2       65.3        45.4        78.0      60.2
+   SHOT [39]                         57.1        78.1        81.5        68.0         78.2       78.1       67.4       54.9        82.2       73.3        58.8        84.3      71.8
+   MCC [30]                          56.9        76.9        81.2        65.8         77.5       77.6       65.6       55.6        80.7       73.5        58.0        84.4      71.1
+   CC-Loss                           57.9        77.8        81.4        68.3         77.9       78.7       66.9       56.7        82.3       73.7        59.9        85.2      72.2
+   SHOT++ [40]                       57.9        79.7        82.5        68.5         79.6       79.3       68.5       57.0        83.0       73.7        60.7        84.9      73.0
+   CC-Loss+SHOT++                    58.5        80.2        83.1        69.2         80.4       80.1       69.3       57.6        83.5       73.8        61.3        85.6      73.6
+
+
+                                                                                             Multi-Source Domain Adaptation), CMU (tailored to Univer-
+                                                                                0.8
+                                                                                             sal Domain Adaptation), and our method under different
+                                                                                             DA setups. As shown in Fig. 13, our method shows a strong
+                                                                                0.6          capability of capturing the crucial parts of images that well
+                                                                                             characterize the image category. For example, our method
+                                                                                0.4
+                                                                                             focuses on the full bottle or the plant. Baseline methods,
+                                                                                0.2          though capture the correct information under the DA setting
+                                                                                             they are tailored to, fail to focus the attention on the main
+                                                                                0.0
+                                                                                             object when applied to DA other setups.
+             (a) MCC                                 (b) CC-Loss
+                                                                                                 Moreover, for one specific setup, the visualization results
+                                                                                             of our method are consistent with the corresponding method
+Fig. 12: Confusion matrices of images computed by MCC                                        which is tailored to it. For example, our method shows
+and CC-Loss in VisDA-2017 dataset. The diagonal entries of                                   similar behavior with CMU when faced with UniDA. We
+CC-Loss is larger than MCC, which indicates higher accuracy.                                 also observe that our method is superior to other methods
+                                                                                             in detecting multiple objects (e.g. the two cats in MTDA).
+perturbations can produce a more accurate confusion matrix                                   The visualization shows that our method captures the correct
+with the density focusing on the diagonal area. The observa-                                 information for target images under different DA setups,
+tion demonstrates that with the consistency regularization                                   which demonstrates the versatility of CC-Loss.
+on the confusion matrix, CC-Loss successfully makes the
+confusion matrix more stable under perturbations, which in                                   9      C ONCLUSION AND F UTURE D IRECTIONS
+turn improves the estimation of the confusion matrix and
+                                                                                                 This paper studies a more practical paradigm, Versatile
+further increases domain adaptation performance.
+                                                                                             Domain Adaptation (VDA), where one method tackles vari-
+                                                                                             ous DA setups. Our key insight is to utilize class confusion
+             UDA       PDA         MSDA        MTDA         OSDA        UniDA
+                                                                                             to enable VDA. Based on this, we propose a new general loss
+                                                                                             function: Class Confusion Loss (CC-Loss), which consists of
+    ResNet                                                                                   class confusion minimization and class confusion consistency.
+                                                                                             CC-Loss can be applied as a versatile domain adaptation
+                                                                                             approach to a variety of DA setups. Extensive results on
+    M3SDA                                                                                    both 2D and 3D vision tasks justify that our method, without
+                                                                                             any modification, outperforms many setup-specific domain
+                                                                                             adaptation methods with much faster convergence.
+     CMU
+                                                                                                 While our method has achieved competitive performance
+                                                                                             on various DA scenarios, it is limited to classification tasks. It
+                                                                                             is not trivial to extend the central concept of class confusion to
+     Ours
+                                                                                             regression tasks. Thereby, developing a more general method
+                                                                                             that can cope with classification, regression, and detection
+                                                                                             tasks is a nice direction for the community to approach.
+Fig. 13: CAM Visualization. Our method is capable of
+capturing the crucial regions in images. For one specific setup,
+its behavior is consistent with the corresponding method that                                ACKNOWLEDGMENTS
+shows strong performance in this setup.                                                         This work was supported by the National Key Research
+                                                                                             and Development Plan (2021YFB1715200), the National Nat-
+CAM Visualization. We conduct Grad-CAM visualization to                                      ural Science Foundation of China (U2342217 and 62022050),
+identify the image regions that the model views as important.                                the BNRist Innovation Fund (BNR2024RC01010), and the
+We compare the vanilla network, M 3 SDA (designed for                                        National Engineering Research Center for Big Data Software.
+
+     Authorized licensed use limited to: National Univ of Defense Tech. Downloaded on July 01,2024 at 05:24:16 UTC from IEEE Xplore. Restrictions apply.
+                   © 2024 IEEE. Personal use is permitted, but republication/redistribution requires IEEE permission.See https://www.ieee.org/publications/rights/index.html for more information.
+                    This article has been accepted for publication in IEEE Transactions on Pattern Analysis and Machine Intelligence. This is the author's version which has not been fully edited and
+                                              content may change prior to final publication. Citation information: DOI 10.1109/TPAMI.2024.3392565
+
+
+IEEE TRANSACTIONS ON PATTERN ANALYSIS AND MACHINE INTELLIGENCE                                                                                                                            14
+
+R EFERENCES                                                                                   [27] Geoffrey Hinton, Oriol Vinyals, and Jeff Dean. Distilling the
+                                                                                                   knowledge in a neural network. arXiv preprint arXiv:1503.02531,
+[1]  Vladimir Igorevich Arnol’d. Mathematical methods of classical                                 2015.
+     mechanics, volume 60. Springer Science & Business Media, 2013.                           [28] Judy Hoffman, Eric Tzeng, Taesung Park, Jun-Yan Zhu, Phillip
+[2] Philip Bachman, Ouais Alsharif, and Doina Precup. Learning with                                Isola, Kate Saenko, Alexei A. Efros, and Trevor Darrell. Cycada:
+     pseudo-ensembles. In NeurIPS, volume 27, pages 3365–3373, 2014.                               Cycle-consistent adversarial domain adaptation. In ICML, 2018.
+[3] Mahsa Baktashmotlagh, Masoud Faraki, Tom Drummond, and                                    [29] Naoto Inoue, Ryosuke Furuta, Toshihiko Yamasaki, and Kiyoharu
+     Mathieu Salzmann. Learning factorized representations for open-                               Aizawa. Cross-domain weakly-supervised object detection through
+     set domain adaptation. In ICLR, 2019.                                                         progressive domain adaptation. In CVPR, 2018.
+[4] Shai Ben-David, John Blitzer, Koby Crammer, Alex Kulesza,                                 [30] Ying Jin, Ximei Wang, Mingsheng Long, and Jianmin Wang.
+     Fernando Pereira, and Jennifer Wortman Vaughan. A theory of                                   Minimum class confusion for versatile domain adaptation. In
+     learning from different domains. Machine learning, 79(1-2):151–175,                           ECCV, pages 464–480. Springer, 2020.
+     2010.                                                                                    [31] Guoliang Kang, Lu Jiang, Yi Yang, and Alexander Hauptmann.
+[5] Silvia Bucci, Mohammad Reza Loghmani, and Tatiana Tommasi.                                     Contrastive adaptation network for unsupervised domain adapta-
+     On the effectiveness of image rotation for open set domain                                    tion. In CVPR, 2019.
+     adaptation. In ECCV, pages 422–438. Springer, 2020.                                      [32] Guoliang Kang, Lu Jiang, Yi Yang, and Alexander G Hauptmann.
+[6] Pau Panareda Busto and Juergen Gall. Open set domain adaptation.                               Contrastive adaptation network for unsupervised domain adapta-
+     In ICCV, 2017.                                                                                tion. In Proceedings of the IEEE/CVF conference on computer vision and
+[7] Zhangjie Cao, Mingsheng Long, Jianmin Wang, and Michael I                                      pattern recognition, pages 4893–4902, 2019.
+     Jordan. Partial transfer learning with selective adversarial networks.
+                                                                                              [33] Samuli Laine and Timo Aila. Temporal ensembling for semi-
+     In CVPR, 2018.
+                                                                                                   supervised learning. arXiv preprint arXiv:1610.02242, 2016.
+[8] Zhangjie Cao, Lijia Ma, Mingsheng Long, and Jianmin Wang.
+                                                                                              [34] Chen-Yu Lee, Tanmay Batra, Mohammad Haris Baig, and Daniel
+     Partial adversarial domain adaptation. In ECCV, 2018.
+                                                                                                   Ulbricht. Sliced wasserstein discrepancy for unsupervised domain
+[9] Zhangjie Cao, Kaichao You, Mingsheng Long, Jianmin Wang, and
+                                                                                                   adaptation. In CVPR, 2019.
+     Qiang Yang. Learning to transfer examples for partial domain
+                                                                                              [35] Seungmin Lee, Dongwan Kim, Namil Kim, and Seong-Gyun Jeong.
+     adaptation. In CVPR, 2019.
+                                                                                                   Drop to adapt: Learning discriminative features for unsupervised
+[10] Angel X Chang, Thomas Funkhouser, Leonidas Guibas, Pat Han-
+                                                                                                   domain adaptation. In ICCV, 2019.
+     rahan, Qixing Huang, Zimo Li, Silvio Savarese, Manolis Savva,
+                                                                                              [36] Guangrui Li, Guoliang Kang, Yi Zhu, Yunchao Wei, and Yi Yang.
+     Shuran Song, Hao Su, et al. Shapenet: An information-rich 3d
+                                                                                                   Domain consensus clustering for universal domain adaptation. In
+     model repository. arXiv preprint arXiv:1512.03012, 2015.
+                                                                                                   Proceedings of the IEEE/CVF conference on computer vision and pattern
+[11] Jin Chen, Xinxiao Wu, Lixin Duan, and Shenghua. Gao. Domain
+                                                                                                   recognition, pages 9757–9766, 2021.
+     Adversarial Reinforcement Learning for Partial Domain Adaptation.
+     TNNLS, 2020.                                                                             [37] Rui Li, Qianfen Jiao, Wenming Cao, Hau-San Wong, and Si Wu.
+[12] Xinyang Chen, Sinan Wang, Mingsheng Long, and Jianmin Wang.                                   Model adaptation: Unsupervised domain adaptation without
+     Transferability vs. discriminability: Batch spectral penalization for                         source data. In CVPR, pages 9641–9650, 2020.
+     adversarial domain adaptation. In ICML, 2019.                                            [38] Shuang Li, Chi Harold Liu, Qiuxia Lin, Qi Wen, Limin Su, Gao
+[13] Zhihong Chen, Chao Chen, Zhaowei Cheng, Boyuan Jiang, Ke Fang,                                Huang, and Zhengming Ding. Deep residual correction network
+     and Xinyu Jin. Selective Transfer With Reinforced Transfer Network                            for partial domain adaptation. TPAMI, 2020.
+     for Partial Domain Adaptation. In CVPR, 2020.                                            [39] Jian Liang, Dapeng Hu, and Jiashi Feng. Do we really need to
+[14] Angela Dai, Angel X Chang, Manolis Savva, Maciej Halber, Thomas                               access the source data? source hypothesis transfer for unsupervised
+     Funkhouser, and Matthias Nießner. Scannet: Richly-annotated 3d                                domain adaptation. In ICML, pages 6028–6039. PMLR, 2020.
+     reconstructions of indoor scenes. In CVPR, pages 5828–5839, 2017.                        [40] Jian Liang, Dapeng Hu, Yunbo Wang, Ran He, and Jiashi Feng.
+[15] Jia Deng, Wei Dong, Richard Socher, Li-Jia Li, Kai Li, and Li Fei-Fei.                        Source data-absent unsupervised domain adaptation through
+     Imagenet: A large-scale hierarchical image database. In CVPR,                                 hypothesis transfer and labeling transfer. IEEE Transactions on
+     2009.                                                                                         Pattern Analysis and Machine Intelligence, 44(11):8602–8617, 2021.
+[16] Terrance DeVries and Graham W Taylor. Improved regularization                            [41] Hong Liu, Zhangjie Cao, Mingsheng Long, Jianmin Wang, and
+     of convolutional neural networks with cutout. arXiv preprint                                  Qiang Yang. Separate to adapt: Open set domain adaptation via
+     arXiv:1708.04552, 2017.                                                                       progressive separation. In CVPR, June 2019.
+[17] Alexey Dosovitskiy, Lucas Beyer, Alexander Kolesnikov, Dirk Weis-                        [42] Hong Liu, Mingsheng Long, Jianmin Wang, and Michael Jordan.
+     senborn, Xiaohua Zhai, Thomas Unterthiner, Mostafa Dehghani,                                  Transferable adversarial training: A general approach to adapting
+     Matthias Minderer, Georg Heigold, Sylvain Gelly, et al. An image                              deep classifiers. In ICML, 2019.
+     is worth 16x16 words: Transformers for image recognition at scale.                       [43] Mingsheng. Long, Yue. Cao, Jianmin. Wang, and Michael I. Jordan
+     arXiv preprint arXiv:2010.11929, 2020.                                                        Jordan. Learning transferable features with deep adaptation
+[18] Zhen Fang, Jie Lu, Feng Liu, Junyu Xuan, and Guangquan Zhang.                                 networks. In ICML, 2015.
+     Open Set Domain Adaptation: Theoretical Bound and Algorithm.                             [44] Mingsheng Long, Zhangjie Cao, Jianmin Wang, and Michael I.
+     TNNLS, 2020.                                                                                  Jordan. Conditional adversarial domain adaptation. In NeurIPS,
+[19] Geoffrey French, Michal Mackiewicz, and Mark Fisher. Self-                                    2018.
+     ensembling for visual domain adaptation. In ICLR, 2018.                                  [45] Mingsheng Long, Han Zhu, Jianmin Wang, and Michael I. Jordan.
+[20] Bo Fu, Zhangjie Cao, Mingsheng Long, and Jianmin Wang. Learn-                                 Unsupervised domain adaptation with residual transfer networks.
+     ing to detect open classes for universal domain adaptation. In                                In NeurIPS, 2016.
+     ECCV, pages 567–583. Springer, 2020.                                                     [46] Mingsheng Long, Han Zhu, Jianmin Wang, and Michael I. Jordan.
+[21] Yaroslav Ganin, Evgeniya Ustinova, Hana Ajakan, Pascal Germain,                               Deep transfer learning with joint adaptation networks. In ICML,
+     Hugo Larochelle, François Laviolette, Mario Marchand, and Victor                              2017.
+     Lempitsky. Domain-adversarial training of neural networks. JMLR,                         [47] Mehdi Mirza and Simon Osindero. Conditional generative adver-
+     17(1):2096–2030, 2016.                                                                        sarial nets. arXiv preprint arXiv:1411.1784, 2014.
+[22] Ian J. Goodfellow, Jean. Pouget-Abadie, Mehdi. Mirza, Bing. Xu,                          [48] Takeru Miyato, Shin-ichi Maeda, Masanori Koyama, and Shin Ishii.
+     David. Warde-Farley, Sherjil. Ozair, Aaron. Courville, and Yoshua.                            Virtual adversarial training: a regularization method for supervised
+     Bengio. Generative adversarial nets. In NeurIPS, 2014.                                        and semi-supervised learning. TPAMI, 41(8):1979–1993, 2018.
+[23] Yves Grandvalet and Yoshua Bengio. Semi-supervised learning by                           [49] Van-Anh Nguyen, Tuan Nguyen, Trung Le, Quan Hung Tran, and
+     entropy minimization. In NeurIPS, 2005.                                                       Dinh Phung. Stem: An approach to multi-source domain adaptation
+[24] Arthur Gretton, Dino Sejdinovic, Heiko Strathmann, Sivaraman                                  with guarantees. In ICCV, pages 9352–9363, October 2021.
+     Balakrishnan, Massimiliano Pontil, Kenji Fukumizu, and Bharath K.                        [50] Sinno Jialin Pan and Qiang Yang. A survey on transfer learning.
+     Sriperumbudur. Optimal kernel choice for large-scale two-sample                               TKDE, 22(10):1345–1359, 2010.
+     tests. In NeurIPS, 2012.                                                                 [51] Yingwei Pan, Ting Yao, Yehao Li, Yu Wang, Chong-Wah Ngo, and
+[25] Chuan Guo, Geoff Pleiss, Yu Sun, and Kilian Q. Weinberger. On                                 Tao Mei. Transferrable prototypical networks for unsupervised
+     calibration of modern neural networks. In ICML, 2017.                                         domain adaptation. In CVPR, 2019.
+[26] Kaiming He, Xiangyu Zhang, Shaoqing Ren, and Jian Sun. Deep                              [52] Adam Paszke, Sam Gross, Francisco Massa, Adam Lerer, James
+     residual learning for image recognition. In CVPR, 2016.                                       Bradbury, Gregory Chanan, Trevor Killeen, Zeming Lin, Natalia
+
+
+      Authorized licensed use limited to: National Univ of Defense Tech. Downloaded on July 01,2024 at 05:24:16 UTC from IEEE Xplore. Restrictions apply.
+                    © 2024 IEEE. Personal use is permitted, but republication/redistribution requires IEEE permission.See https://www.ieee.org/publications/rights/index.html for more information.
+                    This article has been accepted for publication in IEEE Transactions on Pattern Analysis and Machine Intelligence. This is the author's version which has not been fully edited and
+                                              content may change prior to final publication. Citation information: DOI 10.1109/TPAMI.2024.3392565
+
+
+IEEE TRANSACTIONS ON PATTERN ANALYSIS AND MACHINE INTELLIGENCE                                                                                                                            15
+
+     Gimelshein, Luca Antiga, Alban Desmaison, Andreas Kopf, Ed-                              [77] Hang Wang, Minghao Xu, Bingbing Ni, and Wenjun Zhang.
+     ward Yang, Zachary DeVito, Martin Raison, Alykhan Tejani, Sasank                              Learning to combine: Knowledge aggregation for multi-source
+     Chilamkurthy, Benoit Steiner, Lu Fang, Junjie Bai, and Soumith                                domain adaptation. In ECCV, pages 727–744. Springer, 2020.
+     Chintala. Pytorch: An imperative style, high-performance deep                            [78] Ximei Wang, Ying Jin, Mingsheng Long, Jianmin Wang, and
+     learning library. In NeurIPS, pages 8024–8035. 2019.                                          Michael I Jordan. Transferable normalization: Towards improving
+[53] Zhongyi Pei, Zhangjie Cao, Mingsheng Long, and Jianmin Wang.                                  transferability of deep neural networks. In NeurIPS, pages 1953–
+     Multi-adversarial domain adaptation. In AAAI, 2018.                                           1963, 2019.
+[54] Xingchao Peng, Qinxun Bai, Xide Xia, Zijun Huang, Kate Saenko,                           [79] Ximei Wang, Liang Li, Weirui Ye, Mingsheng Long, and Jianmin
+     and Bo Wang. Moment matching for multi-source domain adapta-                                  Wang. Transferable attention for domain adaptation. In AAAI,
+     tion. In ICCV, 2019.                                                                          2019.
+[55] Xingchao Peng, Zijun Huang, Ximeng Sun, and Kate Saenko.                                 [80] Ximei Wang, Liang Li, Weirui Ye, Mingsheng Long, and Jianmin
+     Domain agnostic learning with disentangled representations. In                                Wang. Transferable attention for domain adaptation. In AAAI,
+     ICML, 2019.                                                                                   2019.
+[56] Xingchao Peng, Ben Usman, Neela Kaushik, Judy Hoffman, Dequan                            [81] Zhirong Wu, Shuran Song, Aditya Khosla, Fisher Yu, Linguang
+     Wang, and Kate Saenko. Visda: The visual domain adaptation                                    Zhang, Xiaoou Tang, and Jianxiong Xiao. 3d shapenets: A deep
+     challenge. arXiv preprint arXiv:1710.06924, 2017.                                             representation for volumetric shapes. In CVPR, pages 1912–1920,
+[57] Charles R Qi, Hao Su, Kaichun Mo, and Leonidas J Guibas. Pointnet:                            2015.
+     Deep learning on point sets for 3d classification and segmentation.                      [82] Ruijia Xu, Ziliang Chen, Wangmeng Zuo, Junjie Yan, and Liang
+     In CVPR, pages 652–660, 2017.                                                                 Lin. Deep cocktail network: Multi-source unsupervised domain
+                                                                                                   adaptation with category shift. In CVPR, 2018.
+[58] Can Qin, Haoxuan You, Lichen Wang, C-C Jay Kuo, and Yun Fu.
+                                                                                              [83] Ruijia Xu, Guanbin Li, Jihan Yang, and Liang Lin. Larger norm
+     Pointdan: A multi-scale 3d domain adaption network for point
+                                                                                                   more transferable: An adaptive feature norm approach. In ICCV,
+     cloud representation. arXiv preprint arXiv:1911.02744, 2019.
+                                                                                                   2019.
+[59] Zhen Qiu, Yifan Zhang, Hongbin Lin, Shuaicheng Niu, Yanxia                               [84] Jinyu Yang, Jingjing Liu, Ning Xu, and Junzhou Huang. Tvt: Trans-
+     Liu, Qing Du, and Mingkui Tan. Source-free domain adaptation                                  ferable vision transformer for unsupervised domain adaptation.
+     via avatar prototype generation and adaptation. arXiv preprint                                arXiv preprint arXiv:2108.05988, 2021.
+     arXiv:2106.15326, 2021.                                                                  [85] Luyu Yang, Yogesh Balaji, Ser-Nam Lim, and Abhinav Shrivastava.
+[60] Joaquin Quionero-Candela, Masashi Sugiyama, Anton                                             Curriculum manager for source selection in multi-source domain
+     Schwaighofer, and Neil D. Lawrence. Dataset Shift in Machine                                  adaptation. In ECCV, pages 608–624. Springer, 2020.
+     Learning. The MIT Press, 2009.                                                           [86] Kaichao You, Mingsheng Long, Zhangjie Cao, Jianmin Wang, and
+[61] Antti Rasmus, Harri Valpola, Mikko Honkala, Mathias Berglund,                                 Michael I. Jordan. Universal Domain Adaptation. In CVPR, 2019.
+     and Tapani Raiko. Semi-supervised learning with ladder networks.                         [87] Kaichao You, Ximei Wang, Mingsheng Long, and Michael Jordan.
+     In NeurIPS, 2015.                                                                             Towards accurate model selection in deep unsupervised domain
+[62] Subhankar Roy, Evgeny Krivosheev, Zhun Zhong, Nicu Sebe, and                                  adaptation. In ICML, 2019.
+     Elisa Ricci. Curriculum graph co-teaching for multi-target domain                        [88] Jing Zhang, Zewei Ding, Wanqing Li, and Philip Ogunbona. Im-
+     adaptation. In CVPR, pages 5351–5360, June 2021.                                              portance weighted adversarial nets for partial domain adaptation.
+[63] Kuniaki Saito, Donghyun Kim, Stan Sclaroff, and Kate Saenko.                                  In CVPR, 2018.
+     Universal domain adaptation through self supervision. arXiv                              [89] Yabin Zhang, Hui Tang, Kui Jia, and Mingkui Tan. Domain-
+     preprint arXiv:2002.07953, 2020.                                                              symmetric networks for adversarial domain adaptation. In CVPR,
+[64] Kuniaki Saito, Yamamoto Shohei, Ushiku Yoshitaka, and Harada                                  2019.
+     Tatsuya. Open set domain adaptation by backpropagation. In                               [90] Yabin Zhang, Haojian Zhang, Bin Deng, Shuai Li, Kui Jia, and Lei
+     ECCV, 2018.                                                                                   Zhang. Semi-supervised models are strong unsupervised domain
+[65] Kuniaki Saito, Kohei Watanabe, Yoshitaka Ushiku, and Tatsuya                                  adaptation learners. arXiv preprint arXiv:2106.00417, 2021.
+     Harada. Maximum classifier discrepancy for unsupervised domain                           [91] Yuchen Zhang, Tianle Liu, Mingsheng Long, and Michael I Jordan.
+     adaptation. In CVPR, 2018.                                                                    Bridging theory and algorithm for domain adaptation. In ICML,
+[66] Mehdi Sajjadi, Mehran Javanmardi, and Tolga Tasdizen. Regular-                                2019.
+     ization with stochastic transformations and perturbations for deep                       [92] Han Zhao, Shanghang Zhang, Guanhang Wu, José MF Moura,
+     semi-supervised learning. NeurIPS, 29:1163–1171, 2016.                                        Joao P Costeira, and Geoffrey J Gordon. Adversarial multiple
+[67] Swami Sankaranarayanan, Yogesh Balaji, Carlos D. Castillo, and                                source domain adaptation. In NeurIPS, 2018.
+     Rama Chellappa. Generate to adapt: Aligning domains using                                [93] Fariba Zohrizadeh, Mohsen Kheirandishfard, and Farhad Kaman-
+     generative adversarial networks. In CVPR, 2018.                                               gar. Class Subset Selection for Partial Domain Adaptation. In CVPR
+[68] Hinrich Schutze, Christopher D Manning, and Prabhakar Ragha-                                  Workshops, 2019.
+     van. Introduction to information retrieval. In Proceedings of the                        [94] Yang Zou, Zhiding Yu, B. Kumar, and Jinsong Wang. Unsupervised
+     international communication of association for computing machinery                            domain adaptation for semantic segmentation via class-balanced
+     conference, 2008.                                                                             self-training. In ECCV, 2018.
+[69] Rui Shu, Hung H. Bui, Hirokazu Narui, and Stefano Ermon. A                               [95] Yang Zou, Zhiding Yu, Xiaofeng Liu, B.V.K. Vijaya Kumar, and
+     DIRT-T Approach to Unsupervised Domain Adaptation. In ICLR,                                   Jinsong Wang. Confidence regularized self-training. In ICCV, 2019.
+     2018.
+[70] Kihyuk Sohn, David Berthelot, Chun-Liang Li, Zizhao Zhang,
+     Nicholas Carlini, Ekin D Cubuk, Alex Kurakin, Han Zhang, and
+     Colin Raffel. Fixmatch: Simplifying semi-supervised learning with
+     consistency and confidence. arXiv preprint arXiv:2001.07685, 2020.
+[71] Baochen Sun and Kate Saenko. Deep coral: Correlation alignment
+     for deep domain adaptation. In ECCV, 2016.
+[72] Antti Tarvainen and Harri Valpola. Weight-averaged consistency                                                          Ying Jin received the M.Eng degree in Software
+     targets improve semi-supervised deep learning results. In NeurIPS,                                                      Engineering from Tsinghua University, China in
+     2017.                                                                                                                   2021 and the B.E. degree in Information Secu-
+[73] Eric Tzeng, Judy Hoffman, Trevor Darrell, and Kate Saenko.                                                              rity from Shanghai Jiao Tong University, China
+     Simultaneous deep transfer across domains and tasks. In ICCV,                                                           in 2018. She is pursuing the Ph.D. degree in
+     2015.                                                                                                                   Multimedia Laboratory (MMLab) at the Chinese
+[74] Eric Tzeng, Judy Hoffman, Kate Saenko, and Trevor Darrell.                                                              University of Hong Kong. Her research interests
+     Adversarial discriminative domain adaptation. In CVPR, 2017.                                                            include machine learning and computer vision.
+[75] Eric Tzeng, Judy Hoffman, Ning Zhang, Kate Saenko, and Trevor
+     Darrell. Deep domain confusion: Maximizing for domain invari-
+     ance. CoRR, abs/1412.3474, 2014.
+[76] Ulrike von Luxburg. A tutorial on spectral clustering. Statistics and
+     Computing, 17(4):395–416, Dec 2007.
+
+
+      Authorized licensed use limited to: National Univ of Defense Tech. Downloaded on July 01,2024 at 05:24:16 UTC from IEEE Xplore. Restrictions apply.
+                    © 2024 IEEE. Personal use is permitted, but republication/redistribution requires IEEE permission.See https://www.ieee.org/publications/rights/index.html for more information.
+                    This article has been accepted for publication in IEEE Transactions on Pattern Analysis and Machine Intelligence. This is the author's version which has not been fully edited and
+                                              content may change prior to final publication. Citation information: DOI 10.1109/TPAMI.2024.3392565
+
+
+IEEE TRANSACTIONS ON PATTERN ANALYSIS AND MACHINE INTELLIGENCE                                                                                                                            16
+
+                         Zhangjie Cao received the B.E. degree in Com-
+                         puter Software from Tsinghua University, China in
+                         2018. He is pursuing the Ph.D. degree in Depart-
+                         ment of Computer Science at Stanford University.
+                         His research interests include machine learning,
+                         computer vision and robotics.
+
+
+
+
+                         Ximei Wang received the B.E. degree in the De-
+                         partment of Automation from Tsinghua University,
+                         China in 2017. He is pursuing the Ph.D. degree
+                         in the School of Software at Tsinghua University.
+                         His research interests include transfer learning,
+                         domain adaptation, and semi-supervised learn-
+                         ing. He was selected to receive outstanding
+                         reviewer awards in NeurIPS 2020, ICLR 2021,
+                         and NeurIPS 2021, and also served as an expert
+                         reviewer for ICML 2021.
+
+
+
+
+                     Jianmin Wang received the BE degree from
+                     Peking University, China, in 1990, and the ME
+                     and PhD degrees in computer software from
+                     Tsinghua University, China, in 1992 and 1995,
+                     respectively. He is a full professor with the School
+                     of Software, Tsinghua University. His research
+                     interests include big data management systems
+                     and large-scale data analytics. He led to develop
+                     a product data & lifecycle management system,
+                     which has been deployed in hundreds of enter-
+                     prises in China. He is leading to develop the
+Tsinghua DataWay big data platform in the National Engineering Lab for
+Big Data Software.
+
+
+
+
+                       Mingsheng Long received the BE and PhD
+                       degrees from Tsinghua University in 2008 and
+                       2014 respectively. He was a visiting researcher at
+                       UC Berkeley from 2014 to 2015. He is currently
+                       a tenured associate professor with the School
+                       of Software, Tsinghua University. He serves as
+                       an Associate Editor of the IEEE Transactions on
+                       Pattern Analysis and Machine Intelligence and
+                       the Artificial Intelligence Journal, and as (Senior)
+                       Area Chairs of machine learning conferences,
+                       including ICML, NeurIPS, and ICLR. His research
+is dedicated to machine learning theory, algorithms, and models, with
+special interests in transfer learning and domain adaptation, deep
+learning and foundation models, scientific learning and world models.
+
+
+
+
+      Authorized licensed use limited to: National Univ of Defense Tech. Downloaded on July 01,2024 at 05:24:16 UTC from IEEE Xplore. Restrictions apply.
+                    © 2024 IEEE. Personal use is permitted, but republication/redistribution requires IEEE permission.See https://www.ieee.org/publications/rights/index.html for more information.
+

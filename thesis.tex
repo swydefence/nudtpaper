@@ -68,10 +68,10 @@
 % 	\emergencystretch=1.5em%
 % }
 
-\classification{TP957}
+\classification{TP753}
 \serialno{23033116}
 \confidentiality{公开}
-\UDC{}
+\UDC{621.39}
 \title{面向仿真-实测迁移的跨域SAR目标识别\\方法研究}
 \displaytitle{面向仿真-实测迁移的跨域SAR目标识别\\方法研究}
 \author{束文郁}
@@ -95,6 +95,8 @@
 % 制作封面，生成目录，插入摘要，插入符号列表 \\
 
 \maketitle
+% 双面排版补白页保留页眉页脚；封面内部的补白页仍由模板保持为空白页。
+\let\cleardoublepage=\cleardoublepagewithhead
 \frontmatter
 
 % \let\cleardoublepage=\clearpage % 保持注释以确保各章都从奇数页起始
@@ -117,7 +119,6 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%正文部分%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %书写正文，可以根据需要增添章节; 正文还包括致谢，参考文献与成果
-\let\cleardoublepage=\cleardoublepagewithhead %章节需从单数页起始
 \mainmatter
 \input{data/chap01}
 \input{data/chap02}
