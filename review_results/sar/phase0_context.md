@@ -1,7 +1,8 @@
 # Phase 0: Automated Audit Results
 
 **File**: `thesis.tex` | **Language**: zh | **Mode**: quick-audit
-**Generated**: 2026-04-28T21:08:28.155807
+**Venue**: thesis-zh
+**Generated**: 2026-05-01T23:59:21.092526
 
 ## Issue Summary (13 total)
 - Minor: 13
@@ -48,4 +49,7 @@
 - [x] All tables referenced in text
 - [x] Anonymous submission (blind review check)
 - [x] Consistent math notation
-- [ ] Acronyms defined on first use — Potentially undefined: ['UDC', 'SHU', 'PS', 'BIB', 'TEX']
+- [ ] Acronyms defined on first use — Potentially undefined: ['ZHAN', 'SAR', 'PS', 'UDC', 'BIB']
+- [x] [THESIS-ZH] Bilingual abstract present
+- [ ] [THESIS-ZH] Declaration of originality present — Not found — required for THESIS-ZH submission
+- [x] [THESIS-ZH] Acknowledgments present

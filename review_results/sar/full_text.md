@@ -6,8 +6,8 @@ TP753
 23033116
 公开
 621.39
-面向仿真-实测迁移的跨域SAR目标识别\\方法研究
-面向仿真-实测迁移的跨域SAR目标识别\\方法研究
+面向仿真--实测迁移的跨域SAR目标识别\\方法研究
+面向仿真--实测迁移的跨域SAR目标识别\\方法研究
 束文郁
 Research on Cross-Domain SAR Target Recognition Methods for Simulated-to-Measured Transfer
 SHU Wenyu

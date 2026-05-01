@@ -1,7 +1,7 @@
 # Deep Review Report
 
 **Paper**: `D:\Lastpaper\nudtpaper\thesis.tex` | **Language**: ZH | **Mode**: deep-review
-**Generated**: 2026-04-28 21:08
+**Generated**: 2026-05-01 23:59 | **Venue**: thesis-zh
 **Artifacts**: `D:\Lastpaper\nudtpaper\review_results\sar`
 
 ## Overall Assessment
@@ -14,7 +14,7 @@ Deep review found 0 major, 0 moderate, 1 minor issues that should be addressed b
 
 ## Paper Summary
 
-# Paper Summary: 面向仿真-实测迁移的跨域SAR目标识别\\方法研究
+# Paper Summary: 面向仿真--实测迁移的跨域SAR目标识别\\方法研究
 
 ## Research Question
 - TODO

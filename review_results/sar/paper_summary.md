@@ -1,4 +1,4 @@
-# Paper Summary: 面向仿真-实测迁移的跨域SAR目标识别\\方法研究
+# Paper Summary: 面向仿真--实测迁移的跨域SAR目标识别\\方法研究
 
 ## Research Question
 - TODO
